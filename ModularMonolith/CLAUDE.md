@@ -4,7 +4,7 @@
 ClaimApi - Modular Monolith Web API
 
 ## Tech Stack
-- .NET 8, ASP.NET Core Minimal APIs
+- .NET 9, ASP.NET Core Minimal APIs
 - EF Core 10 with PostgreSQL (snake_case naming convention)
 - FluentValidation for request validation
 - Result<T> pattern for error handling (no exceptions for business logic) using ErrorOr from ErrorOr package

@@ -8,11 +8,6 @@ internal sealed class ClaimRequestValidator : AbstractValidator<ClaimRequest>
 {
     public ClaimRequestValidator()
     {
-        RuleFor(x => x.Id)
-            .NotEmpty()
-            .WithErrorCode(ClaimErrorCodes.ClaimIdCannotBeEmpty)
-            .WithMessage(ClaimErrorMessages.ClaimIdCannotBeEmpty);
-
         RuleFor(x => x.Booking)
             .Cascade(CascadeMode.Stop)
             .NotNull()
@@ -30,11 +25,6 @@ internal sealed class BookingRequestValidator : AbstractValidator<BookingRequest
 {
     public BookingRequestValidator()
     {
-        RuleFor(x => x.Id)
-            .NotEmpty()
-            .WithErrorCode(BookingErrorCodes.BookingIdCannotBeEmptyGuid)
-            .WithMessage(BookingErrorMessages.BookingIdCannotBeEmptyGuid);
-
         RuleFor(x => x.BookingNumber)
             .NotEmpty()
             .WithErrorCode(ClaimErrorCodes.ClaimBookingNumberCannotBeNullOrEmpty)
@@ -60,11 +50,6 @@ internal sealed class CustomerRequestValidator : AbstractValidator<CustomerReque
 {
     public CustomerRequestValidator()
     {
-        RuleFor(x => x.Id)
-            .NotEmpty()
-            .WithErrorCode(CustomerErrorCodes.CustomerIdCannotBeEmptyGuid)
-            .WithMessage(CustomerErrorMessages.CustomerIdCannotBeEmptyGuid);
-
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithErrorCode(ClaimErrorCodes.ClaimCustomerNameCannotBeNullOrEmpty)
@@ -76,11 +61,6 @@ internal sealed class SupplierRequestValidator : AbstractValidator<SupplierReque
 {
     public SupplierRequestValidator()
     {
-        RuleFor(x => x.Id)
-            .NotEmpty()
-            .WithErrorCode(SupplierErrorCodes.SupplierIdCannotBeEmptyGuid)
-            .WithMessage(SupplierErrorMessages.SupplierIdCannotBeEmptyGuid);
-
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithErrorCode(ClaimErrorCodes.ClaimSupplierNameCannotBeNullOrEmpty)

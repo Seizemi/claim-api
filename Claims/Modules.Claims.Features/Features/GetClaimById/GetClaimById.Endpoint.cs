@@ -12,7 +12,8 @@ public sealed class GetClaimByIdEndpoint : IEndpointModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet(RouteConsts.ClaimDetails, Handle);
+        app.MapGet(RouteConsts.ClaimDetails, Handle)
+            .WithName(RouteConsts.GetClaimByIdRouteName);
     }
 
     private static async Task<IResult> Handle(

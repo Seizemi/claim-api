@@ -5,59 +5,68 @@ namespace Modules.Claims.Features.Features.CreateClaim;
 
 internal static class CreateClaimMappingExtensions
 {
-    internal static Claim MapToClaim(this ClaimRequest request) => new()
+    internal static Claim MapToClaim(this ClaimRequest request, Guid id)
     {
-        Id = request.Id,
-        State = request.State,
-        FollowedBy = request.FollowedBy,
-        Reason = request.Reason,
-        ClaimSummary = request.ClaimSummary,
-        Solution = request.Solution,
-        PurposeOfSolution = request.PurposeOfSolution,
-        UpdateReason = request.UpdateReason,
-        CustomerSuppInfo = request.CustomerSuppInfo,
-        SupplierSuppInfo = request.SupplierSuppInfo,
-        BookingId = request.Booking.Id,
-        Booking = request.Booking.MapToBooking(),
-        ClaimDate = request.ClaimDate.MapToClaimDate(request.Id),
-        Compensation = request.Compensation.MapToCompensation(request.Id)
-    };
+        var bookingId = Guid.CreateVersion7();
+        return new()
+        {
+            Id = id,
+            State = request.State,
+            FollowedBy = request.FollowedBy,
+            Reason = request.Reason,
+            ClaimSummary = request.ClaimSummary,
+            Solution = request.Solution,
+            PurposeOfSolution = request.PurposeOfSolution,
+            UpdateReason = request.UpdateReason,
+            CustomerSuppInfo = request.CustomerSuppInfo,
+            SupplierSuppInfo = request.SupplierSuppInfo,
+            BookingId = bookingId,
+            Booking = request.Booking.MapToBooking(bookingId),
+            ClaimDate = request.ClaimDate.MapToClaimDate(id),
+            Compensation = request.Compensation.MapToCompensation(id)
+        };
+    }
 
-    private static Booking MapToBooking(this BookingRequest request) => new()
+    private static Booking MapToBooking(this BookingRequest request, Guid id)
     {
-        Id = request.Id,
-        BookingNumber = request.BookingNumber,
-        SalesChannel = request.SalesChannel,
-        Language = request.Language,
-        SeasonLabel = request.SeasonLabel,
-        SeasonValue = request.SeasonValue,
-        Service = request.Service,
-        Skissim = request.Skissim,
-        SkissimType = request.SkissimType,
-        Product = request.Product,
-        CustomerId = request.Customer.Id,
-        Customer = request.Customer.MapToCustomer(),
-        SupplierId = request.Supplier.Id,
-        Supplier = request.Supplier.MapToSupplier()
-    };
+        var customerId = Guid.CreateVersion7();
+        var supplierId = Guid.CreateVersion7();
+        return new()
+        {
+            Id = id,
+            BookingNumber = request.BookingNumber,
+            SalesChannel = request.SalesChannel,
+            Language = request.Language,
+            SeasonLabel = request.SeasonLabel,
+            SeasonValue = request.SeasonValue,
+            Service = request.Service,
+            Skissim = request.Skissim,
+            SkissimType = request.SkissimType,
+            Product = request.Product,
+            CustomerId = customerId,
+            Customer = request.Customer.MapToCustomer(customerId),
+            SupplierId = supplierId,
+            Supplier = request.Supplier.MapToSupplier(supplierId)
+        };
+    }
 
-    private static Customer MapToCustomer(this CustomerRequest request) => new()
+    private static Customer MapToCustomer(this CustomerRequest request, Guid id) => new()
     {
-        Id = request.Id,
+        Id = id,
         Name = request.Name,
         AkioNumber = request.AkioNumber
     };
 
-    private static Supplier MapToSupplier(this SupplierRequest request) => new()
+    private static Supplier MapToSupplier(this SupplierRequest request, Guid id) => new()
     {
-        Id = request.Id,
+        Id = id,
         Name = request.Name,
         SupplierAkioNumber = request.SupplierAkioNumber
     };
 
     private static ClaimDate MapToClaimDate(this ClaimDateRequest request, Guid claimId) => new()
     {
-        Id = Guid.NewGuid(),
+        Id = Guid.CreateVersion7(),
         ClaimId = claimId,
         DateOfReceivedClaim = request.DateOfReceivedClaim,
         DateOfStartFollowUp = request.DateOfStartFollowUp,
@@ -69,7 +78,7 @@ internal static class CreateClaimMappingExtensions
 
     private static Compensation MapToCompensation(this CompensationRequest request, Guid claimId) => new()
     {
-        Id = Guid.NewGuid(),
+        Id = Guid.CreateVersion7(),
         ClaimId = claimId,
         CustomerVoucher = request.CustomerVoucher,
         CustomerUsedVoucher = request.CustomerUsedVoucher,

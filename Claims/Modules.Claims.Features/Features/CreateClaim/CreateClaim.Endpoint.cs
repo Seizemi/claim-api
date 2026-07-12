@@ -34,6 +34,9 @@ public sealed class CreateClaimEndpoint : IEndpointModule
             return response.Errors.ToProblem();
         }
 
-        return Results.NoContent();
+        return Results.CreatedAtRoute(
+            RouteConsts.GetClaimByIdRouteName,
+            new { claimId = response.Value },
+            response.Value);
     }
 }

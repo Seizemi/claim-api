@@ -8,13 +8,11 @@ internal static class ClaimErrorCodes
     internal const string ClaimCustomerNameCannotBeNullOrEmpty = "Claim.CustomerNameCannotBeNullOrEmpty";
     internal const string ClaimSupplierNameCannotBeNullOrEmpty = "Claim.SupplierNameCannotBeNullOrEmpty";
     internal const string ClaimDateOfDepartureCannotBeSmallerThanDateOfArrival = "Claim.DateOfDepartureCannotBeSmallerThanDateOfArrival";
-    internal const string ClaimAlreadyExists = "Claim.AlreadyExists";
 }
 
 internal static class ClaimErrorMessages
 {
     internal const string ClaimCannotBeNull = "Claim doesn't exist.";
-    internal const string ClaimAlreadyExists = "A claim with this id already exists.";
     internal const string ClaimIdCannotBeEmpty = "Claim id cannot be empty.";
     internal const string ClaimBookingNumberCannotBeNullOrEmpty = "Booking number cannot be null or empty.";
     internal const string ClaimCustomerNameCannotBeNullOrEmpty = "Customer name cannot be null or empty.";
