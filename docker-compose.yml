@@ -1,0 +1,6 @@
+services:
+  claimapi:
+    image: ${DOCKER_REGISTRY-}claimapi
+    build:
+      context: .
+      dockerfile: ModularMonolith/Dockerfile

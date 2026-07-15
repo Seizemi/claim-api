@@ -12,10 +12,14 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ClaimApi.csproj", "."]
-RUN dotnet restore "./ClaimApi.csproj"
+COPY ["ModularMonolith/ClaimApi.csproj", "ModularMonolith/"]
+COPY ["Claims/Modules.Claims.Features/Modules.Claims.Features.csproj", "Claims/Modules.Claims.Features/"]
+COPY ["Common/Modules.Common.Features/Modules.Common.Features.csproj", "Common/Modules.Common.Features/"]
+COPY ["Claims/Modules.Claims.Infrastructure/Modules.Claims.Infrastructure.csproj", "Claims/Modules.Claims.Infrastructure/"]
+COPY ["Claims/Modules.Claims.Domain/Modules.Claims.Domain.csproj", "Claims/Modules.Claims.Domain/"]
+RUN dotnet restore "./ModularMonolith/ClaimApi.csproj"
 COPY . .
-WORKDIR "/src/."
+WORKDIR "/src/ModularMonolith"
 RUN dotnet build "./ClaimApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Cette étape permet de publier le projet de service à copier dans la phase finale

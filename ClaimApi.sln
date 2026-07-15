@@ -1,23 +1,24 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35728.132
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClaimApi", "ClaimApi.csproj", "{6DA426F3-51FF-4B39-9A57-642381F53F44}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClaimApi", "ModularMonolith\ClaimApi.csproj", "{6DA426F3-51FF-4B39-9A57-642381F53F44}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{1316BE2F-E21D-440E-BB6B-05DB7E3112C9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{930C27AE-7B52-4BC3-99C8-6563F043D33B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Common.Features", "..\Common\Modules.Common.Features\Modules.Common.Features.csproj", "{B1876F65-7BDE-4C0E-B737-238C7DA9B587}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Common.Features", "Common\Modules.Common.Features\Modules.Common.Features.csproj", "{B1876F65-7BDE-4C0E-B737-238C7DA9B587}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Claims", "Claims", "{AA000001-0000-0000-0000-000000000001}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Claims.Domain", "..\Claims\Modules.Claims.Domain\Modules.Claims.Domain.csproj", "{AA000002-0000-0000-0000-000000000002}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Claims.Domain", "Claims\Modules.Claims.Domain\Modules.Claims.Domain.csproj", "{AA000002-0000-0000-0000-000000000002}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Claims.Infrastructure", "..\Claims\Modules.Claims.Infrastructure\Modules.Claims.Infrastructure.csproj", "{AA000003-0000-0000-0000-000000000003}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Claims.Infrastructure", "Claims\Modules.Claims.Infrastructure\Modules.Claims.Infrastructure.csproj", "{AA000003-0000-0000-0000-000000000003}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Claims.Features", "..\Claims\Modules.Claims.Features\Modules.Claims.Features.csproj", "{AA000004-0000-0000-0000-000000000004}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Claims.Features", "Claims\Modules.Claims.Features\Modules.Claims.Features.csproj", "{AA000004-0000-0000-0000-000000000004}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +46,10 @@ Global
 		{AA000004-0000-0000-0000-000000000004}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA000004-0000-0000-0000-000000000004}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA000004-0000-0000-0000-000000000004}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
