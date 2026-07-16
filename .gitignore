@@ -485,7 +485,6 @@ $RECYCLE.BIN/
 
 # Docker
 .dockerignore
-docker-compose.override.yml
 
 # Claude Code local/personal settings
 **/.claude/settings.local.json

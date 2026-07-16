@@ -24,7 +24,7 @@ dotnet ef database update --project Claims/Modules.Claims.Infrastructure/Modules
 
 ### Local database access
 
-`docker compose up` also starts a Postgres container. A `docker-compose.override.yml` (gitignored, local-only) exposes it to your host so you can connect with a desktop client (DBeaver, Azure Data Studio, pgAdmin, etc.) — you don't need to install a Postgres server locally, just a client:
+`docker compose up` also starts a Postgres container. A `docker-compose.override.yml` exposes it to your host so you can connect with a desktop client (DBeaver, Azure Data Studio, pgAdmin, etc.) — you don't need to install a Postgres server locally, just a client:
 
 - Host: `localhost`
 - Port: `5432`
@@ -32,11 +32,3 @@ dotnet ef database update --project Claims/Modules.Claims.Infrastructure/Modules
 - Password: `postgres`
 - Database: `claimapi`
 
-If `docker-compose.override.yml` is missing (e.g. fresh clone), recreate it at the repo root:
-
-```yaml
-services:
-  postgres:
-    ports:
-      - "5432:5432"
-```
