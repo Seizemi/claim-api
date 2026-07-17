@@ -5,7 +5,7 @@ using Modules.Common.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddClaimsModule(builder.Configuration);
+builder.Services.AddClaimsModule(builder.Configuration, builder.Environment.IsDevelopment());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();

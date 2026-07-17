@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Modules.Claims.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ClaimsDbContext))]
-    [Migration("20260716010318_InitialCreate")]
+    [Migration("20260717183943_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -192,6 +192,9 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_claim_dates_claim_id");
 
+                    b.HasIndex("DateOfReceivedClaim")
+                        .HasDatabaseName("ix_claim_dates_date_of_received_claim");
+
                     b.ToTable("claim_dates", "claims");
                 });
 
@@ -206,9 +209,9 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("claim_id");
 
-                    b.Property<float?>("ClaimRefound")
+                    b.Property<float?>("ClaimRefund")
                         .HasColumnType("real")
-                        .HasColumnName("claim_refound");
+                        .HasColumnName("claim_refund");
 
                     b.Property<float?>("CustomerUsedVoucher")
                         .HasColumnType("real")
@@ -218,9 +221,9 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("real")
                         .HasColumnName("customer_voucher");
 
-                    b.Property<string>("RefoundState")
+                    b.Property<string>("RefundState")
                         .HasColumnType("text")
-                        .HasColumnName("refound_state");
+                        .HasColumnName("refund_state");
 
                     b.Property<float?>("SupplierRefund")
                         .HasColumnType("real")

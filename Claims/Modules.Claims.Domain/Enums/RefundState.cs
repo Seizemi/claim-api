@@ -1,9 +1,9 @@
 namespace Modules.Claims.Domain.Enums;
 
-public enum RefoundState
+public enum RefundState
 {
-    Refound,
-    NotRefound,
+    Refunded,
+    NotRefunded,
     AwaitingRib,
     AwaitingStripe
 }

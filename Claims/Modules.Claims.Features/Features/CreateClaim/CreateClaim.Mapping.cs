@@ -83,7 +83,7 @@ internal static class CreateClaimMappingExtensions
         CustomerVoucher = request.CustomerVoucher,
         CustomerUsedVoucher = request.CustomerUsedVoucher,
         SupplierRefund = request.SupplierRefund,
-        ClaimRefound = request.ClaimRefound,
-        RefoundState = request.RefoundState
+        ClaimRefund = request.ClaimRefund,
+        RefundState = request.RefundState
     };
 }

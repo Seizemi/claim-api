@@ -58,6 +58,6 @@ internal static class ClaimMappingExtensions
         compensation.CustomerVoucher,
         compensation.CustomerUsedVoucher,
         compensation.SupplierRefund,
-        compensation.ClaimRefound,
-        compensation.RefoundState);
+        compensation.ClaimRefund,
+        compensation.RefundState);
 }

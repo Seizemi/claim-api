@@ -8,9 +8,9 @@ namespace Modules.Claims.Features;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddClaimsModule(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddClaimsModule(this IServiceCollection services, IConfiguration configuration, bool enableSensitiveDataLogging)
     {
-        services.AddClaimsInfrastructure(configuration);
+        services.AddClaimsInfrastructure(configuration, enableSensitiveDataLogging);
         services.RegisterHandlersFromAssemblyContaining(typeof(DependencyInjection));
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
 

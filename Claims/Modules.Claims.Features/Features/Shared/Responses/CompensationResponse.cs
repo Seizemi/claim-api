@@ -7,5 +7,5 @@ public sealed record CompensationResponse(
     float? CustomerVoucher,
     float? CustomerUsedVoucher,
     float? SupplierRefund,
-    float? ClaimRefound,
-    RefoundState? RefoundState);
+    float? ClaimRefund,
+    RefundState? RefundState);

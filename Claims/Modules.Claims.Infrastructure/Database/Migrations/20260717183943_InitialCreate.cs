@@ -159,8 +159,8 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                     customer_voucher = table.Column<float>(type: "real", nullable: true),
                     customer_used_voucher = table.Column<float>(type: "real", nullable: true),
                     supplier_refund = table.Column<float>(type: "real", nullable: true),
-                    claim_refound = table.Column<float>(type: "real", nullable: true),
-                    refound_state = table.Column<string>(type: "text", nullable: true),
+                    claim_refund = table.Column<float>(type: "real", nullable: true),
+                    refund_state = table.Column<string>(type: "text", nullable: true),
                     claim_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -193,6 +193,12 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                 table: "claim_dates",
                 column: "claim_id",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_claim_dates_date_of_received_claim",
+                schema: "claims",
+                table: "claim_dates",
+                column: "date_of_received_claim");
 
             migrationBuilder.CreateIndex(
                 name: "ix_claims_booking_id",

@@ -17,7 +17,7 @@ internal sealed class CreateClaimHandler(ClaimsDbContext context) : ICreateClaim
         var claimId = Guid.CreateVersion7();
         var claim = request.MapToClaim(claimId);
 
-        await context.Claims.AddAsync(claim, cancellationToken);
+        context.Claims.Add(claim);
         await context.SaveChangesAsync(cancellationToken);
 
         return claimId;

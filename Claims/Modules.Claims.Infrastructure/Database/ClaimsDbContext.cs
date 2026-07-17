@@ -85,13 +85,14 @@ public class ClaimsDbContext(DbContextOptions<ClaimsDbContext> options) : DbCont
         {
             entity.HasKey(x => x.Id);
             entity.Property(x => x.ClaimId).IsRequired();
+            entity.HasIndex(x => x.DateOfReceivedClaim);
         });
 
         modelBuilder.Entity<Compensation>(entity =>
         {
             entity.HasKey(x => x.Id);
             entity.Property(x => x.ClaimId).IsRequired();
-            entity.Property(x => x.RefoundState).HasConversion<string>();
+            entity.Property(x => x.RefundState).HasConversion<string>();
         });
 
         modelBuilder.Entity<User>(entity =>

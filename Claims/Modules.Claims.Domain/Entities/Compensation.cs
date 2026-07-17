@@ -8,8 +8,8 @@ public class Compensation
     public float? CustomerVoucher { get; set; }
     public float? CustomerUsedVoucher { get; set; }
     public float? SupplierRefund { get; set; }
-    public float? ClaimRefound { get; set; }
-    public RefoundState? RefoundState { get; set; }
+    public float? ClaimRefund { get; set; }
+    public RefundState? RefundState { get; set; }
     public required Guid ClaimId { get; set; }
     public Claim Claim { get; set; } = null!;
 }

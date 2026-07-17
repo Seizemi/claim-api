@@ -65,7 +65,7 @@ internal static class UpdateClaimMappingExtensions
         compensation.CustomerVoucher = request.CustomerVoucher;
         compensation.CustomerUsedVoucher = request.CustomerUsedVoucher;
         compensation.SupplierRefund = request.SupplierRefund;
-        compensation.ClaimRefound = request.ClaimRefound;
-        compensation.RefoundState = request.RefoundState;
+        compensation.ClaimRefund = request.ClaimRefund;
+        compensation.RefundState = request.RefundState;
     }
 }
