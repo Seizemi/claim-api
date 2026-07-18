@@ -25,4 +25,9 @@
     <ProjectReference Include="..\Modules.Claims.Infrastructure\Modules.Claims.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Modules.Claims.Features.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
 </Project>

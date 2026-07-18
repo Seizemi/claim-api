@@ -5,20 +5,19 @@ using Modules.Claims.Features.Features.Shared.Mapping;
 using Modules.Claims.Features.Features.Shared.Requests;
 using Modules.Claims.Features.Features.Shared.Responses;
 using Modules.Claims.Infrastructure.Database;
-using Modules.Common.Features;
 
 namespace Modules.Claims.Features.Features.GetAllClaims;
 
 internal interface IGetAllClaimsHandler : IHandler
 {
-    Task<ErrorOr<PagedResponse<ClaimResponse>>> HandleAsync(GetAllClaimsRequest request, CancellationToken cancellationToken);
+    Task<ErrorOr<PagedResponse>> HandleAsync(GetAllClaimsRequest request, CancellationToken cancellationToken);
 }
 
 internal sealed class GetAllClaimsHandler(ClaimsDbContext context) : IGetAllClaimsHandler
 {
     internal const int MaxPageSize = 100;
 
-    public async Task<ErrorOr<PagedResponse<ClaimResponse>>> HandleAsync(GetAllClaimsRequest request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<PagedResponse>> HandleAsync(GetAllClaimsRequest request, CancellationToken cancellationToken)
     {
         var pageNumber = request.PageNumber;
         var pageSize = request.PageSize;
@@ -42,7 +41,7 @@ internal sealed class GetAllClaimsHandler(ClaimsDbContext context) : IGetAllClai
 
         var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-        return new PagedResponse<ClaimResponse>(
+        return new PagedResponse(
             claims.Select(c => c.MapToResponse()).ToList(),
             pageNumber,
             pageSize,
