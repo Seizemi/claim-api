@@ -9,6 +9,22 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
+        if (exception is BadHttpRequestException badHttpRequestException)
+        {
+            logger.LogWarning(exception, "Bad request received");
+
+            httpContext.Response.StatusCode = badHttpRequestException.StatusCode;
+
+            await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
+            {
+                Status = badHttpRequestException.StatusCode,
+                Title = "Bad request",
+                Detail = badHttpRequestException.Message
+            }, cancellationToken);
+
+            return true;
+        }
+
         logger.LogError(exception, "Unhandled exception occurred");
 
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;

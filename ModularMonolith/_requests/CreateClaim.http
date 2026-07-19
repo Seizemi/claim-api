@@ -1,0 +1,49 @@
+### Create a claim
+POST {{host}}/api/v1.0/Claim/new-claim/claim
+Content-Type: application/json
+
+{
+  "state": "AwaitingSupplier",
+  "followedBy": "Jane Doe",
+  "reason": "Overbooked accommodation",
+  "claimSummary": "Customer was denied check-in due to overbooking by the supplier.",
+  "solution": "Remboursement",
+  "purposeOfSolution": "Full refund of accommodation cost",
+  "updateReason": null,
+  "customerSuppInfo": "Customer requested written confirmation of refund.",
+  "supplierSuppInfo": "Supplier acknowledged the overbooking by email.",
+  "booking": {
+    "bookingNumber": "BK-2026-000123",
+    "salesChannel": "TravelskiCom",
+    "language": "Fr",
+    "seasonLabel": "Winter 2025-2026",
+    "seasonValue": "W2526",
+    "service": "Hebergement",
+    "skissim": true,
+    "skissimType": "Select",
+    "product": "Chalet Alpina - 7 nights",
+    "customer": {
+      "name": "John Smith",
+      "akioNumber": 123456
+    },
+    "supplier": {
+      "name": "Alpina Resorts SARL",
+      "supplierAkioNumber": 654321
+    }
+  },
+  "claimDate": {
+    "dateOfReceivedClaim": "2026-07-15T09:00:00Z",
+    "dateOfStartFollowUp": "2026-07-15T10:00:00Z",
+    "dateLastUpdate": null,
+    "dateOfDeparture": "2026-07-10T00:00:00Z",
+    "dateEndOfFollowUp": null,
+    "dateOfArrival": "2026-07-17T00:00:00Z"
+  },
+  "compensation": {
+    "customerVoucher": null,
+    "customerUsedVoucher": null,
+    "supplierRefund": null,
+    "claimRefund": 350.00,
+    "refundState": "AwaitingRib"
+  }
+}

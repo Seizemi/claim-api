@@ -1,0 +1,2 @@
+﻿### Get all claims
+GET {{host}}/api/v1.0/Claim/dashboard/claim?pageNumber=1&pageSize=20
