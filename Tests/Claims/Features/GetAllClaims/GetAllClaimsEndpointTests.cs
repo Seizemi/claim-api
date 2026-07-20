@@ -10,13 +10,13 @@ using Modules.Claims.Features.Features.GetAllClaims;
 using Modules.Claims.Features.Features.Shared.Requests;
 using Modules.Claims.Features.Features.Shared.Responses;
 using Modules.Claims.Features.Tests.Shared;
+using Xunit;
 
 namespace Modules.Claims.Features.Tests.Features.GetAllClaims;
 
-[TestClass]
 public sealed class GetAllClaimsEndpointTests
 {
-    [TestMethod]
+    [Fact]
     public void AddRoutes_Always_RegistersGetOnDashboardClaimRoute()
     {
         // Arrange
@@ -30,13 +30,13 @@ public sealed class GetAllClaimsEndpointTests
         });
 
         // Assert
-        Assert.AreEqual("/api/v1.0/Claim/dashboard/claim", routeEndpoint.RoutePattern.RawText);
+        Assert.Equal("/api/v1.0/Claim/dashboard/claim", routeEndpoint.RoutePattern.RawText);
         var httpMethodMetadata = routeEndpoint.Metadata.GetMetadata<HttpMethodMetadata>();
-        Assert.IsNotNull(httpMethodMetadata);
+        Assert.NotNull(httpMethodMetadata);
         Assert.Contains("GET", httpMethodMetadata.HttpMethods);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Handle_WhenValidationFails_ReturnsValidationProblemWithoutCallingHandler()
     {
         // Arrange
@@ -61,14 +61,14 @@ public sealed class GetAllClaimsEndpointTests
             CancellationToken.None);
 
         // Assert
-        Assert.IsInstanceOfType<IStatusCodeHttpResult>(result, out var problem);
-        Assert.AreEqual(StatusCodes.Status400BadRequest, problem.StatusCode);
+        var problem = Assert.IsType<IStatusCodeHttpResult>(result, exactMatch: false);
+        Assert.Equal(StatusCodes.Status400BadRequest, problem.StatusCode);
         handlerMock.Verify(
             h => h.HandleAsync(It.IsAny<GetAllClaimsRequest>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Handle_WhenHandlerReturnsError_ReturnsMappedProblem()
     {
         // Arrange
@@ -93,11 +93,11 @@ public sealed class GetAllClaimsEndpointTests
             CancellationToken.None);
 
         // Assert
-        Assert.IsInstanceOfType<IStatusCodeHttpResult>(result, out var problem);
-        Assert.AreEqual(StatusCodes.Status500InternalServerError, problem.StatusCode);
+        var problem = Assert.IsType<IStatusCodeHttpResult>(result, exactMatch: false);
+        Assert.Equal(StatusCodes.Status500InternalServerError, problem.StatusCode);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Handle_WhenValidAndHandlerSucceeds_ReturnsOkWithPagedResponse()
     {
         // Arrange
@@ -123,7 +123,7 @@ public sealed class GetAllClaimsEndpointTests
             CancellationToken.None);
 
         // Assert
-        Assert.IsInstanceOfType<Ok<PagedResponse>>(result, out var okResult);
-        Assert.AreSame(pagedResponse, okResult.Value);
+        var okResult = Assert.IsType<Ok<PagedResponse>>(result);
+        Assert.Same(pagedResponse, okResult.Value);
     }
 }

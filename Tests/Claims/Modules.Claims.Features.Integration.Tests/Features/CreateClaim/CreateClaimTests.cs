@@ -6,161 +6,162 @@ using Microsoft.EntityFrameworkCore;
 using Modules.Claims.Features.Features.Shared.Responses;
 using Modules.Claims.Features.Integration.Tests.Infrastructure;
 using Modules.Claims.Features.Integration.Tests.Shared;
+using Xunit;
 
 namespace Modules.Claims.Features.Integration.Tests.Features.CreateClaim;
 
-[TestClass]
-public sealed class CreateClaimTests : IntegrationTestBase
+[Collection(IntegrationTestCollection.Name)]
+public sealed class CreateClaimTests(IntegrationTestWebAppFactory factory) : IntegrationTestBase(factory)
 {
-    [TestMethod]
+    [Fact]
     public async Task CreateClaim_ValidRequest_Returns201WithLocationHeaderAndClaimId()
     {
         var request = ClaimRequestFactory.CreateValid();
 
-        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default);
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
-        Assert.IsNotNull(response.Headers.Location);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.NotNull(response.Headers.Location);
 
-        var claimId = await response.Content.ReadFromJsonAsync<Guid>(TestJsonSerializerOptions.Default);
-        Assert.AreNotEqual(Guid.Empty, claimId);
+        var claimId = await response.Content.ReadFromJsonAsync<Guid>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotEqual(Guid.Empty, claimId);
 
-        var dbClaim = await DbContext.Claims.SingleAsync(c => c.Id == claimId);
-        Assert.AreEqual(dbClaim.Reason, request.Reason);
+        var dbClaim = await DbContext.Claims.SingleAsync(c => c.Id == claimId, TestContext.Current.CancellationToken);
+        Assert.Equal(dbClaim.Reason, request.Reason);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task CreateClaim_ValidRequest_PersistsRetrievableViaGetClaimById()
     {
         var request = ClaimRequestFactory.CreateValid();
 
-        var createResponse = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default);
-        var claimId = await createResponse.Content.ReadFromJsonAsync<Guid>(TestJsonSerializerOptions.Default);
+        var createResponse = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        var claimId = await createResponse.Content.ReadFromJsonAsync<Guid>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        var getResponse = await Client.GetAsync(RouteConsts.ClaimDetails(claimId));
-        Assert.AreEqual(HttpStatusCode.OK, getResponse.StatusCode);
+        var getResponse = await Client.GetAsync(RouteConsts.ClaimDetails(claimId), TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
 
-        var claim = await getResponse.Content.ReadFromJsonAsync<ClaimResponse>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(claim);
-        Assert.AreEqual(claimId, claim!.Id);
-        Assert.AreEqual(request.State, claim.State);
-        Assert.AreEqual(request.Solution, claim.Solution);
-        Assert.AreEqual(request.Reason, claim.Reason);
-        Assert.AreEqual(request.Booking.BookingNumber, claim.Booking.BookingNumber);
-        Assert.AreEqual(request.Booking.SalesChannel, claim.Booking.SalesChannel);
-        Assert.AreEqual(request.Booking.Customer.Name, claim.Booking.Customer.Name);
-        Assert.AreEqual(request.Booking.Customer.AkioNumber, claim.Booking.Customer.AkioNumber);
-        Assert.AreEqual(request.Booking.Supplier.Name, claim.Booking.Supplier.Name);
-        Assert.AreEqual(request.Booking.Supplier.SupplierAkioNumber, claim.Booking.Supplier.SupplierAkioNumber);
+        var claim = await getResponse.Content.ReadFromJsonAsync<ClaimResponse>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(claim);
+        Assert.Equal(claimId, claim!.Id);
+        Assert.Equal(request.State, claim.State);
+        Assert.Equal(request.Solution, claim.Solution);
+        Assert.Equal(request.Reason, claim.Reason);
+        Assert.Equal(request.Booking.BookingNumber, claim.Booking.BookingNumber);
+        Assert.Equal(request.Booking.SalesChannel, claim.Booking.SalesChannel);
+        Assert.Equal(request.Booking.Customer.Name, claim.Booking.Customer.Name);
+        Assert.Equal(request.Booking.Customer.AkioNumber, claim.Booking.Customer.AkioNumber);
+        Assert.Equal(request.Booking.Supplier.Name, claim.Booking.Supplier.Name);
+        Assert.Equal(request.Booking.Supplier.SupplierAkioNumber, claim.Booking.Supplier.SupplierAkioNumber);
         DateTimeOffsetAssert.AreClose(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
-        Assert.AreEqual(request.Compensation.CustomerVoucher, claim.Compensation.CustomerVoucher);
-        Assert.AreEqual(request.Compensation.RefundState, claim.Compensation.RefundState);
+        Assert.Equal(request.Compensation.CustomerVoucher, claim.Compensation.CustomerVoucher);
+        Assert.Equal(request.Compensation.RefundState, claim.Compensation.RefundState);
 
-        var dbClaim = await DbContext.Claims.SingleAsync(c => c.Id == claimId);
-        Assert.AreEqual(dbClaim.Reason, request.Reason);
+        var dbClaim = await DbContext.Claims.SingleAsync(c => c.Id == claimId, TestContext.Current.CancellationToken);
+        Assert.Equal(dbClaim.Reason, request.Reason);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task CreateClaim_EmptyBookingNumber_Returns400ValidationProblem()
     {
         var request = ClaimRequestFactory.WithEmptyBookingNumber(ClaimRequestFactory.CreateValid());
 
-        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default);
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("Booking.BookingNumber"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Booking.BookingNumber"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task CreateClaim_EmptyCustomerName_Returns400ValidationProblem()
     {
         var request = ClaimRequestFactory.WithEmptyCustomerName(ClaimRequestFactory.CreateValid());
 
-        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default);
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("Booking.Customer.Name"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Booking.Customer.Name"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task CreateClaim_DepartureAfterArrival_Returns400ValidationProblem()
     {
         var request = ClaimRequestFactory.WithDepartureAfterArrival(ClaimRequestFactory.CreateValid());
 
-        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default);
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("ClaimDate"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("ClaimDate"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task CreateClaim_EmptySupplierName_Returns400ValidationProblem()
     {
         var request = ClaimRequestFactory.WithEmptySupplierName(ClaimRequestFactory.CreateValid());
 
-        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default);
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("Booking.Supplier.Name"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Booking.Supplier.Name"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task CreateClaim_NullBooking_Returns400ValidationProblem()
     {
         var request = ClaimRequestFactory.WithNullBooking(ClaimRequestFactory.CreateValid());
 
-        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default);
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("Booking"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Booking"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task CreateClaim_NullCustomer_Returns400ValidationProblem()
     {
         var request = ClaimRequestFactory.WithNullCustomer(ClaimRequestFactory.CreateValid());
 
-        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default);
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("Booking.Customer"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Booking.Customer"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task CreateClaim_NullSupplier_Returns400ValidationProblem()
     {
         var request = ClaimRequestFactory.WithNullSupplier(ClaimRequestFactory.CreateValid());
 
-        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default);
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("Booking.Supplier"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Booking.Supplier"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task CreateClaim_MalformedJsonBody_Returns400BadRequest()
     {
         using var content = new StringContent("{ not valid json", Encoding.UTF8, "application/json");
 
-        var response = await Client.PostAsync(RouteConsts.NewClaim, content);
+        var response = await Client.PostAsync(RouteConsts.NewClaim, content, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.AreEqual("Bad request", problem!.Title);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.Equal("Bad request", problem!.Title);
     }
 }

@@ -1,12 +1,12 @@
 using Modules.Claims.Features.Features.UpdateClaim;
 using Modules.Claims.Features.Tests.Shared;
+using Xunit;
 
 namespace Modules.Claims.Features.Tests.Features.UpdateClaim;
 
-[TestClass]
 public sealed class UpdateClaimMappingExtensionsTests
 {
-    [TestMethod]
+    [Fact]
     public void UpdateFrom_WithValidRequest_UpdatesTopLevelClaimFields()
     {
         // Arrange
@@ -17,18 +17,18 @@ public sealed class UpdateClaimMappingExtensionsTests
         claim.UpdateFrom(request);
 
         // Assert
-        Assert.AreEqual(request.State, claim.State);
-        Assert.AreEqual(request.FollowedBy, claim.FollowedBy);
-        Assert.AreEqual(request.Reason, claim.Reason);
-        Assert.AreEqual(request.ClaimSummary, claim.ClaimSummary);
-        Assert.AreEqual(request.Solution, claim.Solution);
-        Assert.AreEqual(request.PurposeOfSolution, claim.PurposeOfSolution);
-        Assert.AreEqual(request.UpdateReason, claim.UpdateReason);
-        Assert.AreEqual(request.CustomerSuppInfo, claim.CustomerSuppInfo);
-        Assert.AreEqual(request.SupplierSuppInfo, claim.SupplierSuppInfo);
+        Assert.Equal(request.State, claim.State);
+        Assert.Equal(request.FollowedBy, claim.FollowedBy);
+        Assert.Equal(request.Reason, claim.Reason);
+        Assert.Equal(request.ClaimSummary, claim.ClaimSummary);
+        Assert.Equal(request.Solution, claim.Solution);
+        Assert.Equal(request.PurposeOfSolution, claim.PurposeOfSolution);
+        Assert.Equal(request.UpdateReason, claim.UpdateReason);
+        Assert.Equal(request.CustomerSuppInfo, claim.CustomerSuppInfo);
+        Assert.Equal(request.SupplierSuppInfo, claim.SupplierSuppInfo);
     }
 
-    [TestMethod]
+    [Fact]
     public void UpdateFrom_WithValidRequest_UpdatesNestedBookingCustomerSupplierClaimDateCompensationFields()
     {
         // Arrange
@@ -39,37 +39,37 @@ public sealed class UpdateClaimMappingExtensionsTests
         claim.UpdateFrom(request);
 
         // Assert
-        Assert.AreEqual(request.Booking.BookingNumber, claim.Booking.BookingNumber);
-        Assert.AreEqual(request.Booking.SalesChannel, claim.Booking.SalesChannel);
-        Assert.AreEqual(request.Booking.Language, claim.Booking.Language);
-        Assert.AreEqual(request.Booking.SeasonLabel, claim.Booking.SeasonLabel);
-        Assert.AreEqual(request.Booking.SeasonValue, claim.Booking.SeasonValue);
-        Assert.AreEqual(request.Booking.Service, claim.Booking.Service);
-        Assert.AreEqual(request.Booking.Skissim, claim.Booking.Skissim);
-        Assert.AreEqual(request.Booking.SkissimType, claim.Booking.SkissimType);
-        Assert.AreEqual(request.Booking.Product, claim.Booking.Product);
+        Assert.Equal(request.Booking.BookingNumber, claim.Booking.BookingNumber);
+        Assert.Equal(request.Booking.SalesChannel, claim.Booking.SalesChannel);
+        Assert.Equal(request.Booking.Language, claim.Booking.Language);
+        Assert.Equal(request.Booking.SeasonLabel, claim.Booking.SeasonLabel);
+        Assert.Equal(request.Booking.SeasonValue, claim.Booking.SeasonValue);
+        Assert.Equal(request.Booking.Service, claim.Booking.Service);
+        Assert.Equal(request.Booking.Skissim, claim.Booking.Skissim);
+        Assert.Equal(request.Booking.SkissimType, claim.Booking.SkissimType);
+        Assert.Equal(request.Booking.Product, claim.Booking.Product);
 
-        Assert.AreEqual(request.Booking.Customer.Name, claim.Booking.Customer.Name);
-        Assert.AreEqual(request.Booking.Customer.AkioNumber, claim.Booking.Customer.AkioNumber);
+        Assert.Equal(request.Booking.Customer.Name, claim.Booking.Customer.Name);
+        Assert.Equal(request.Booking.Customer.AkioNumber, claim.Booking.Customer.AkioNumber);
 
-        Assert.AreEqual(request.Booking.Supplier.Name, claim.Booking.Supplier.Name);
-        Assert.AreEqual(request.Booking.Supplier.SupplierAkioNumber, claim.Booking.Supplier.SupplierAkioNumber);
+        Assert.Equal(request.Booking.Supplier.Name, claim.Booking.Supplier.Name);
+        Assert.Equal(request.Booking.Supplier.SupplierAkioNumber, claim.Booking.Supplier.SupplierAkioNumber);
 
-        Assert.AreEqual(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
-        Assert.AreEqual(request.ClaimDate.DateOfStartFollowUp, claim.ClaimDate.DateOfStartFollowUp);
-        Assert.AreEqual(request.ClaimDate.DateLastUpdate, claim.ClaimDate.DateLastUpdate);
-        Assert.AreEqual(request.ClaimDate.DateOfDeparture, claim.ClaimDate.DateOfDeparture);
-        Assert.AreEqual(request.ClaimDate.DateEndOfFollowUp, claim.ClaimDate.DateEndOfFollowUp);
-        Assert.AreEqual(request.ClaimDate.DateOfArrival, claim.ClaimDate.DateOfArrival);
+        Assert.Equal(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
+        Assert.Equal(request.ClaimDate.DateOfStartFollowUp, claim.ClaimDate.DateOfStartFollowUp);
+        Assert.Equal(request.ClaimDate.DateLastUpdate, claim.ClaimDate.DateLastUpdate);
+        Assert.Equal(request.ClaimDate.DateOfDeparture, claim.ClaimDate.DateOfDeparture);
+        Assert.Equal(request.ClaimDate.DateEndOfFollowUp, claim.ClaimDate.DateEndOfFollowUp);
+        Assert.Equal(request.ClaimDate.DateOfArrival, claim.ClaimDate.DateOfArrival);
 
-        Assert.AreEqual(request.Compensation.CustomerVoucher, claim.Compensation.CustomerVoucher);
-        Assert.AreEqual(request.Compensation.CustomerUsedVoucher, claim.Compensation.CustomerUsedVoucher);
-        Assert.AreEqual(request.Compensation.SupplierRefund, claim.Compensation.SupplierRefund);
-        Assert.AreEqual(request.Compensation.ClaimRefund, claim.Compensation.ClaimRefund);
-        Assert.AreEqual(request.Compensation.RefundState, claim.Compensation.RefundState);
+        Assert.Equal(request.Compensation.CustomerVoucher, claim.Compensation.CustomerVoucher);
+        Assert.Equal(request.Compensation.CustomerUsedVoucher, claim.Compensation.CustomerUsedVoucher);
+        Assert.Equal(request.Compensation.SupplierRefund, claim.Compensation.SupplierRefund);
+        Assert.Equal(request.Compensation.ClaimRefund, claim.Compensation.ClaimRefund);
+        Assert.Equal(request.Compensation.RefundState, claim.Compensation.RefundState);
     }
 
-    [TestMethod]
+    [Fact]
     public void UpdateFrom_WithValidRequest_DoesNotChangeEntityIdentitiesOrForeignKeys()
     {
         // Arrange
@@ -87,14 +87,14 @@ public sealed class UpdateClaimMappingExtensionsTests
         claim.UpdateFrom(request);
 
         // Assert
-        Assert.AreEqual(originalClaimId, claim.Id);
-        Assert.AreEqual(originalBookingId, claim.Booking.Id);
-        Assert.AreEqual(originalCustomerId, claim.Booking.Customer.Id);
-        Assert.AreEqual(originalSupplierId, claim.Booking.Supplier.Id);
-        Assert.AreEqual(originalClaimDateId, claim.ClaimDate.Id);
-        Assert.AreEqual(originalCompensationId, claim.Compensation.Id);
-        Assert.AreEqual(claim.Booking.Id, claim.BookingId);
-        Assert.AreEqual(claim.Id, claim.ClaimDate.ClaimId);
-        Assert.AreEqual(claim.Id, claim.Compensation.ClaimId);
+        Assert.Equal(originalClaimId, claim.Id);
+        Assert.Equal(originalBookingId, claim.Booking.Id);
+        Assert.Equal(originalCustomerId, claim.Booking.Customer.Id);
+        Assert.Equal(originalSupplierId, claim.Booking.Supplier.Id);
+        Assert.Equal(originalClaimDateId, claim.ClaimDate.Id);
+        Assert.Equal(originalCompensationId, claim.Compensation.Id);
+        Assert.Equal(claim.Booking.Id, claim.BookingId);
+        Assert.Equal(claim.Id, claim.ClaimDate.ClaimId);
+        Assert.Equal(claim.Id, claim.Compensation.ClaimId);
     }
 }

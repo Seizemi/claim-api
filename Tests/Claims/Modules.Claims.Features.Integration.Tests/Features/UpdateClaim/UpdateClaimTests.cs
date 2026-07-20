@@ -7,13 +7,14 @@ using Modules.Claims.Domain.Enums;
 using Modules.Claims.Features.Features.Shared.Responses;
 using Modules.Claims.Features.Integration.Tests.Infrastructure;
 using Modules.Claims.Features.Integration.Tests.Shared;
+using Xunit;
 
 namespace Modules.Claims.Features.Integration.Tests.Features.UpdateClaim;
 
-[TestClass]
-public sealed class UpdateClaimTests : IntegrationTestBase
+[Collection(IntegrationTestCollection.Name)]
+public sealed class UpdateClaimTests(IntegrationTestWebAppFactory factory) : IntegrationTestBase(factory)
 {
-    [TestMethod]
+    [Fact]
     public async Task UpdateClaim_ExistingClaim_Returns200AndPersistsChanges()
     {
         var original = ClaimRequestFactory.CreateValid();
@@ -27,114 +28,114 @@ public sealed class UpdateClaimTests : IntegrationTestBase
             Compensation = original.Compensation with { CustomerVoucher = 999.5f }
         };
 
-        var putResponse = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), updated, TestJsonSerializerOptions.Default);
-        Assert.AreEqual(HttpStatusCode.OK, putResponse.StatusCode);
+        var putResponse = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), updated, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
 
-        var getResponse = await Client.GetAsync(RouteConsts.ClaimDetails(claimId));
-        var claim = await getResponse.Content.ReadFromJsonAsync<ClaimResponse>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(claim);
-        Assert.AreEqual(claimId, claim!.Id);
-        Assert.AreEqual(newState, claim.State);
-        Assert.AreEqual("Updated reason", claim.Reason);
-        Assert.AreEqual(999.5f, claim.Compensation.CustomerVoucher);
+        var getResponse = await Client.GetAsync(RouteConsts.ClaimDetails(claimId), TestContext.Current.CancellationToken);
+        var claim = await getResponse.Content.ReadFromJsonAsync<ClaimResponse>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(claim);
+        Assert.Equal(claimId, claim!.Id);
+        Assert.Equal(newState, claim.State);
+        Assert.Equal("Updated reason", claim.Reason);
+        Assert.Equal(999.5f, claim.Compensation.CustomerVoucher);
 
-        var dbClaim = await DbContext.Claims.SingleAsync(c => c.Id == claimId);
-        Assert.AreEqual(newState, dbClaim.State);
+        var dbClaim = await DbContext.Claims.SingleAsync(c => c.Id == claimId, TestContext.Current.CancellationToken);
+        Assert.Equal(newState, dbClaim.State);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task UpdateClaim_UnknownId_Returns400WithClaimCannotBeNullError()
     {
         var request = ClaimRequestFactory.CreateValid();
 
-        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(Guid.NewGuid()), request, TestJsonSerializerOptions.Default);
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(Guid.NewGuid()), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("Claim.CannotBeNull"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.CannotBeNull"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task UpdateClaim_InvalidNestedSupplierName_Returns400ValidationProblem()
     {
         var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
         var invalidRequest = ClaimRequestFactory.WithEmptySupplierName(ClaimRequestFactory.CreateValid());
 
-        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), invalidRequest, TestJsonSerializerOptions.Default);
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), invalidRequest, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("Booking.Supplier.Name"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Booking.Supplier.Name"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task UpdateClaim_EmptyGuid_Returns400WithIdCannotBeEmptyError()
     {
         var request = ClaimRequestFactory.CreateValid();
 
-        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(Guid.Empty), request, TestJsonSerializerOptions.Default);
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(Guid.Empty), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("ClaimId"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("ClaimId"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task UpdateClaim_EmptyBookingNumber_Returns400ValidationProblem()
     {
         var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
         var invalidRequest = ClaimRequestFactory.WithEmptyBookingNumber(ClaimRequestFactory.CreateValid());
 
-        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), invalidRequest, TestJsonSerializerOptions.Default);
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), invalidRequest, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("Booking.BookingNumber"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Booking.BookingNumber"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task UpdateClaim_EmptyCustomerName_Returns400ValidationProblem()
     {
         var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
         var invalidRequest = ClaimRequestFactory.WithEmptyCustomerName(ClaimRequestFactory.CreateValid());
 
-        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), invalidRequest, TestJsonSerializerOptions.Default);
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), invalidRequest, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("Booking.Customer.Name"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Booking.Customer.Name"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task UpdateClaim_DepartureAfterArrival_Returns400ValidationProblem()
     {
         var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
         var invalidRequest = ClaimRequestFactory.WithDepartureAfterArrival(ClaimRequestFactory.CreateValid());
 
-        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), invalidRequest, TestJsonSerializerOptions.Default);
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), invalidRequest, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("ClaimDate"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("ClaimDate"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task UpdateClaim_MalformedJsonBody_Returns400BadRequest()
     {
         var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
         using var content = new StringContent("{ not valid json", Encoding.UTF8, "application/json");
 
-        var response = await Client.PutAsync(RouteConsts.ClaimDetails(claimId), content);
+        var response = await Client.PutAsync(RouteConsts.ClaimDetails(claimId), content, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.AreEqual("Bad request", problem!.Title);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.Equal("Bad request", problem!.Title);
     }
 }

@@ -2,15 +2,15 @@ using FluentValidation.TestHelper;
 using Modules.Claims.Features.Features.GetClaimById;
 using Modules.Claims.Features.Features.Shared.Errors;
 using Modules.Claims.Features.Features.Shared.Requests;
+using Xunit;
 
 namespace Modules.Claims.Features.Tests.Features.GetClaimById;
 
-[TestClass]
 public sealed class GetClaimByIdRequestValidatorTests
 {
     private readonly GetClaimByIdRequestValidator _validator = new();
 
-    [TestMethod]
+    [Fact]
     public void Validate_WithEmptyClaimId_HasValidationErrorForClaimId()
     {
         // Arrange
@@ -24,7 +24,7 @@ public sealed class GetClaimByIdRequestValidatorTests
             .WithErrorCode(ClaimErrorCodes.ClaimIdCannotBeEmpty);
     }
 
-    [TestMethod]
+    [Fact]
     public void Validate_WithNonEmptyClaimId_HasNoValidationErrors()
     {
         // Arrange

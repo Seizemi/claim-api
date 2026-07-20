@@ -1,4 +1,4 @@
-using Bogus;
+using AutoFixture;
 using Modules.Claims.Domain.Entities;
 using Modules.Claims.Domain.Enums;
 using Modules.Claims.Features.Features.Shared.Requests;
@@ -9,7 +9,7 @@ internal static class ClaimTestDataFactory
 {
     internal static Claim CreateClaim(DateTimeOffset dateOfReceivedClaim)
     {
-        var faker = new Faker();
+        var fixture = new Fixture();
         var claimId = Guid.CreateVersion7();
         var bookingId = Guid.CreateVersion7();
         var customerId = Guid.CreateVersion7();
@@ -18,27 +18,27 @@ internal static class ClaimTestDataFactory
         return new Claim
         {
             Id = claimId,
-            State = faker.PickRandom<ClaimState>(),
+            State = fixture.Create<ClaimState>(),
             BookingId = bookingId,
             Booking = new Booking
             {
                 Id = bookingId,
-                BookingNumber = faker.Random.Replace("BK####"),
-                SeasonLabel = faker.Commerce.Department(),
-                SeasonValue = faker.Random.Word(),
+                BookingNumber = fixture.Create<string>(),
+                SeasonLabel = fixture.Create<string>(),
+                SeasonValue = fixture.Create<string>(),
                 CustomerId = customerId,
                 Customer = new Customer
                 {
                     Id = customerId,
-                    Name = faker.Person.FullName,
-                    AkioNumber = faker.Random.Int(1000, 9999)
+                    Name = fixture.Create<string>(),
+                    AkioNumber = fixture.Create<int>()
                 },
                 SupplierId = supplierId,
                 Supplier = new Supplier
                 {
                     Id = supplierId,
-                    Name = faker.Company.CompanyName(),
-                    SupplierAkioNumber = faker.Random.Int(1000, 9999)
+                    Name = fixture.Create<string>(),
+                    SupplierAkioNumber = fixture.Create<int>()
                 }
             },
             ClaimDate = new ClaimDate
@@ -57,46 +57,49 @@ internal static class ClaimTestDataFactory
 
     internal static ClaimRequest CreateClaimRequest()
     {
-        var faker = new Faker();
+        var fixture = new Fixture();
 
         return new ClaimRequest(
-            State: faker.PickRandom<ClaimState>(),
-            FollowedBy: faker.Person.FullName,
-            Reason: faker.Lorem.Sentence(),
-            ClaimSummary: faker.Lorem.Paragraph(),
-            Solution: faker.PickRandom<ClaimSolution>(),
-            PurposeOfSolution: faker.Lorem.Sentence(),
+            State: fixture.Create<ClaimState>(),
+            FollowedBy: fixture.Create<string>(),
+            Reason: fixture.Create<string>(),
+            ClaimSummary: fixture.Create<string>(),
+            Solution: fixture.Create<ClaimSolution>(),
+            PurposeOfSolution: fixture.Create<string>(),
             UpdateReason: null,
-            CustomerSuppInfo: faker.Lorem.Sentence(),
-            SupplierSuppInfo: faker.Lorem.Sentence(),
+            CustomerSuppInfo: fixture.Create<string>(),
+            SupplierSuppInfo: fixture.Create<string>(),
             Booking: new BookingRequest(
-                BookingNumber: faker.Random.Replace("BK####"),
-                SalesChannel: faker.PickRandom<SalesChannel>(),
-                Language: faker.PickRandom<Language>(),
-                SeasonLabel: faker.Commerce.Department(),
-                SeasonValue: faker.Random.Word(),
-                Service: faker.PickRandom<BookingService>(),
-                Skissim: faker.Random.Bool(),
-                SkissimType: faker.PickRandom<SkissimType>(),
-                Product: faker.Commerce.ProductName(),
+                BookingNumber: fixture.Create<string>(),
+                SalesChannel: fixture.Create<SalesChannel>(),
+                Language: fixture.Create<Language>(),
+                SeasonLabel: fixture.Create<string>(),
+                SeasonValue: fixture.Create<string>(),
+                Service: fixture.Create<BookingService>(),
+                Skissim: fixture.Create<bool>(),
+                SkissimType: fixture.Create<SkissimType>(),
+                Product: fixture.Create<string>(),
                 Customer: new CustomerRequest(
-                    Name: faker.Person.FullName,
-                    AkioNumber: faker.Random.Int(1000, 9999)),
+                    Name: fixture.Create<string>(),
+                    AkioNumber: fixture.Create<int>()),
                 Supplier: new SupplierRequest(
-                    Name: faker.Company.CompanyName(),
-                    SupplierAkioNumber: faker.Random.Int(1000, 9999))),
+                    Name: fixture.Create<string>(),
+                    SupplierAkioNumber: fixture.Create<int>())),
+            // DateOfDeparture/DateOfArrival are left null: ClaimRequestValidator requires
+            // DateOfDeparture <= DateOfArrival whenever both are set, which two independently
+            // generated values can't guarantee.
             ClaimDate: new ClaimDateRequest(
-                DateOfReceivedClaim: DateTimeOffset.UtcNow,
+                DateOfReceivedClaim: fixture.Create<DateTimeOffset>(),
                 DateOfStartFollowUp: null,
                 DateLastUpdate: null,
                 DateOfDeparture: null,
                 DateEndOfFollowUp: null,
                 DateOfArrival: null),
             Compensation: new CompensationRequest(
-                CustomerVoucher: faker.Random.Float(0, 500),
+                CustomerVoucher: fixture.Create<float>(),
                 CustomerUsedVoucher: null,
                 SupplierRefund: null,
                 ClaimRefund: null,
-                RefundState: faker.PickRandom<RefundState>()));
+                RefundState: fixture.Create<RefundState>()));
     }
 }

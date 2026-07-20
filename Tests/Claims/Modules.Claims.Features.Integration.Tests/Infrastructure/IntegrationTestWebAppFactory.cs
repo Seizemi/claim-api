@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Testcontainers.PostgreSql;
+using Xunit;
 
 namespace Modules.Claims.Features.Integration.Tests.Infrastructure;
 
-internal sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
+public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:17-alpine")
         .WithDatabase("claimapi_test")
@@ -14,7 +15,14 @@ internal sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Progr
 
     internal string ConnectionString => _container.GetConnectionString();
 
-    internal Task InitializeAsync() => _container.StartAsync();
+    public async ValueTask InitializeAsync()
+    {
+        await _container.StartAsync();
+
+        // Forces the WebApplicationFactory to build its host now (running Program.cs's
+        // startup migration once), rather than lazily on the first test's request.
+        _ = Server;
+    }
 
     public override async ValueTask DisposeAsync()
     {

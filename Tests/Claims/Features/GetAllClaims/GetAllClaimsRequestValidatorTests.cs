@@ -2,17 +2,17 @@ using FluentValidation.TestHelper;
 using Modules.Claims.Features.Features.GetAllClaims;
 using Modules.Claims.Features.Features.Shared.Errors;
 using Modules.Claims.Features.Features.Shared.Requests;
+using Xunit;
 
 namespace Modules.Claims.Features.Tests.Features.GetAllClaims;
 
-[TestClass]
 public sealed class GetAllClaimsRequestValidatorTests
 {
     private readonly GetAllClaimsRequestValidator _validator = new();
 
-    [TestMethod]
-    [DataRow(0)]
-    [DataRow(-1)]
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
     public void Validate_WithPageNumberLessThanOne_HasValidationErrorForPageNumber(int pageNumber)
     {
         // Arrange
@@ -26,9 +26,9 @@ public sealed class GetAllClaimsRequestValidatorTests
             .WithErrorCode(PagingErrorCodes.PageNumberMustBeGreaterThanZero);
     }
 
-    [TestMethod]
-    [DataRow(0)]
-    [DataRow(101)]
+    [Theory]
+    [InlineData(0)]
+    [InlineData(101)]
     public void Validate_WithPageSizeOutOfRange_HasValidationErrorForPageSize(int pageSize)
     {
         // Arrange
@@ -42,10 +42,10 @@ public sealed class GetAllClaimsRequestValidatorTests
             .WithErrorCode(PagingErrorCodes.PageSizeMustBeBetweenOneAndMax);
     }
 
-    [TestMethod]
-    [DataRow(1, 1)]
-    [DataRow(1, 100)]
-    [DataRow(5, 20)]
+    [Theory]
+    [InlineData(1, 1)]
+    [InlineData(1, 100)]
+    [InlineData(5, 20)]
     public void Validate_WithValuesWithinRange_HasNoValidationErrors(int pageNumber, int pageSize)
     {
         // Arrange

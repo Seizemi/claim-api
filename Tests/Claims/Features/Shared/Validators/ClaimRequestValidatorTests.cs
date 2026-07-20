@@ -2,15 +2,15 @@ using FluentValidation.TestHelper;
 using Modules.Claims.Features.Features.Shared.Errors;
 using Modules.Claims.Features.Features.Shared.Validators;
 using Modules.Claims.Features.Tests.Shared;
+using Xunit;
 
 namespace Modules.Claims.Features.Tests.Features.Shared.Validators;
 
-[TestClass]
 public sealed class ClaimRequestValidatorTests
 {
     private readonly ClaimRequestValidator _validator = new();
 
-    [TestMethod]
+    [Fact]
     public void Validate_WithNullBooking_HasValidationErrorForBooking()
     {
         // Arrange
@@ -24,7 +24,7 @@ public sealed class ClaimRequestValidatorTests
             .WithErrorCode(BookingErrorCodes.BookingCannotBeNull);
     }
 
-    [TestMethod]
+    [Fact]
     public void Validate_WithBookingNumberEmpty_HasValidationErrorForNestedBookingNumber()
     {
         // Arrange
@@ -39,7 +39,7 @@ public sealed class ClaimRequestValidatorTests
             .WithErrorCode(ClaimErrorCodes.ClaimBookingNumberCannotBeNullOrEmpty);
     }
 
-    [TestMethod]
+    [Fact]
     public void Validate_WithNullCustomer_HasValidationErrorForNestedCustomer()
     {
         // Arrange
@@ -54,7 +54,7 @@ public sealed class ClaimRequestValidatorTests
             .WithErrorCode(CustomerErrorCodes.CustomerCannotBeNull);
     }
 
-    [TestMethod]
+    [Fact]
     public void Validate_WithCustomerNameEmpty_HasValidationErrorForNestedCustomerName()
     {
         // Arrange
@@ -75,7 +75,7 @@ public sealed class ClaimRequestValidatorTests
             .WithErrorCode(ClaimErrorCodes.ClaimCustomerNameCannotBeNullOrEmpty);
     }
 
-    [TestMethod]
+    [Fact]
     public void Validate_WithNullSupplier_HasValidationErrorForNestedSupplier()
     {
         // Arrange
@@ -90,7 +90,7 @@ public sealed class ClaimRequestValidatorTests
             .WithErrorCode(SupplierErrorCodes.SupplierCannotBeNull);
     }
 
-    [TestMethod]
+    [Fact]
     public void Validate_WithSupplierNameEmpty_HasValidationErrorForNestedSupplierName()
     {
         // Arrange
@@ -111,7 +111,7 @@ public sealed class ClaimRequestValidatorTests
             .WithErrorCode(ClaimErrorCodes.ClaimSupplierNameCannotBeNullOrEmpty);
     }
 
-    [TestMethod]
+    [Fact]
     public void Validate_WithDepartureDateAfterArrivalDate_HasValidationErrorForClaimDate()
     {
         // Arrange
@@ -133,7 +133,7 @@ public sealed class ClaimRequestValidatorTests
             .WithErrorCode(ClaimErrorCodes.ClaimDateOfDepartureCannotBeSmallerThanDateOfArrival);
     }
 
-    [TestMethod]
+    [Fact]
     public void Validate_WithNullClaimDate_HasNoValidationErrorForClaimDate()
     {
         // Arrange
@@ -146,7 +146,7 @@ public sealed class ClaimRequestValidatorTests
         result.ShouldNotHaveValidationErrorFor(x => x.ClaimDate);
     }
 
-    [TestMethod]
+    [Fact]
     public void Validate_WithValidRequest_HasNoValidationErrors()
     {
         // Arrange

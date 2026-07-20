@@ -4,63 +4,64 @@ using Microsoft.AspNetCore.Mvc;
 using Modules.Claims.Features.Features.Shared.Responses;
 using Modules.Claims.Features.Integration.Tests.Infrastructure;
 using Modules.Claims.Features.Integration.Tests.Shared;
+using Xunit;
 
 namespace Modules.Claims.Features.Integration.Tests.Features.GetClaimById;
 
-[TestClass]
-public sealed class GetClaimByIdTests : IntegrationTestBase
+[Collection(IntegrationTestCollection.Name)]
+public sealed class GetClaimByIdTests(IntegrationTestWebAppFactory factory) : IntegrationTestBase(factory)
 {
-    [TestMethod]
+    [Fact]
     public async Task GetClaimById_ExistingClaim_Returns200WithFullMappedResponse()
     {
         var request = ClaimRequestFactory.CreateValid();
         var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client, request);
 
-        var response = await Client.GetAsync(RouteConsts.ClaimDetails(claimId));
+        var response = await Client.GetAsync(RouteConsts.ClaimDetails(claimId), TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        var claim = await response.Content.ReadFromJsonAsync<ClaimResponse>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(claim);
-        Assert.AreEqual(claimId, claim!.Id);
-        Assert.AreEqual(request.State, claim.State);
-        Assert.AreEqual(request.FollowedBy, claim.FollowedBy);
-        Assert.AreEqual(request.Booking.BookingNumber, claim.Booking.BookingNumber);
-        Assert.AreEqual(request.Booking.Customer.Name, claim.Booking.Customer.Name);
-        Assert.AreEqual(request.Booking.Supplier.Name, claim.Booking.Supplier.Name);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var claim = await response.Content.ReadFromJsonAsync<ClaimResponse>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(claim);
+        Assert.Equal(claimId, claim!.Id);
+        Assert.Equal(request.State, claim.State);
+        Assert.Equal(request.FollowedBy, claim.FollowedBy);
+        Assert.Equal(request.Booking.BookingNumber, claim.Booking.BookingNumber);
+        Assert.Equal(request.Booking.Customer.Name, claim.Booking.Customer.Name);
+        Assert.Equal(request.Booking.Supplier.Name, claim.Booking.Supplier.Name);
         DateTimeOffsetAssert.AreClose(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
-        Assert.AreEqual(request.Compensation.CustomerVoucher, claim.Compensation.CustomerVoucher);
+        Assert.Equal(request.Compensation.CustomerVoucher, claim.Compensation.CustomerVoucher);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GetClaimById_UnknownId_Returns400WithClaimCannotBeNullError()
     {
-        var response = await Client.GetAsync(RouteConsts.ClaimDetails(Guid.NewGuid()));
+        var response = await Client.GetAsync(RouteConsts.ClaimDetails(Guid.NewGuid()), TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("Claim.CannotBeNull"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.CannotBeNull"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GetClaimById_EmptyGuid_Returns400WithIdCannotBeEmptyError()
     {
-        var response = await Client.GetAsync(RouteConsts.ClaimDetails(Guid.Empty));
+        var response = await Client.GetAsync(RouteConsts.ClaimDetails(Guid.Empty), TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.IsTrue(problem!.Errors.ContainsKey("ClaimId"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("ClaimId"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GetClaimById_MalformedGuidRouteValue_Returns400BadRequest()
     {
-        var response = await Client.GetAsync("/api/v1.0/Claim/claim-details/not-a-guid/information");
+        var response = await Client.GetAsync("/api/v1.0/Claim/claim-details/not-a-guid/information", TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(TestJsonSerializerOptions.Default);
-        Assert.IsNotNull(problem);
-        Assert.AreEqual("Bad request", problem!.Title);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.Equal("Bad request", problem!.Title);
     }
 }

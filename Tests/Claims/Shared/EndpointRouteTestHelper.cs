@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Modules.Common.Features;
+using Xunit;
 
 namespace Modules.Claims.Features.Tests.Shared;
 
@@ -26,6 +27,6 @@ internal static class EndpointRouteTestHelper
             .SelectMany(dataSource => dataSource.Endpoints)
             .ToList();
 
-        return (RouteEndpoint)Assert.ContainsSingle(endpoints);
+        return (RouteEndpoint)Assert.Single(endpoints);
     }
 }

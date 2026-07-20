@@ -11,12 +11,10 @@ internal sealed class DatabaseResetHelper(IServiceProvider services)
         using var scope = services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ClaimsDbContext>();
 
-        context.Claims.RemoveRange(context.Claims);
-        context.Bookings.RemoveRange(context.Bookings);
-        context.Customers.RemoveRange(context.Customers);
-        context.Suppliers.RemoveRange(context.Suppliers);
-        context.Users.RemoveRange(context.Users);
-
-        await context.SaveChangesAsync();
+        await context.Claims.ExecuteDeleteAsync();
+        await context.Bookings.ExecuteDeleteAsync();
+        await context.Customers.ExecuteDeleteAsync();
+        await context.Suppliers.ExecuteDeleteAsync();
+        await context.Users.ExecuteDeleteAsync();
     }
 }

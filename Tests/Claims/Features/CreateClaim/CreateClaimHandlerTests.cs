@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Modules.Claims.Features.Features.CreateClaim;
 using Modules.Claims.Features.Tests.Shared;
+using Xunit;
 
 namespace Modules.Claims.Features.Tests.Features.CreateClaim;
 
-[TestClass]
 public sealed class CreateClaimHandlerTests
 {
-    [TestMethod]
+    [Fact]
     public async Task HandleAsync_WithValidRequest_ReturnsNonEmptyClaimId()
     {
         // Arrange
@@ -16,14 +16,14 @@ public sealed class CreateClaimHandlerTests
         var request = ClaimTestDataFactory.CreateClaimRequest();
 
         // Act
-        var result = await handler.HandleAsync(request, CancellationToken.None);
+        var result = await handler.HandleAsync(request, TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.IsFalse(result.IsError);
-        Assert.AreNotEqual(Guid.Empty, result.Value);
+        Assert.False(result.IsError);
+        Assert.NotEqual(Guid.Empty, result.Value);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task HandleAsync_WithValidRequest_PersistsClaimWithMappedFields()
     {
         // Arrange
@@ -33,10 +33,10 @@ public sealed class CreateClaimHandlerTests
         var request = ClaimTestDataFactory.CreateClaimRequest();
 
         // Act
-        var result = await handler.HandleAsync(request, CancellationToken.None);
+        var result = await handler.HandleAsync(request, TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.IsFalse(result.IsError);
+        Assert.False(result.IsError);
 
         await using var readContext = ClaimsDbContextFactory.Create(databaseName);
         var persisted = await readContext.Claims
@@ -44,19 +44,19 @@ public sealed class CreateClaimHandlerTests
             .Include(c => c.Booking).ThenInclude(b => b.Supplier)
             .Include(c => c.ClaimDate)
             .Include(c => c.Compensation)
-            .SingleAsync(c => c.Id == result.Value);
+            .SingleAsync(c => c.Id == result.Value, TestContext.Current.CancellationToken);
 
-        Assert.AreEqual(request.State, persisted.State);
-        Assert.AreEqual(request.FollowedBy, persisted.FollowedBy);
-        Assert.AreEqual(request.Reason, persisted.Reason);
-        Assert.AreEqual(request.Booking.BookingNumber, persisted.Booking.BookingNumber);
-        Assert.AreEqual(request.Booking.Customer.Name, persisted.Booking.Customer.Name);
-        Assert.AreEqual(request.Booking.Supplier.Name, persisted.Booking.Supplier.Name);
-        Assert.AreEqual(request.ClaimDate.DateOfReceivedClaim, persisted.ClaimDate.DateOfReceivedClaim);
-        Assert.AreEqual(request.Compensation.RefundState, persisted.Compensation.RefundState);
+        Assert.Equal(request.State, persisted.State);
+        Assert.Equal(request.FollowedBy, persisted.FollowedBy);
+        Assert.Equal(request.Reason, persisted.Reason);
+        Assert.Equal(request.Booking.BookingNumber, persisted.Booking.BookingNumber);
+        Assert.Equal(request.Booking.Customer.Name, persisted.Booking.Customer.Name);
+        Assert.Equal(request.Booking.Supplier.Name, persisted.Booking.Supplier.Name);
+        Assert.Equal(request.ClaimDate.DateOfReceivedClaim, persisted.ClaimDate.DateOfReceivedClaim);
+        Assert.Equal(request.Compensation.RefundState, persisted.Compensation.RefundState);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task HandleAsync_WithValidRequest_AssignsDistinctNonEmptyIdsToNestedEntities()
     {
         // Arrange
@@ -65,7 +65,7 @@ public sealed class CreateClaimHandlerTests
         var request = ClaimTestDataFactory.CreateClaimRequest();
 
         // Act
-        var result = await handler.HandleAsync(request, CancellationToken.None);
+        var result = await handler.HandleAsync(request, TestContext.Current.CancellationToken);
 
         // Assert
         var claim = await context.Claims
@@ -73,7 +73,7 @@ public sealed class CreateClaimHandlerTests
             .Include(c => c.Booking).ThenInclude(b => b.Supplier)
             .Include(c => c.ClaimDate)
             .Include(c => c.Compensation)
-            .SingleAsync(c => c.Id == result.Value);
+            .SingleAsync(c => c.Id == result.Value, TestContext.Current.CancellationToken);
 
         var ids = new[]
         {
@@ -85,11 +85,11 @@ public sealed class CreateClaimHandlerTests
             claim.Compensation.Id
         };
 
-        Assert.HasCount(ids.Length, ids.Distinct());
+        Assert.Equal(ids.Length, ids.Distinct().Count());
         Assert.DoesNotContain(Guid.Empty, ids);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task HandleAsync_CalledTwice_CreatesTwoDistinctClaims()
     {
         // Arrange
@@ -97,11 +97,11 @@ public sealed class CreateClaimHandlerTests
         var handler = new CreateClaimHandler(context);
 
         // Act
-        var firstResult = await handler.HandleAsync(ClaimTestDataFactory.CreateClaimRequest(), CancellationToken.None);
-        var secondResult = await handler.HandleAsync(ClaimTestDataFactory.CreateClaimRequest(), CancellationToken.None);
+        var firstResult = await handler.HandleAsync(ClaimTestDataFactory.CreateClaimRequest(), TestContext.Current.CancellationToken);
+        var secondResult = await handler.HandleAsync(ClaimTestDataFactory.CreateClaimRequest(), TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.AreNotEqual(firstResult.Value, secondResult.Value);
-        Assert.AreEqual(2, await context.Claims.CountAsync());
+        Assert.NotEqual(firstResult.Value, secondResult.Value);
+        Assert.Equal(2, await context.Claims.CountAsync(TestContext.Current.CancellationToken));
     }
 }

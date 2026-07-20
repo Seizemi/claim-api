@@ -1,28 +1,31 @@
 using Microsoft.Extensions.DependencyInjection;
 using Modules.Claims.Infrastructure.Database;
+using Xunit;
 
 namespace Modules.Claims.Features.Integration.Tests.Infrastructure;
 
-[TestClass]
-public abstract class IntegrationTestBase
+public abstract class IntegrationTestBase : IAsyncLifetime
 {
-    private static DatabaseResetHelper _resetHelper = null!;
-    protected static HttpClient Client { get; private set; } = null!;
-
+    private readonly IntegrationTestWebAppFactory _factory;
+    private readonly DatabaseResetHelper _resetHelper;
     private IServiceScope? _scope;
-    protected ClaimsDbContext DbContext =>
-        (_scope ??= AssemblyFixture.Factory.Services.CreateScope())
-            .ServiceProvider.GetRequiredService<ClaimsDbContext>();
 
-    [ClassInitialize(InheritanceBehavior.BeforeEachDerivedClass)]
-    public static void ClassInitialize(TestContext _)
+    protected IntegrationTestBase(IntegrationTestWebAppFactory factory)
     {
-        Client = AssemblyFixture.Factory.CreateClient();
-        _resetHelper = new DatabaseResetHelper(AssemblyFixture.Factory.Services);
+        _factory = factory;
+        Client = factory.CreateClient();
+        _resetHelper = new DatabaseResetHelper(factory.Services);
     }
 
-    [TestCleanup]
-    public async Task TestCleanupAsync()
+    protected HttpClient Client { get; }
+
+    protected ClaimsDbContext DbContext =>
+        (_scope ??= _factory.Services.CreateScope())
+            .ServiceProvider.GetRequiredService<ClaimsDbContext>();
+
+    public ValueTask InitializeAsync() => ValueTask.CompletedTask;
+
+    public async ValueTask DisposeAsync()
     {
         _scope?.Dispose();
         _scope = null;

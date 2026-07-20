@@ -1,3 +1,5 @@
+using Xunit;
+
 namespace Modules.Claims.Features.Integration.Tests.Shared;
 
 internal static class DateTimeOffsetAssert
@@ -6,10 +8,10 @@ internal static class DateTimeOffsetAssert
     // ticks, so an exact round-trip comparison can fail by a sub-microsecond amount.
     internal static void AreClose(DateTimeOffset? expected, DateTimeOffset? actual)
     {
-        Assert.AreEqual(expected.HasValue, actual.HasValue);
+        Assert.Equal(expected.HasValue, actual.HasValue);
         if (expected.HasValue && actual.HasValue)
         {
-            Assert.IsTrue((expected.Value - actual.Value).Duration() < TimeSpan.FromMilliseconds(1));
+            Assert.True((expected.Value - actual.Value).Duration() < TimeSpan.FromMilliseconds(1));
         }
     }
 }
