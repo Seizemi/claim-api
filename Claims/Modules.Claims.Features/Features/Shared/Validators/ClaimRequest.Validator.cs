@@ -75,7 +75,7 @@ internal sealed class ClaimDateRequestValidator : AbstractValidator<ClaimDateReq
         RuleFor(x => x)
             .Must(cd => cd.DateOfDeparture is null
                      || cd.DateOfArrival is null
-                     || cd.DateOfDeparture <= cd.DateOfArrival)
+                     || cd.DateOfDeparture >= cd.DateOfArrival)
             .WithErrorCode(ClaimErrorCodes.ClaimDateOfDepartureCannotBeSmallerThanDateOfArrival)
             .WithMessage(ClaimErrorMessages.ClaimDateOfDepartureCannotBeSmallerThanDateOfArrival);
     }

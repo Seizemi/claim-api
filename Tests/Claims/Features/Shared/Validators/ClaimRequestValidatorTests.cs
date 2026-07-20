@@ -112,7 +112,7 @@ public sealed class ClaimRequestValidatorTests
     }
 
     [Fact]
-    public void Validate_WithDepartureDateAfterArrivalDate_HasValidationErrorForClaimDate()
+    public void Validate_WithDepartureDateBeforeArrivalDate_HasValidationErrorForClaimDate()
     {
         // Arrange
         var request = ClaimTestDataFactory.CreateClaimRequest();
@@ -120,8 +120,8 @@ public sealed class ClaimRequestValidatorTests
         {
             ClaimDate = request.ClaimDate with
             {
-                DateOfDeparture = DateTimeOffset.UtcNow,
-                DateOfArrival = DateTimeOffset.UtcNow.AddDays(-1)
+                DateOfDeparture = DateTimeOffset.UtcNow.AddDays(-1),
+                DateOfArrival = DateTimeOffset.UtcNow
             }
         };
 

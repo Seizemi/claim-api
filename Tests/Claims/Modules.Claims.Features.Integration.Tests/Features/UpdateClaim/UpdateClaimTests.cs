@@ -112,10 +112,10 @@ public sealed class UpdateClaimTests(IntegrationTestWebAppFactory factory) : Int
     }
 
     [Fact]
-    public async Task UpdateClaim_DepartureAfterArrival_Returns400ValidationProblem()
+    public async Task UpdateClaim_DepartureBeforeArrival_Returns400ValidationProblem()
     {
         var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
-        var invalidRequest = ClaimRequestFactory.WithDepartureAfterArrival(ClaimRequestFactory.CreateValid());
+        var invalidRequest = ClaimRequestFactory.WithDepartureBeforeArrival(ClaimRequestFactory.CreateValid());
 
         var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), invalidRequest, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 

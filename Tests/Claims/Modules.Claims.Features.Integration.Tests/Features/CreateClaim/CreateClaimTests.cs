@@ -88,9 +88,9 @@ public sealed class CreateClaimTests(IntegrationTestWebAppFactory factory) : Int
     }
 
     [Fact]
-    public async Task CreateClaim_DepartureAfterArrival_Returns400ValidationProblem()
+    public async Task CreateClaim_DepartureBeforeArrival_Returns400ValidationProblem()
     {
-        var request = ClaimRequestFactory.WithDepartureAfterArrival(ClaimRequestFactory.CreateValid());
+        var request = ClaimRequestFactory.WithDepartureBeforeArrival(ClaimRequestFactory.CreateValid());
 
         var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 

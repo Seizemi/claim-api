@@ -10,6 +10,9 @@ internal static class ClaimRequestFactory
     {
         var fixture = new Fixture();
 
+        var dateOfArrival = fixture.Create<DateTimeOffset>().ToUniversalTime();
+        var dateOfDeparture = dateOfArrival.AddDays(Math.Abs(fixture.Create<int>()) % 30);
+
         return new ClaimRequest(
             State: fixture.Create<ClaimState>(),
             FollowedBy: fixture.Create<string>(),
@@ -36,16 +39,13 @@ internal static class ClaimRequestFactory
                 Supplier: new SupplierRequest(
                     Name: fixture.Create<string>(),
                     SupplierAkioNumber: fixture.Create<int>())),
-            // DateOfDeparture/DateOfArrival are left null: ClaimRequestValidator requires
-            // DateOfDeparture <= DateOfArrival whenever both are set, which two independently
-            // generated values can't guarantee.
             ClaimDate: new ClaimDateRequest(
                 DateOfReceivedClaim: dateOfReceivedClaim ?? DateTimeOffset.UtcNow.AddDays(-fixture.Create<int>() % 30),
                 DateOfStartFollowUp: null,
                 DateLastUpdate: null,
-                DateOfDeparture: null,
+                DateOfDeparture: dateOfDeparture,
                 DateEndOfFollowUp: null,
-                DateOfArrival: null),
+                DateOfArrival: dateOfArrival),
             Compensation: new CompensationRequest(
                 CustomerVoucher: fixture.Create<float>(),
                 CustomerUsedVoucher: null,
@@ -84,13 +84,13 @@ internal static class ClaimRequestFactory
     internal static ClaimRequest WithNullSupplier(ClaimRequest request) =>
         request with { Booking = request.Booking with { Supplier = null! } };
 
-    internal static ClaimRequest WithDepartureAfterArrival(ClaimRequest request) =>
+    internal static ClaimRequest WithDepartureBeforeArrival(ClaimRequest request) =>
         request with
         {
             ClaimDate = request.ClaimDate with
             {
-                DateOfDeparture = DateTimeOffset.UtcNow,
-                DateOfArrival = DateTimeOffset.UtcNow.AddDays(-1)
+                DateOfDeparture = DateTimeOffset.UtcNow.AddDays(-1),
+                DateOfArrival = DateTimeOffset.UtcNow
             }
         };
 }
