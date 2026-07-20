@@ -33,3 +33,5 @@ if (app.Environment.IsDevelopment())
 app.MapEndpointModulesFromAssemblyContaining(typeof(DependencyInjection));
 
 app.Run();
+
+public partial class Program;

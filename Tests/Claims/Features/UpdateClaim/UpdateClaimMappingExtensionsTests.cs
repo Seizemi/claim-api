@@ -56,10 +56,15 @@ public sealed class UpdateClaimMappingExtensionsTests
         Assert.AreEqual(request.Booking.Supplier.SupplierAkioNumber, claim.Booking.Supplier.SupplierAkioNumber);
 
         Assert.AreEqual(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
+        Assert.AreEqual(request.ClaimDate.DateOfStartFollowUp, claim.ClaimDate.DateOfStartFollowUp);
+        Assert.AreEqual(request.ClaimDate.DateLastUpdate, claim.ClaimDate.DateLastUpdate);
         Assert.AreEqual(request.ClaimDate.DateOfDeparture, claim.ClaimDate.DateOfDeparture);
+        Assert.AreEqual(request.ClaimDate.DateEndOfFollowUp, claim.ClaimDate.DateEndOfFollowUp);
         Assert.AreEqual(request.ClaimDate.DateOfArrival, claim.ClaimDate.DateOfArrival);
 
         Assert.AreEqual(request.Compensation.CustomerVoucher, claim.Compensation.CustomerVoucher);
+        Assert.AreEqual(request.Compensation.CustomerUsedVoucher, claim.Compensation.CustomerUsedVoucher);
+        Assert.AreEqual(request.Compensation.SupplierRefund, claim.Compensation.SupplierRefund);
         Assert.AreEqual(request.Compensation.ClaimRefund, claim.Compensation.ClaimRefund);
         Assert.AreEqual(request.Compensation.RefundState, claim.Compensation.RefundState);
     }

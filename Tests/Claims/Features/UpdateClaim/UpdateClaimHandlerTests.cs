@@ -1,3 +1,4 @@
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Modules.Claims.Features.Features.Shared.Errors;
 using Modules.Claims.Features.Features.UpdateClaim;
@@ -59,6 +60,7 @@ public sealed class UpdateClaimHandlerTests
         // Assert
         Assert.IsTrue(result.IsError);
         var error = Assert.ContainsSingle(result.Errors);
+        Assert.AreEqual(ErrorType.Validation, error.Type);
         Assert.AreEqual(ClaimErrorCodes.ClaimCannotBeNull, error.Code);
     }
 
