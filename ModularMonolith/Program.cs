@@ -31,6 +31,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapEndpointModulesFromAssemblyContaining(typeof(DependencyInjection));
+app.MapHealthChecks("/health");
 
 app.Run();
 

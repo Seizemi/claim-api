@@ -23,6 +23,9 @@ public static class DependencyInjection
             }
         });
 
+        services.AddHealthChecks()
+            .AddDbContextCheck<ClaimsDbContext>();
+
         return services;
     }
 }
