@@ -35,7 +35,7 @@ Content-Type: application/json
     "dateOfReceivedClaim": "2026-07-15T09:00:00Z",
     "dateOfStartFollowUp": "2026-07-15T10:00:00Z",
     "dateLastUpdate": null,
-    "dateOfDeparture": "2026-07-10T00:00:00Z",
+    "dateOfDeparture": "2026-07-18T00:00:00Z",
     "dateEndOfFollowUp": null,
     "dateOfArrival": "2026-07-17T00:00:00Z"
   },

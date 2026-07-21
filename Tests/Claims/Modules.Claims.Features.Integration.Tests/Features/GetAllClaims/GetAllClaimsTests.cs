@@ -99,7 +99,7 @@ public sealed class GetAllClaimsTests(IntegrationTestWebAppFactory factory) : In
         Assert.NotNull(paged);
         Assert.Equal(0, paged!.TotalCount);
         Assert.Equal(0, paged.TotalPages);
-        Assert.Equal(0, paged.Items.Count);
+        Assert.Empty(paged.Items);
     }
 
     [Fact]
