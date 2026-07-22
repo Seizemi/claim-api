@@ -49,18 +49,12 @@ public class ClaimsDbContext(DbContextOptions<ClaimsDbContext> options) : DbCont
             entity.Property(x => x.BookingNumber).IsRequired();
             entity.Property(x => x.SeasonLabel).IsRequired();
             entity.Property(x => x.SeasonValue).IsRequired();
-
-            entity.Property(x => x.SalesChannel).HasConversion<string>();
-            entity.Property(x => x.Language).HasConversion<string>();
-            entity.Property(x => x.Service).HasConversion<string>();
-            entity.Property(x => x.SkissimType).HasConversion<string>();
         });
 
         modelBuilder.Entity<Claim>(entity =>
         {
             entity.HasKey(x => x.Id);
-            entity.Property(x => x.State).HasConversion<string>().IsRequired();
-            entity.Property(x => x.Solution).HasConversion<string>();
+            entity.Property(x => x.State).IsRequired();
 
             entity.HasOne(x => x.Booking)
                 .WithOne(x => x.Claim)
@@ -92,7 +86,6 @@ public class ClaimsDbContext(DbContextOptions<ClaimsDbContext> options) : DbCont
         {
             entity.HasKey(x => x.Id);
             entity.Property(x => x.ClaimId).IsRequired();
-            entity.Property(x => x.RefundState).HasConversion<string>();
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -102,7 +95,7 @@ public class ClaimsDbContext(DbContextOptions<ClaimsDbContext> options) : DbCont
             entity.Property(x => x.LastName).IsRequired();
             entity.Property(x => x.Email).IsRequired();
             entity.HasIndex(x => x.Email).IsUnique();
-            entity.Property(x => x.Role).HasConversion<string>().IsRequired();
+            entity.Property(x => x.Role).IsRequired();
         });
     }
 }

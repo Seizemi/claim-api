@@ -2,8 +2,8 @@ namespace Modules.Claims.Domain.Enums;
 
 public enum ClaimState
 {
-    AwaitingSupplier,
-    AwaitingClient,
-    Terminate,
-    ClosedWithoutResponse
+    AwaitingSupplier = 0,
+    AwaitingClient = 1,
+    Terminate = 2,
+    ClosedWithoutResponse = 3
 }

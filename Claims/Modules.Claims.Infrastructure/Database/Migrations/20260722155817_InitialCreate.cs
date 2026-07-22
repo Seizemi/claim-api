@@ -51,7 +51,7 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                     first_name = table.Column<string>(type: "text", nullable: false),
                     last_name = table.Column<string>(type: "text", nullable: false),
                     email = table.Column<string>(type: "text", nullable: false),
-                    role = table.Column<string>(type: "text", nullable: false)
+                    role = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,13 +65,13 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     booking_number = table.Column<string>(type: "text", nullable: false),
-                    sales_channel = table.Column<string>(type: "text", nullable: true),
-                    language = table.Column<string>(type: "text", nullable: true),
+                    sales_channel = table.Column<int>(type: "integer", nullable: true),
+                    language = table.Column<int>(type: "integer", nullable: true),
                     season_label = table.Column<string>(type: "text", nullable: false),
                     season_value = table.Column<string>(type: "text", nullable: false),
-                    service = table.Column<string>(type: "text", nullable: true),
+                    service = table.Column<int>(type: "integer", nullable: true),
                     skissim = table.Column<bool>(type: "boolean", nullable: true),
-                    skissim_type = table.Column<string>(type: "text", nullable: true),
+                    skissim_type = table.Column<int>(type: "integer", nullable: true),
                     product = table.Column<string>(type: "text", nullable: true),
                     customer_id = table.Column<Guid>(type: "uuid", nullable: false),
                     supplier_id = table.Column<Guid>(type: "uuid", nullable: false)
@@ -101,11 +101,11 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    state = table.Column<string>(type: "text", nullable: false),
+                    state = table.Column<int>(type: "integer", nullable: false),
                     followed_by = table.Column<string>(type: "text", nullable: true),
                     reason = table.Column<string>(type: "text", nullable: true),
                     claim_summary = table.Column<string>(type: "text", nullable: true),
-                    solution = table.Column<string>(type: "text", nullable: true),
+                    solution = table.Column<int>(type: "integer", nullable: true),
                     purpose_of_solution = table.Column<string>(type: "text", nullable: true),
                     update_reason = table.Column<string>(type: "text", nullable: true),
                     customer_supp_info = table.Column<string>(type: "text", nullable: true),
@@ -160,7 +160,7 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                     customer_used_voucher = table.Column<float>(type: "real", nullable: true),
                     supplier_refund = table.Column<float>(type: "real", nullable: true),
                     claim_refund = table.Column<float>(type: "real", nullable: true),
-                    refund_state = table.Column<string>(type: "text", nullable: true),
+                    refund_state = table.Column<int>(type: "integer", nullable: true),
                     claim_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>

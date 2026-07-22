@@ -2,7 +2,7 @@ namespace Modules.Claims.Domain.Enums;
 
 public enum Language
 {
-    Fr,
-    En,
-    Nl
+    Fr = 0,
+    En = 1,
+    Nl = 2
 }

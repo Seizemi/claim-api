@@ -3,7 +3,7 @@ POST {{host}}/api/v1.0/Claim/new-claim/claim
 Content-Type: application/json
 
 {
-  "state": "ClosedWithoutResponse",
+  "state": "AwaitingSupplier",
   "followedBy": "Lindy Doe",
   "reason": "Overbooked accommodation",
   "claimSummary": "Customer was denied check-in due to overbooking by the supplier.",

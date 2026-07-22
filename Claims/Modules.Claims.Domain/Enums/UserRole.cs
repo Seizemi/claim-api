@@ -2,7 +2,7 @@ namespace Modules.Claims.Domain.Enums;
 
 public enum UserRole
 {
-    None,
-    Agent,
-    Supervisor
+    None = 0,
+    Agent = 1,
+    Supervisor = 2
 }

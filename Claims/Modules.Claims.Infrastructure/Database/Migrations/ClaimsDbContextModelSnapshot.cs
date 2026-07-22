@@ -39,16 +39,16 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("customer_id");
 
-                    b.Property<string>("Language")
-                        .HasColumnType("text")
+                    b.Property<int?>("Language")
+                        .HasColumnType("integer")
                         .HasColumnName("language");
 
                     b.Property<string>("Product")
                         .HasColumnType("text")
                         .HasColumnName("product");
 
-                    b.Property<string>("SalesChannel")
-                        .HasColumnType("text")
+                    b.Property<int?>("SalesChannel")
+                        .HasColumnType("integer")
                         .HasColumnName("sales_channel");
 
                     b.Property<string>("SeasonLabel")
@@ -61,16 +61,16 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("text")
                         .HasColumnName("season_value");
 
-                    b.Property<string>("Service")
-                        .HasColumnType("text")
+                    b.Property<int?>("Service")
+                        .HasColumnType("integer")
                         .HasColumnName("service");
 
                     b.Property<bool?>("Skissim")
                         .HasColumnType("boolean")
                         .HasColumnName("skissim");
 
-                    b.Property<string>("SkissimType")
-                        .HasColumnType("text")
+                    b.Property<int?>("SkissimType")
+                        .HasColumnType("integer")
                         .HasColumnName("skissim_type");
 
                     b.Property<Guid>("SupplierId")
@@ -120,13 +120,12 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("text")
                         .HasColumnName("reason");
 
-                    b.Property<string>("Solution")
-                        .HasColumnType("text")
+                    b.Property<int?>("Solution")
+                        .HasColumnType("integer")
                         .HasColumnName("solution");
 
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("text")
+                    b.Property<int>("State")
+                        .HasColumnType("integer")
                         .HasColumnName("state");
 
                     b.Property<string>("SupplierSuppInfo")
@@ -218,8 +217,8 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("real")
                         .HasColumnName("customer_voucher");
 
-                    b.Property<string>("RefundState")
-                        .HasColumnType("text")
+                    b.Property<int?>("RefundState")
+                        .HasColumnType("integer")
                         .HasColumnName("refund_state");
 
                     b.Property<float?>("SupplierRefund")
@@ -302,9 +301,8 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("text")
                         .HasColumnName("last_name");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("text")
+                    b.Property<int>("Role")
+                        .HasColumnType("integer")
                         .HasColumnName("role");
 
                     b.HasKey("Id")

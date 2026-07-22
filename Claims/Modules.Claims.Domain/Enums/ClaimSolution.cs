@@ -2,8 +2,8 @@ namespace Modules.Claims.Domain.Enums;
 
 public enum ClaimSolution
 {
-    Remboursement,
-    Voucher,
-    RemboursementAndVoucher,
-    RejectionOfRequest
+    Remboursement = 0,
+    Voucher = 1,
+    RemboursementAndVoucher = 2,
+    RejectionOfRequest = 3
 }

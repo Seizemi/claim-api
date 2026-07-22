@@ -33,5 +33,6 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseSetting("ConnectionStrings:Postgres", ConnectionString);
+        builder.UseSetting("Seeding:Enabled", "false");
     }
 }
