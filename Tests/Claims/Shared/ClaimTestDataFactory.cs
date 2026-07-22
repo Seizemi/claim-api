@@ -7,7 +7,7 @@ namespace Modules.Claims.Features.Tests.Shared;
 
 internal static class ClaimTestDataFactory
 {
-    internal static Claim CreateClaim(DateTimeOffset dateOfReceivedClaim)
+    internal static Claim CreateClaim(DateTimeOffset dateOfReceivedClaim, ClaimState? state = null)
     {
         var fixture = new Fixture();
         var claimId = Guid.CreateVersion7();
@@ -18,7 +18,7 @@ internal static class ClaimTestDataFactory
         return new Claim
         {
             Id = claimId,
-            State = fixture.Create<ClaimState>(),
+            State = state ?? fixture.Create<ClaimState>(),
             BookingId = bookingId,
             Booking = new Booking
             {

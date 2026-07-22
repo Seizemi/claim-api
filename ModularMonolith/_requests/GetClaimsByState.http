@@ -1,0 +1,2 @@
+### Get claims by state
+GET {{host}}/api/v1.0/Claim/by-state/AwaitingSupplier?pageNumber=1&pageSize=20

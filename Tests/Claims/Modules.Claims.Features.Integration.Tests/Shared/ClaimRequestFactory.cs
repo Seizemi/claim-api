@@ -6,7 +6,7 @@ namespace Modules.Claims.Features.Integration.Tests.Shared;
 
 internal static class ClaimRequestFactory
 {
-    internal static ClaimRequest CreateValid(DateTimeOffset? dateOfReceivedClaim = null)
+    internal static ClaimRequest CreateValid(DateTimeOffset? dateOfReceivedClaim = null, ClaimState? state = null)
     {
         var fixture = new Fixture();
 
@@ -14,7 +14,7 @@ internal static class ClaimRequestFactory
         var dateOfDeparture = dateOfArrival.AddDays(Math.Abs(fixture.Create<int>()) % 30);
 
         return new ClaimRequest(
-            State: fixture.Create<ClaimState>(),
+            State: state ?? fixture.Create<ClaimState>(),
             FollowedBy: fixture.Create<string>(),
             Reason: fixture.Create<string>(),
             ClaimSummary: fixture.Create<string>(),
