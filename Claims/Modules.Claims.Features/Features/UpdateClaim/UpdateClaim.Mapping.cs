@@ -27,8 +27,6 @@ internal static class UpdateClaimMappingExtensions
         booking.BookingNumber = request.BookingNumber;
         booking.SalesChannel = request.SalesChannel;
         booking.Language = request.Language;
-        booking.SeasonLabel = request.SeasonLabel;
-        booking.SeasonValue = request.SeasonValue;
         booking.Service = request.Service;
         booking.Skissim = request.Skissim;
         booking.SkissimType = request.SkissimType;

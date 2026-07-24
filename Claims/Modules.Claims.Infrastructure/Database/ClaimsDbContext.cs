@@ -47,8 +47,6 @@ public class ClaimsDbContext(DbContextOptions<ClaimsDbContext> options) : DbCont
         {
             entity.HasKey(x => x.Id);
             entity.Property(x => x.BookingNumber).IsRequired();
-            entity.Property(x => x.SeasonLabel).IsRequired();
-            entity.Property(x => x.SeasonValue).IsRequired();
         });
 
         modelBuilder.Entity<Claim>(entity =>

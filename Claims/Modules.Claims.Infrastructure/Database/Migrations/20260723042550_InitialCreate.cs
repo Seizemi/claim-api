@@ -67,8 +67,6 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                     booking_number = table.Column<string>(type: "text", nullable: false),
                     sales_channel = table.Column<int>(type: "integer", nullable: true),
                     language = table.Column<int>(type: "integer", nullable: true),
-                    season_label = table.Column<string>(type: "text", nullable: false),
-                    season_value = table.Column<string>(type: "text", nullable: false),
                     service = table.Column<int>(type: "integer", nullable: true),
                     skissim = table.Column<bool>(type: "boolean", nullable: true),
                     skissim_type = table.Column<int>(type: "integer", nullable: true),

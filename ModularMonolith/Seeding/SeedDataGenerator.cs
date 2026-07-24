@@ -91,7 +91,6 @@ internal static class SeedDataGenerator
     private static Booking GenerateBooking(Guid bookingId, Supplier supplier, Random random)
     {
         var customerId = Guid.CreateVersion7();
-        var seasonYear = random.Next(2023, 2027);
 
         return new Booking
         {
@@ -99,8 +98,6 @@ internal static class SeedDataGenerator
             BookingNumber = $"BK{random.Next(100000, 999999)}",
             SalesChannel = RandomEnum<SalesChannel>(random),
             Language = RandomEnum<Language>(random),
-            SeasonLabel = $"Winter {seasonYear}/{seasonYear + 1}",
-            SeasonValue = $"{seasonYear}-{seasonYear + 1}",
             Service = RandomEnum<BookingService>(random),
             Skissim = random.Next(2) == 0,
             SkissimType = RandomEnum<SkissimType>(random),

@@ -6,8 +6,6 @@ public sealed record BookingRequest(
     string BookingNumber,
     SalesChannel? SalesChannel,
     Language? Language,
-    string SeasonLabel,
-    string SeasonValue,
     BookingService? Service,
     bool? Skissim,
     SkissimType? SkissimType,

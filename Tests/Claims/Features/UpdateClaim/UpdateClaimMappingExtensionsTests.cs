@@ -42,8 +42,6 @@ public sealed class UpdateClaimMappingExtensionsTests
         Assert.Equal(request.Booking.BookingNumber, claim.Booking.BookingNumber);
         Assert.Equal(request.Booking.SalesChannel, claim.Booking.SalesChannel);
         Assert.Equal(request.Booking.Language, claim.Booking.Language);
-        Assert.Equal(request.Booking.SeasonLabel, claim.Booking.SeasonLabel);
-        Assert.Equal(request.Booking.SeasonValue, claim.Booking.SeasonValue);
         Assert.Equal(request.Booking.Service, claim.Booking.Service);
         Assert.Equal(request.Booking.Skissim, claim.Booking.Skissim);
         Assert.Equal(request.Booking.SkissimType, claim.Booking.SkissimType);

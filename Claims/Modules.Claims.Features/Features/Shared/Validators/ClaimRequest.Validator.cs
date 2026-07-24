@@ -72,6 +72,11 @@ internal sealed class ClaimDateRequestValidator : AbstractValidator<ClaimDateReq
 {
     public ClaimDateRequestValidator()
     {
+        RuleFor(x => x.DateOfArrival)
+            .NotNull()
+            .WithErrorCode(ClaimErrorCodes.ClaimDateOfArrivalCannotBeNull)
+            .WithMessage(ClaimErrorMessages.ClaimDateOfArrivalCannotBeNull);
+
         RuleFor(x => x)
             .Must(cd => cd.DateOfDeparture is null
                      || cd.DateOfArrival is null

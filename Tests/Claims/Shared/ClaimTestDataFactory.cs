@@ -24,8 +24,6 @@ internal static class ClaimTestDataFactory
             {
                 Id = bookingId,
                 BookingNumber = fixture.Create<string>(),
-                SeasonLabel = fixture.Create<string>(),
-                SeasonValue = fixture.Create<string>(),
                 CustomerId = customerId,
                 Customer = new Customer
                 {
@@ -73,8 +71,6 @@ internal static class ClaimTestDataFactory
                 BookingNumber: fixture.Create<string>(),
                 SalesChannel: fixture.Create<SalesChannel>(),
                 Language: fixture.Create<Language>(),
-                SeasonLabel: fixture.Create<string>(),
-                SeasonValue: fixture.Create<string>(),
                 Service: fixture.Create<BookingService>(),
                 Skissim: fixture.Create<bool>(),
                 SkissimType: fixture.Create<SkissimType>(),
@@ -85,16 +81,13 @@ internal static class ClaimTestDataFactory
                 Supplier: new SupplierRequest(
                     Name: fixture.Create<string>(),
                     SupplierAkioNumber: fixture.Create<int>())),
-            // DateOfDeparture/DateOfArrival are left null: ClaimRequestValidator requires
-            // DateOfDeparture <= DateOfArrival whenever both are set, which two independently
-            // generated values can't guarantee.
             ClaimDate: new ClaimDateRequest(
                 DateOfReceivedClaim: fixture.Create<DateTimeOffset>(),
                 DateOfStartFollowUp: null,
                 DateLastUpdate: null,
-                DateOfDeparture: null,
+                DateOfDeparture: new DateTimeOffset(2025, 9, 15, 0, 0, 0, TimeSpan.Zero),
                 DateEndOfFollowUp: null,
-                DateOfArrival: null),
+                DateOfArrival: new DateTimeOffset(2025, 8, 15, 0, 0, 0, TimeSpan.Zero)),
             Compensation: new CompensationRequest(
                 CustomerVoucher: fixture.Create<float>(),
                 CustomerUsedVoucher: null,

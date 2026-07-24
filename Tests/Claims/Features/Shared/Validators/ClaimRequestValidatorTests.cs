@@ -134,6 +134,21 @@ public sealed class ClaimRequestValidatorTests
     }
 
     [Fact]
+    public void Validate_WithNullDateOfArrival_HasValidationErrorForNestedDateOfArrival()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest();
+        request = request with { ClaimDate = request.ClaimDate with { DateOfArrival = null } };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor("ClaimDate.DateOfArrival")
+            .WithErrorCode(ClaimErrorCodes.ClaimDateOfArrivalCannotBeNull);
+    }
+
+    [Fact]
     public void Validate_WithNullClaimDate_HasNoValidationErrorForClaimDate()
     {
         // Arrange

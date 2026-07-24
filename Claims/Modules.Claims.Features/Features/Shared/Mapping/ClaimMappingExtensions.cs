@@ -1,3 +1,4 @@
+using Modules.Claims.Domain;
 using Modules.Claims.Domain.Entities;
 using Modules.Claims.Features.Features.Shared.Responses;
 
@@ -16,23 +17,33 @@ internal static class ClaimMappingExtensions
         claim.UpdateReason,
         claim.CustomerSuppInfo,
         claim.SupplierSuppInfo,
-        claim.Booking.MapToResponse(),
+        claim.Booking.MapToResponse(claim.ClaimDate.DateOfArrival),
         claim.ClaimDate.MapToResponse(),
         claim.Compensation.MapToResponse());
 
-    private static BookingResponse MapToResponse(this Booking booking) => new(
-        booking.Id,
-        booking.BookingNumber,
-        booking.SalesChannel,
-        booking.Language,
-        booking.SeasonLabel,
-        booking.SeasonValue,
-        booking.Service,
-        booking.Skissim,
-        booking.SkissimType,
-        booking.Product,
-        booking.Customer.MapToResponse(),
-        booking.Supplier.MapToResponse());
+    private static BookingResponse MapToResponse(this Booking booking, DateTimeOffset? dateOfArrival)
+    {
+        string? seasonValue = null;
+        string? seasonLabel = null;
+        if (dateOfArrival is not null)
+        {
+            (seasonValue, seasonLabel) = SeasonCalculator.Compute(dateOfArrival.Value);
+        }
+
+        return new(
+            booking.Id,
+            booking.BookingNumber,
+            booking.SalesChannel,
+            booking.Language,
+            seasonLabel,
+            seasonValue,
+            booking.Service,
+            booking.Skissim,
+            booking.SkissimType,
+            booking.Product,
+            booking.Customer.MapToResponse(),
+            booking.Supplier.MapToResponse());
+    }
 
     private static CustomerResponse MapToResponse(this Customer customer) => new(
         customer.Id,

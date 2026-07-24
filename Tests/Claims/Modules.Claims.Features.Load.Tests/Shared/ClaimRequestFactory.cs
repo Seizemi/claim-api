@@ -27,8 +27,6 @@ internal static class ClaimRequestFactory
                 BookingNumber: fixture.Create<string>(),
                 SalesChannel: fixture.Create<SalesChannel>(),
                 Language: fixture.Create<Language>(),
-                SeasonLabel: fixture.Create<string>(),
-                SeasonValue: fixture.Create<string>(),
                 Service: fixture.Create<BookingService>(),
                 Skissim: fixture.Create<bool>(),
                 SkissimType: fixture.Create<SkissimType>(),

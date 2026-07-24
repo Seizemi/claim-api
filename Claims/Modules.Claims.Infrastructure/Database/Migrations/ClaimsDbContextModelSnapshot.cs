@@ -51,16 +51,6 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("sales_channel");
 
-                    b.Property<string>("SeasonLabel")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("season_label");
-
-                    b.Property<string>("SeasonValue")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("season_value");
-
                     b.Property<int?>("Service")
                         .HasColumnType("integer")
                         .HasColumnName("service");

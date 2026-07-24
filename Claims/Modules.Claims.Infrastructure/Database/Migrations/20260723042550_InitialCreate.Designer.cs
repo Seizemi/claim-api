@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Modules.Claims.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ClaimsDbContext))]
-    [Migration("20260722155817_InitialCreate")]
+    [Migration("20260723042550_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -53,16 +53,6 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                     b.Property<int?>("SalesChannel")
                         .HasColumnType("integer")
                         .HasColumnName("sales_channel");
-
-                    b.Property<string>("SeasonLabel")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("season_label");
-
-                    b.Property<string>("SeasonValue")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("season_value");
 
                     b.Property<int?>("Service")
                         .HasColumnType("integer")

@@ -8,6 +8,7 @@ internal static class ClaimErrorCodes
     internal const string ClaimCustomerNameCannotBeNullOrEmpty = "Claim.CustomerNameCannotBeNullOrEmpty";
     internal const string ClaimSupplierNameCannotBeNullOrEmpty = "Claim.SupplierNameCannotBeNullOrEmpty";
     internal const string ClaimDateOfDepartureCannotBeSmallerThanDateOfArrival = "Claim.DateOfDepartureCannotBeSmallerThanDateOfArrival";
+    internal const string ClaimDateOfArrivalCannotBeNull = "Claim.DateOfArrivalCannotBeNull";
 }
 
 internal static class ClaimErrorMessages
@@ -18,4 +19,5 @@ internal static class ClaimErrorMessages
     internal const string ClaimCustomerNameCannotBeNullOrEmpty = "Customer name cannot be null or empty.";
     internal const string ClaimSupplierNameCannotBeNullOrEmpty = "Supplier name cannot be null or empty.";
     internal const string ClaimDateOfDepartureCannotBeSmallerThanDateOfArrival = "Date of departure cannot be later than date of arrival.";
+    internal const string ClaimDateOfArrivalCannotBeNull = "Date of arrival cannot be null.";
 }

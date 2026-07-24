@@ -1,3 +1,4 @@
+using Modules.Claims.Domain;
 using Modules.Claims.Features.Features.Shared.Mapping;
 using Modules.Claims.Features.Tests.Shared;
 using Xunit;
@@ -53,5 +54,36 @@ public sealed class ClaimMappingExtensionsTests
 
         Assert.Equal(claim.Compensation.Id, response.Compensation.Id);
         Assert.Equal(claim.Compensation.RefundState, response.Compensation.RefundState);
+    }
+
+    [Fact]
+    public void MapToResponse_WithDateOfArrival_ComputesSeasonFromSeasonCalculator()
+    {
+        // Arrange
+        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        claim.ClaimDate.DateOfArrival = new DateTimeOffset(2025, 8, 15, 0, 0, 0, TimeSpan.Zero);
+        var (expectedSeasonValue, expectedSeasonLabel) = SeasonCalculator.Compute(claim.ClaimDate.DateOfArrival.Value);
+
+        // Act
+        var response = claim.MapToResponse();
+
+        // Assert
+        Assert.Equal(expectedSeasonValue, response.Booking.SeasonValue);
+        Assert.Equal(expectedSeasonLabel, response.Booking.SeasonLabel);
+    }
+
+    [Fact]
+    public void MapToResponse_WithNullDateOfArrival_ReturnsNullSeasonFields()
+    {
+        // Arrange
+        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        claim.ClaimDate.DateOfArrival = null;
+
+        // Act
+        var response = claim.MapToResponse();
+
+        // Assert
+        Assert.Null(response.Booking.SeasonValue);
+        Assert.Null(response.Booking.SeasonLabel);
     }
 }

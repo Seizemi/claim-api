@@ -8,8 +8,6 @@ public class Booking
     public required string BookingNumber { get; set; }
     public SalesChannel? SalesChannel { get; set; }
     public Language? Language { get; set; }
-    public required string SeasonLabel { get; set; }
-    public required string SeasonValue { get; set; }
     public BookingService? Service { get; set; }
     public bool? Skissim { get; set; }
     public SkissimType? SkissimType { get; set; }

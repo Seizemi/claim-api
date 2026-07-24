@@ -37,8 +37,6 @@ internal static class CreateClaimMappingExtensions
             BookingNumber = request.BookingNumber,
             SalesChannel = request.SalesChannel,
             Language = request.Language,
-            SeasonLabel = request.SeasonLabel,
-            SeasonValue = request.SeasonValue,
             Service = request.Service,
             Skissim = request.Skissim,
             SkissimType = request.SkissimType,
