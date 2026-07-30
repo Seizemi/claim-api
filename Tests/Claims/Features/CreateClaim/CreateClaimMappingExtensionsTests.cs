@@ -19,10 +19,10 @@ public sealed class CreateClaimMappingExtensionsTests
         // Assert
         Assert.Equal(claimId, claim.Id);
         Assert.Equal(request.State, claim.State);
-        Assert.Equal(request.FollowedBy, claim.FollowedBy);
-        Assert.Equal(request.Reason, claim.Reason);
+        Assert.Equal(request.FollowedById, claim.FollowedById);
+        Assert.Equal(request.ReasonId, claim.ReasonId);
         Assert.Equal(request.ClaimSummary, claim.ClaimSummary);
-        Assert.Equal(request.Solution, claim.Solution);
+        Assert.Equal(request.SolutionId, claim.SolutionId);
         Assert.Equal(request.PurposeOfSolution, claim.PurposeOfSolution);
         Assert.Equal(request.UpdateReason, claim.UpdateReason);
         Assert.Equal(request.CustomerSuppInfo, claim.CustomerSuppInfo);
@@ -41,18 +41,18 @@ public sealed class CreateClaimMappingExtensionsTests
 
         // Assert
         Assert.Equal(request.Booking.BookingNumber, claim.Booking.BookingNumber);
-        Assert.Equal(request.Booking.SalesChannel, claim.Booking.SalesChannel);
+        Assert.Equal(request.Booking.SalesChannelId, claim.Booking.SalesChannelId);
         Assert.Equal(request.Booking.Language, claim.Booking.Language);
-        Assert.Equal(request.Booking.Service, claim.Booking.Service);
-        Assert.Equal(request.Booking.Skissim, claim.Booking.Skissim);
-        Assert.Equal(request.Booking.SkissimType, claim.Booking.SkissimType);
+        Assert.Equal(request.Booking.SkissimTypeId, claim.Booking.SkissimTypeId);
         Assert.Equal(request.Booking.Product, claim.Booking.Product);
 
         Assert.Equal(request.Booking.Customer.Name, claim.Booking.Customer.Name);
         Assert.Equal(request.Booking.Customer.AkioNumber, claim.Booking.Customer.AkioNumber);
 
-        Assert.Equal(request.Booking.Supplier.Name, claim.Booking.Supplier.Name);
+        Assert.Equal(request.Booking.Supplier.Label, claim.Booking.Supplier.Label);
+        Assert.Equal(request.Booking.Supplier.Value, claim.Booking.Supplier.Value);
         Assert.Equal(request.Booking.Supplier.SupplierAkioNumber, claim.Booking.Supplier.SupplierAkioNumber);
+        Assert.Equal(request.Booking.Supplier.ServiceId, claim.Booking.Supplier.ServiceId);
 
         Assert.Equal(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
         Assert.Equal(request.ClaimDate.DateOfStartFollowUp, claim.ClaimDate.DateOfStartFollowUp);
@@ -65,7 +65,8 @@ public sealed class CreateClaimMappingExtensionsTests
         Assert.Equal(request.Compensation.CustomerUsedVoucher, claim.Compensation.CustomerUsedVoucher);
         Assert.Equal(request.Compensation.SupplierRefund, claim.Compensation.SupplierRefund);
         Assert.Equal(request.Compensation.ClaimRefund, claim.Compensation.ClaimRefund);
-        Assert.Equal(request.Compensation.RefundState, claim.Compensation.RefundState);
+        Assert.Equal(request.Compensation.RefundStateId, claim.Compensation.RefundStateId);
+        Assert.Equal(request.Compensation.CompensationReasonId, claim.Compensation.CompensationReasonId);
     }
 
     [Fact]

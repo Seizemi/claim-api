@@ -132,7 +132,7 @@ public sealed class GetAllClaimsHandlerTests
         Assert.Equal(claim.Booking.BookingNumber, response.Booking.BookingNumber);
         Assert.Equal(claim.Booking.Customer.Name, response.Booking.Customer.Name);
         Assert.Equal(claim.Booking.Customer.AkioNumber, response.Booking.Customer.AkioNumber);
-        Assert.Equal(claim.Booking.Supplier.Name, response.Booking.Supplier.Name);
+        Assert.Equal(claim.Booking.Supplier.Label, response.Booking.Supplier.Label);
         Assert.Equal(claim.Booking.Supplier.SupplierAkioNumber, response.Booking.Supplier.SupplierAkioNumber);
         Assert.Equal(claim.ClaimDate.DateOfReceivedClaim, response.ClaimDate.DateOfReceivedClaim);
         Assert.Equal(claim.Compensation.Id, response.Compensation.Id);

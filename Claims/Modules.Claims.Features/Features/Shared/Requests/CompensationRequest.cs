@@ -1,5 +1,3 @@
-using Modules.Claims.Domain.Enums;
-
 namespace Modules.Claims.Features.Features.Shared.Requests;
 
 public sealed record CompensationRequest(
@@ -7,4 +5,5 @@ public sealed record CompensationRequest(
     float? CustomerUsedVoucher,
     float? SupplierRefund,
     float? ClaimRefund,
-    RefundState? RefundState);
+    Guid RefundStateId,
+    Guid CompensationReasonId);

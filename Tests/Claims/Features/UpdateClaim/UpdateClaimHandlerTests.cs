@@ -21,6 +21,7 @@ public sealed class UpdateClaimHandlerTests
         writeContext.ChangeTracker.Clear();
 
         var request = ClaimTestDataFactory.CreateClaimRequest();
+        await ClaimTestDataFactory.SeedLookupsAsync(writeContext, request, TestContext.Current.CancellationToken);
         var handler = new UpdateClaimHandler(writeContext);
 
         // Act
@@ -38,12 +39,13 @@ public sealed class UpdateClaimHandlerTests
             .SingleAsync(c => c.Id == claim.Id, TestContext.Current.CancellationToken);
 
         Assert.Equal(request.State, updated.State);
-        Assert.Equal(request.FollowedBy, updated.FollowedBy);
+        Assert.Equal(request.FollowedById, updated.FollowedById);
         Assert.Equal(request.Booking.BookingNumber, updated.Booking.BookingNumber);
         Assert.Equal(request.Booking.Customer.Name, updated.Booking.Customer.Name);
-        Assert.Equal(request.Booking.Supplier.Name, updated.Booking.Supplier.Name);
+        Assert.Equal(request.Booking.Supplier.Label, updated.Booking.Supplier.Label);
+        Assert.Equal(request.Booking.Supplier.Value, updated.Booking.Supplier.Value);
         Assert.Equal(request.ClaimDate.DateOfReceivedClaim, updated.ClaimDate.DateOfReceivedClaim);
-        Assert.Equal(request.Compensation.RefundState, updated.Compensation.RefundState);
+        Assert.Equal(request.Compensation.RefundStateId, updated.Compensation.RefundStateId);
     }
 
     [Fact]
@@ -75,6 +77,7 @@ public sealed class UpdateClaimHandlerTests
 
         var handler = new UpdateClaimHandler(context);
         var request = ClaimTestDataFactory.CreateClaimRequest();
+        await ClaimTestDataFactory.SeedLookupsAsync(context, request, TestContext.Current.CancellationToken);
 
         // Act
         await handler.HandleAsync(claim.Id, request, TestContext.Current.CancellationToken);

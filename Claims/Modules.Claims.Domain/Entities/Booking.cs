@@ -6,11 +6,11 @@ public class Booking
 {
     public Guid Id { get; set; }
     public required string BookingNumber { get; set; }
-    public SalesChannel? SalesChannel { get; set; }
+    public required Guid SalesChannelId { get; set; }
+    public SalesChannel SalesChannel { get; set; } = null!;
     public Language? Language { get; set; }
-    public BookingService? Service { get; set; }
-    public bool? Skissim { get; set; }
-    public SkissimType? SkissimType { get; set; }
+    public required Guid SkissimTypeId { get; set; }
+    public SkissimType SkissimType { get; set; } = null!;
     public string? Product { get; set; }
     public Claim? Claim { get; set; }
     public required Guid CustomerId { get; set; }

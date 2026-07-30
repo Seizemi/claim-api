@@ -12,10 +12,10 @@ internal static class CreateClaimMappingExtensions
         {
             Id = id,
             State = request.State,
-            FollowedBy = request.FollowedBy,
-            Reason = request.Reason,
+            FollowedById = request.FollowedById,
+            ReasonId = request.ReasonId,
             ClaimSummary = request.ClaimSummary,
-            Solution = request.Solution,
+            SolutionId = request.SolutionId,
             PurposeOfSolution = request.PurposeOfSolution,
             UpdateReason = request.UpdateReason,
             CustomerSuppInfo = request.CustomerSuppInfo,
@@ -35,11 +35,9 @@ internal static class CreateClaimMappingExtensions
         {
             Id = id,
             BookingNumber = request.BookingNumber,
-            SalesChannel = request.SalesChannel,
+            SalesChannelId = request.SalesChannelId,
             Language = request.Language,
-            Service = request.Service,
-            Skissim = request.Skissim,
-            SkissimType = request.SkissimType,
+            SkissimTypeId = request.SkissimTypeId,
             Product = request.Product,
             CustomerId = customerId,
             Customer = request.Customer.MapToCustomer(customerId),
@@ -58,8 +56,10 @@ internal static class CreateClaimMappingExtensions
     private static Supplier MapToSupplier(this SupplierRequest request, Guid id) => new()
     {
         Id = id,
-        Name = request.Name,
-        SupplierAkioNumber = request.SupplierAkioNumber
+        Label = request.Label,
+        Value = request.Value,
+        SupplierAkioNumber = request.SupplierAkioNumber,
+        ServiceId = request.ServiceId
     };
 
     private static ClaimDate MapToClaimDate(this ClaimDateRequest request, Guid claimId) => new()
@@ -82,6 +82,7 @@ internal static class CreateClaimMappingExtensions
         CustomerUsedVoucher = request.CustomerUsedVoucher,
         SupplierRefund = request.SupplierRefund,
         ClaimRefund = request.ClaimRefund,
-        RefundState = request.RefundState
+        RefundStateId = request.RefundStateId,
+        CompensationReasonId = request.CompensationReasonId
     };
 }

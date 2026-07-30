@@ -1,5 +1,3 @@
-using Modules.Claims.Domain.Enums;
-
 namespace Modules.Claims.Features.Features.Shared.Responses;
 
 public sealed record CompensationResponse(
@@ -8,4 +6,5 @@ public sealed record CompensationResponse(
     float? CustomerUsedVoucher,
     float? SupplierRefund,
     float? ClaimRefund,
-    RefundState? RefundState);
+    RefundStateResponse RefundState,
+    CompensationReasonResponse CompensationReason);

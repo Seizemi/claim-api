@@ -27,7 +27,7 @@ public sealed class CreateClaimTests(IntegrationTestWebAppFactory factory) : Int
         Assert.NotEqual(Guid.Empty, claimId);
 
         var dbClaim = await DbContext.Claims.SingleAsync(c => c.Id == claimId, TestContext.Current.CancellationToken);
-        Assert.Equal(dbClaim.Reason, request.Reason);
+        Assert.Equal(dbClaim.ReasonId, request.ReasonId);
     }
 
     [Fact]
@@ -45,20 +45,20 @@ public sealed class CreateClaimTests(IntegrationTestWebAppFactory factory) : Int
         Assert.NotNull(claim);
         Assert.Equal(claimId, claim!.Id);
         Assert.Equal(request.State, claim.State);
-        Assert.Equal(request.Solution, claim.Solution);
-        Assert.Equal(request.Reason, claim.Reason);
+        Assert.Equal(request.SolutionId, claim.Solution.Id);
+        Assert.Equal(request.ReasonId, claim.Reason.Id);
         Assert.Equal(request.Booking.BookingNumber, claim.Booking.BookingNumber);
-        Assert.Equal(request.Booking.SalesChannel, claim.Booking.SalesChannel);
+        Assert.Equal(request.Booking.SalesChannelId, claim.Booking.SalesChannel.Id);
         Assert.Equal(request.Booking.Customer.Name, claim.Booking.Customer.Name);
         Assert.Equal(request.Booking.Customer.AkioNumber, claim.Booking.Customer.AkioNumber);
-        Assert.Equal(request.Booking.Supplier.Name, claim.Booking.Supplier.Name);
+        Assert.Equal(request.Booking.Supplier.Label, claim.Booking.Supplier.Label);
         Assert.Equal(request.Booking.Supplier.SupplierAkioNumber, claim.Booking.Supplier.SupplierAkioNumber);
         DateTimeOffsetAssert.AreClose(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
         Assert.Equal(request.Compensation.CustomerVoucher, claim.Compensation.CustomerVoucher);
-        Assert.Equal(request.Compensation.RefundState, claim.Compensation.RefundState);
+        Assert.Equal(request.Compensation.RefundStateId, claim.Compensation.RefundState.Id);
 
         var dbClaim = await DbContext.Claims.SingleAsync(c => c.Id == claimId, TestContext.Current.CancellationToken);
-        Assert.Equal(dbClaim.Reason, request.Reason);
+        Assert.Equal(dbClaim.ReasonId, request.ReasonId);
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public sealed class CreateClaimTests(IntegrationTestWebAppFactory factory) : Int
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
         Assert.NotNull(problem);
-        Assert.True(problem!.Errors.ContainsKey("Booking.Supplier.Name"));
+        Assert.True(problem!.Errors.ContainsKey("Booking.Supplier.Label"));
     }
 
     [Fact]
@@ -150,6 +150,33 @@ public sealed class CreateClaimTests(IntegrationTestWebAppFactory factory) : Int
         var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
         Assert.NotNull(problem);
         Assert.True(problem!.Errors.ContainsKey("Booking.Supplier"));
+    }
+
+    [Fact]
+    public async Task CreateClaim_NonExistentReasonId_Returns400ValidationProblem()
+    {
+        var request = ClaimRequestFactory.CreateValid() with { ReasonId = Guid.NewGuid() };
+
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.ReasonIdDoesNotExist"));
+        Assert.Equal(0, await DbContext.Claims.CountAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task CreateClaim_NonExistentFollowedById_Returns400ValidationProblem()
+    {
+        var request = ClaimRequestFactory.CreateValid() with { FollowedById = Guid.NewGuid() };
+
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.FollowedByIdDoesNotExist"));
     }
 
     [Fact]

@@ -9,10 +9,10 @@ internal static class ClaimMappingExtensions
     internal static ClaimResponse MapToResponse(this Claim claim) => new(
         claim.Id,
         claim.State,
-        claim.FollowedBy,
-        claim.Reason,
+        claim.FollowedBy?.MapToResponse(),
+        claim.Reason.MapToResponse(),
         claim.ClaimSummary,
-        claim.Solution,
+        claim.Solution.MapToResponse(),
         claim.PurposeOfSolution,
         claim.UpdateReason,
         claim.CustomerSuppInfo,
@@ -33,13 +33,11 @@ internal static class ClaimMappingExtensions
         return new(
             booking.Id,
             booking.BookingNumber,
-            booking.SalesChannel,
+            booking.SalesChannel.MapToResponse(),
             booking.Language,
             seasonLabel,
             seasonValue,
-            booking.Service,
-            booking.Skissim,
-            booking.SkissimType,
+            booking.SkissimType.MapToResponse(),
             booking.Product,
             booking.Customer.MapToResponse(),
             booking.Supplier.MapToResponse());
@@ -50,10 +48,12 @@ internal static class ClaimMappingExtensions
         customer.Name,
         customer.AkioNumber);
 
-    private static SupplierResponse MapToResponse(this Supplier supplier) => new(
+    internal static SupplierResponse MapToResponse(this Supplier supplier) => new(
         supplier.Id,
-        supplier.Name,
-        supplier.SupplierAkioNumber);
+        supplier.Label,
+        supplier.Value,
+        supplier.SupplierAkioNumber,
+        supplier.Service.MapToResponse());
 
     private static ClaimDateResponse MapToResponse(this ClaimDate claimDate) => new(
         claimDate.Id,
@@ -70,5 +70,47 @@ internal static class ClaimMappingExtensions
         compensation.CustomerUsedVoucher,
         compensation.SupplierRefund,
         compensation.ClaimRefund,
-        compensation.RefundState);
+        compensation.RefundState.MapToResponse(),
+        compensation.CompensationReason.MapToResponse());
+
+    internal static ReasonResponse MapToResponse(this Reason reason) => new(
+        reason.Id,
+        reason.Label,
+        reason.Value);
+
+    internal static SolutionResponse MapToResponse(this Solution solution) => new(
+        solution.Id,
+        solution.Label,
+        solution.Value);
+
+    internal static FollowedByResponse MapToResponse(this FollowedBy followedBy) => new(
+        followedBy.Id,
+        followedBy.Label,
+        followedBy.Value);
+
+    internal static RefundStateResponse MapToResponse(this RefundState refundState) => new(
+        refundState.Id,
+        refundState.Label,
+        refundState.Value);
+
+    internal static CompensationReasonResponse MapToResponse(this CompensationReason compensationReason) => new(
+        compensationReason.Id,
+        compensationReason.Label,
+        compensationReason.Value);
+
+    internal static SalesChannelResponse MapToResponse(this SalesChannel salesChannel) => new(
+        salesChannel.Id,
+        salesChannel.Label,
+        salesChannel.Value,
+        salesChannel.Language);
+
+    internal static ServiceResponse MapToResponse(this Service service) => new(
+        service.Id,
+        service.Label,
+        service.Value);
+
+    internal static SkissimTypeResponse MapToResponse(this SkissimType skissimType) => new(
+        skissimType.Id,
+        skissimType.Label,
+        skissimType.Value);
 }

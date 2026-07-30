@@ -28,7 +28,7 @@ public sealed class GetClaimByIdHandlerTests
         Assert.Equal(claim.State, result.Value.State);
         Assert.Equal(claim.Booking.BookingNumber, result.Value.Booking.BookingNumber);
         Assert.Equal(claim.Booking.Customer.Name, result.Value.Booking.Customer.Name);
-        Assert.Equal(claim.Booking.Supplier.Name, result.Value.Booking.Supplier.Name);
+        Assert.Equal(claim.Booking.Supplier.Label, result.Value.Booking.Supplier.Label);
         Assert.Equal(claim.ClaimDate.DateOfReceivedClaim, result.Value.ClaimDate.DateOfReceivedClaim);
         Assert.Equal(claim.Compensation.Id, result.Value.Compensation.Id);
     }

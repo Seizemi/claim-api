@@ -4,10 +4,10 @@ namespace Modules.Claims.Features.Features.Shared.Requests;
 
 public sealed record ClaimRequest(
     ClaimState State,
-    string? FollowedBy,
-    string? Reason,
+    Guid? FollowedById,
+    Guid ReasonId,
     string? ClaimSummary,
-    ClaimSolution? Solution,
+    Guid SolutionId,
     string? PurposeOfSolution,
     string? UpdateReason,
     string? CustomerSuppInfo,

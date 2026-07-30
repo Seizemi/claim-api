@@ -4,31 +4,29 @@ Content-Type: application/json
 
 {
   "state": "AwaitingSupplier",
-  "followedBy": "Lindy Doe",
-  "reason": "Overbooked accommodation",
+  "followedById": "019fb04d-5507-70cb-bbbf-fba3b5a2fdba",
+  "reasonId": "019fb04d-5506-729a-be8e-06b2362b67e6",
   "claimSummary": "Customer was denied check-in due to overbooking by the supplier.",
-  "solution": "Remboursement",
+  "solutionId": "019fb04d-5507-72e7-8a97-731ddc69edf0",
   "purposeOfSolution": "Full refund of accommodation cost",
   "updateReason": null,
   "customerSuppInfo": "Customer requested written confirmation of refund.",
   "supplierSuppInfo": "Supplier acknowledged the overbooking by email.",
   "booking": {
     "bookingNumber": "BK-2026-000123",
-    "salesChannel": "TravelskiCom",
+    "salesChannelId": "019fb04d-5509-70d9-8418-6052150544db",
     "language": "Fr",
-    "seasonLabel": "Winter 2025-2026",
-    "seasonValue": "W2526",
-    "service": "Hebergement",
-    "skissim": true,
-    "skissimType": "Select",
+    "skissimTypeId": "019fb04d-550a-7a23-bb0f-414a7ac6445a",
     "product": "Chalet Alpina - 7 nights",
     "customer": {
       "name": "John Smith",
       "akioNumber": 123456
     },
     "supplier": {
-      "name": "Alpina Resorts SARL",
-      "supplierAkioNumber": 654321
+      "label": "Alpina Resorts SARL",
+      "value": "AlpinaResortsSARL",
+      "supplierAkioNumber": 654321,
+      "serviceId": "019fb04d-5509-725c-b6b5-56d8118a52b5"
     }
   },
   "claimDate": {
@@ -44,6 +42,7 @@ Content-Type: application/json
     "customerUsedVoucher": null,
     "supplierRefund": null,
     "claimRefund": 350.00,
-    "refundState": "AwaitingRib"
+    "refundStateId": "019fb04d-5507-7916-87ec-f8a773f1f511",
+    "compensationReasonId": "019fb04d-5507-7528-8589-e168c890fa5c"
   }
 }

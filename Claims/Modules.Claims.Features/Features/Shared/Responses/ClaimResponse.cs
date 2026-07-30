@@ -5,10 +5,10 @@ namespace Modules.Claims.Features.Features.Shared.Responses;
 public sealed record ClaimResponse(
     Guid Id,
     ClaimState State,
-    string? FollowedBy,
-    string? Reason,
+    FollowedByResponse? FollowedBy,
+    ReasonResponse Reason,
     string? ClaimSummary,
-    ClaimSolution? Solution,
+    SolutionResponse Solution,
     string? PurposeOfSolution,
     string? UpdateReason,
     string? CustomerSuppInfo,

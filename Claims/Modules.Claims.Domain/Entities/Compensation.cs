@@ -1,5 +1,3 @@
-using Modules.Claims.Domain.Enums;
-
 namespace Modules.Claims.Domain.Entities;
 
 public class Compensation
@@ -9,7 +7,10 @@ public class Compensation
     public float? CustomerUsedVoucher { get; set; }
     public float? SupplierRefund { get; set; }
     public float? ClaimRefund { get; set; }
-    public RefundState? RefundState { get; set; }
+    public required Guid RefundStateId { get; set; }
+    public RefundState RefundState { get; set; } = null!;
+    public required Guid CompensationReasonId { get; set; }
+    public CompensationReason CompensationReason { get; set; } = null!;
     public required Guid ClaimId { get; set; }
     public Claim Claim { get; set; } = null!;
 }

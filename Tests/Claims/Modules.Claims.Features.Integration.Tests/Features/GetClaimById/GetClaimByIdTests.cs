@@ -24,10 +24,10 @@ public sealed class GetClaimByIdTests(IntegrationTestWebAppFactory factory) : In
         Assert.NotNull(claim);
         Assert.Equal(claimId, claim!.Id);
         Assert.Equal(request.State, claim.State);
-        Assert.Equal(request.FollowedBy, claim.FollowedBy);
+        Assert.Equal(request.FollowedById, claim.FollowedBy?.Id);
         Assert.Equal(request.Booking.BookingNumber, claim.Booking.BookingNumber);
         Assert.Equal(request.Booking.Customer.Name, claim.Booking.Customer.Name);
-        Assert.Equal(request.Booking.Supplier.Name, claim.Booking.Supplier.Name);
+        Assert.Equal(request.Booking.Supplier.Label, claim.Booking.Supplier.Label);
         DateTimeOffsetAssert.AreClose(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
         Assert.Equal(request.Compensation.CustomerVoucher, claim.Compensation.CustomerVoucher);
     }

@@ -1,6 +1,7 @@
 using ErrorOr;
 using Modules.Claims.Features.Abstractions;
 using Modules.Claims.Features.Features.Shared.Requests;
+using Modules.Claims.Features.Features.Shared.Validators;
 using Modules.Claims.Infrastructure.Database;
 
 namespace Modules.Claims.Features.Features.CreateClaim;
@@ -14,6 +15,12 @@ internal sealed class CreateClaimHandler(ClaimsDbContext context) : ICreateClaim
 {
     public async Task<ErrorOr<Guid>> HandleAsync(ClaimRequest request, CancellationToken cancellationToken)
     {
+        var lookupErrors = await context.ValidateLookupsExistAsync(request, cancellationToken);
+        if (lookupErrors.Count > 0)
+        {
+            return lookupErrors;
+        }
+
         var claimId = Guid.CreateVersion7();
         var claim = request.MapToClaim(claimId);
 

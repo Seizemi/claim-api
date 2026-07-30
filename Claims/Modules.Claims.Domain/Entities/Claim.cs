@@ -6,10 +6,13 @@ public class Claim
 {
     public Guid Id { get; set; }
     public required ClaimState State { get; set; }
-    public string? FollowedBy { get; set; }
-    public string? Reason { get; set; }
+    public Guid? FollowedById { get; set; }
+    public FollowedBy? FollowedBy { get; set; }
+    public required Guid ReasonId { get; set; }
+    public Reason Reason { get; set; } = null!;
     public string? ClaimSummary { get; set; }
-    public ClaimSolution? Solution { get; set; }
+    public required Guid SolutionId { get; set; }
+    public Solution Solution { get; set; } = null!;
     public string? PurposeOfSolution { get; set; }
     public string? UpdateReason { get; set; }
     public string? CustomerSuppInfo { get; set; }

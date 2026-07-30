@@ -11,6 +11,7 @@ public static class DependencyInjection
     public static IServiceCollection AddClaimsModule(this IServiceCollection services, IConfiguration configuration, bool enableSensitiveDataLogging)
     {
         services.AddClaimsInfrastructure(configuration, enableSensitiveDataLogging);
+        services.AddMemoryCache();
         services.RegisterHandlersFromAssemblyContaining(typeof(DependencyInjection));
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
 

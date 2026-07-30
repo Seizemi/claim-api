@@ -4,11 +4,9 @@ namespace Modules.Claims.Features.Features.Shared.Requests;
 
 public sealed record BookingRequest(
     string BookingNumber,
-    SalesChannel? SalesChannel,
+    Guid SalesChannelId,
     Language? Language,
-    BookingService? Service,
-    bool? Skissim,
-    SkissimType? SkissimType,
+    Guid SkissimTypeId,
     string? Product,
     CustomerRequest Customer,
     SupplierRequest Supplier);

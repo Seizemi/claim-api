@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Modules.Claims.Features.Abstractions;
 using Modules.Claims.Features.Features.Shared.Errors;
 using Modules.Claims.Features.Features.Shared.Requests;
+using Modules.Claims.Features.Features.Shared.Validators;
 using Modules.Claims.Infrastructure.Database;
 
 namespace Modules.Claims.Features.Features.UpdateClaim;
@@ -30,6 +31,12 @@ internal sealed class UpdateClaimHandler(ClaimsDbContext context) : IUpdateClaim
             return Error.Validation(
                 ClaimErrorCodes.ClaimCannotBeNull,
                 ClaimErrorMessages.ClaimCannotBeNull);
+        }
+
+        var lookupErrors = await context.ValidateLookupsExistAsync(request, cancellationToken);
+        if (lookupErrors.Count > 0)
+        {
+            return lookupErrors;
         }
 
         claim.UpdateFrom(request);

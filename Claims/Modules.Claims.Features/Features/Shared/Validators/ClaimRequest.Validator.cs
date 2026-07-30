@@ -8,6 +8,16 @@ internal sealed class ClaimRequestValidator : AbstractValidator<ClaimRequest>
 {
     public ClaimRequestValidator()
     {
+        RuleFor(x => x.ReasonId)
+            .NotEmpty()
+            .WithErrorCode(ClaimErrorCodes.ClaimReasonIdCannotBeEmpty)
+            .WithMessage(ClaimErrorMessages.ClaimReasonIdCannotBeEmpty);
+
+        RuleFor(x => x.SolutionId)
+            .NotEmpty()
+            .WithErrorCode(ClaimErrorCodes.ClaimSolutionIdCannotBeEmpty)
+            .WithMessage(ClaimErrorMessages.ClaimSolutionIdCannotBeEmpty);
+
         RuleFor(x => x.Booking)
             .Cascade(CascadeMode.Stop)
             .NotNull()
@@ -18,6 +28,13 @@ internal sealed class ClaimRequestValidator : AbstractValidator<ClaimRequest>
         RuleFor(x => x.ClaimDate)
             .SetValidator(new ClaimDateRequestValidator())
             .When(x => x.ClaimDate is not null);
+
+        RuleFor(x => x.Compensation)
+            .Cascade(CascadeMode.Stop)
+            .NotNull()
+            .WithErrorCode(CompensationErrorCodes.CompensationCannotBeNull)
+            .WithMessage(CompensationErrorMessages.CompensationCannotBeNull)
+            .SetValidator(new CompensationRequestValidator());
     }
 }
 
@@ -29,6 +46,16 @@ internal sealed class BookingRequestValidator : AbstractValidator<BookingRequest
             .NotEmpty()
             .WithErrorCode(ClaimErrorCodes.ClaimBookingNumberCannotBeNullOrEmpty)
             .WithMessage(ClaimErrorMessages.ClaimBookingNumberCannotBeNullOrEmpty);
+
+        RuleFor(x => x.SalesChannelId)
+            .NotEmpty()
+            .WithErrorCode(ClaimErrorCodes.ClaimSalesChannelIdCannotBeEmpty)
+            .WithMessage(ClaimErrorMessages.ClaimSalesChannelIdCannotBeEmpty);
+
+        RuleFor(x => x.SkissimTypeId)
+            .NotEmpty()
+            .WithErrorCode(ClaimErrorCodes.ClaimSkissimTypeIdCannotBeEmpty)
+            .WithMessage(ClaimErrorMessages.ClaimSkissimTypeIdCannotBeEmpty);
 
         RuleFor(x => x.Customer)
             .Cascade(CascadeMode.Stop)
@@ -61,10 +88,20 @@ internal sealed class SupplierRequestValidator : AbstractValidator<SupplierReque
 {
     public SupplierRequestValidator()
     {
-        RuleFor(x => x.Name)
+        RuleFor(x => x.Label)
             .NotEmpty()
-            .WithErrorCode(ClaimErrorCodes.ClaimSupplierNameCannotBeNullOrEmpty)
-            .WithMessage(ClaimErrorMessages.ClaimSupplierNameCannotBeNullOrEmpty);
+            .WithErrorCode(ClaimErrorCodes.ClaimSupplierLabelCannotBeNullOrEmpty)
+            .WithMessage(ClaimErrorMessages.ClaimSupplierLabelCannotBeNullOrEmpty);
+
+        RuleFor(x => x.Value)
+            .NotEmpty()
+            .WithErrorCode(ClaimErrorCodes.ClaimSupplierValueCannotBeNullOrEmpty)
+            .WithMessage(ClaimErrorMessages.ClaimSupplierValueCannotBeNullOrEmpty);
+
+        RuleFor(x => x.ServiceId)
+            .NotEmpty()
+            .WithErrorCode(ClaimErrorCodes.ClaimSupplierServiceIdCannotBeEmpty)
+            .WithMessage(ClaimErrorMessages.ClaimSupplierServiceIdCannotBeEmpty);
     }
 }
 
@@ -83,5 +120,21 @@ internal sealed class ClaimDateRequestValidator : AbstractValidator<ClaimDateReq
                      || cd.DateOfDeparture >= cd.DateOfArrival)
             .WithErrorCode(ClaimErrorCodes.ClaimDateOfDepartureCannotBeSmallerThanDateOfArrival)
             .WithMessage(ClaimErrorMessages.ClaimDateOfDepartureCannotBeSmallerThanDateOfArrival);
+    }
+}
+
+internal sealed class CompensationRequestValidator : AbstractValidator<CompensationRequest>
+{
+    public CompensationRequestValidator()
+    {
+        RuleFor(x => x.RefundStateId)
+            .NotEmpty()
+            .WithErrorCode(ClaimErrorCodes.ClaimRefundStateIdCannotBeEmpty)
+            .WithMessage(ClaimErrorMessages.ClaimRefundStateIdCannotBeEmpty);
+
+        RuleFor(x => x.CompensationReasonId)
+            .NotEmpty()
+            .WithErrorCode(ClaimErrorCodes.ClaimCompensationReasonIdCannotBeEmpty)
+            .WithMessage(ClaimErrorMessages.ClaimCompensationReasonIdCannotBeEmpty);
     }
 }

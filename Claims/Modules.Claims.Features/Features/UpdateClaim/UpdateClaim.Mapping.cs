@@ -8,10 +8,10 @@ internal static class UpdateClaimMappingExtensions
     internal static void UpdateFrom(this Claim claim, ClaimRequest request)
     {
         claim.State = request.State;
-        claim.FollowedBy = request.FollowedBy;
-        claim.Reason = request.Reason;
+        claim.FollowedById = request.FollowedById;
+        claim.ReasonId = request.ReasonId;
         claim.ClaimSummary = request.ClaimSummary;
-        claim.Solution = request.Solution;
+        claim.SolutionId = request.SolutionId;
         claim.PurposeOfSolution = request.PurposeOfSolution;
         claim.UpdateReason = request.UpdateReason;
         claim.CustomerSuppInfo = request.CustomerSuppInfo;
@@ -25,11 +25,9 @@ internal static class UpdateClaimMappingExtensions
     private static void UpdateFrom(this Booking booking, BookingRequest request)
     {
         booking.BookingNumber = request.BookingNumber;
-        booking.SalesChannel = request.SalesChannel;
+        booking.SalesChannelId = request.SalesChannelId;
         booking.Language = request.Language;
-        booking.Service = request.Service;
-        booking.Skissim = request.Skissim;
-        booking.SkissimType = request.SkissimType;
+        booking.SkissimTypeId = request.SkissimTypeId;
         booking.Product = request.Product;
 
         booking.Customer.UpdateFrom(request.Customer);
@@ -44,8 +42,10 @@ internal static class UpdateClaimMappingExtensions
 
     private static void UpdateFrom(this Supplier supplier, SupplierRequest request)
     {
-        supplier.Name = request.Name;
+        supplier.Label = request.Label;
+        supplier.Value = request.Value;
         supplier.SupplierAkioNumber = request.SupplierAkioNumber;
+        supplier.ServiceId = request.ServiceId;
     }
 
     private static void UpdateFrom(this ClaimDate claimDate, ClaimDateRequest request)
@@ -64,6 +64,7 @@ internal static class UpdateClaimMappingExtensions
         compensation.CustomerUsedVoucher = request.CustomerUsedVoucher;
         compensation.SupplierRefund = request.SupplierRefund;
         compensation.ClaimRefund = request.ClaimRefund;
-        compensation.RefundState = request.RefundState;
+        compensation.RefundStateId = request.RefundStateId;
+        compensation.CompensationReasonId = request.CompensationReasonId;
     }
 }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Modules.Claims.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ClaimsDbContext))]
-    [Migration("20260723042550_InitialCreate")]
+    [Migration("20260726133049_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -50,21 +50,13 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("text")
                         .HasColumnName("product");
 
-                    b.Property<int?>("SalesChannel")
-                        .HasColumnType("integer")
-                        .HasColumnName("sales_channel");
+                    b.Property<Guid>("SalesChannelId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sales_channel_id");
 
-                    b.Property<int?>("Service")
-                        .HasColumnType("integer")
-                        .HasColumnName("service");
-
-                    b.Property<bool?>("Skissim")
-                        .HasColumnType("boolean")
-                        .HasColumnName("skissim");
-
-                    b.Property<int?>("SkissimType")
-                        .HasColumnType("integer")
-                        .HasColumnName("skissim_type");
+                    b.Property<Guid>("SkissimTypeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("skissim_type_id");
 
                     b.Property<Guid>("SupplierId")
                         .HasColumnType("uuid")
@@ -75,6 +67,12 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
 
                     b.HasIndex("CustomerId")
                         .HasDatabaseName("ix_bookings_customer_id");
+
+                    b.HasIndex("SalesChannelId")
+                        .HasDatabaseName("ix_bookings_sales_channel_id");
+
+                    b.HasIndex("SkissimTypeId")
+                        .HasDatabaseName("ix_bookings_skissim_type_id");
 
                     b.HasIndex("SupplierId")
                         .HasDatabaseName("ix_bookings_supplier_id");
@@ -101,21 +99,21 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("text")
                         .HasColumnName("customer_supp_info");
 
-                    b.Property<string>("FollowedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("followed_by");
+                    b.Property<Guid?>("FollowedById")
+                        .HasColumnType("uuid")
+                        .HasColumnName("followed_by_id");
 
                     b.Property<string>("PurposeOfSolution")
                         .HasColumnType("text")
                         .HasColumnName("purpose_of_solution");
 
-                    b.Property<string>("Reason")
-                        .HasColumnType("text")
-                        .HasColumnName("reason");
+                    b.Property<Guid>("ReasonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("reason_id");
 
-                    b.Property<int?>("Solution")
-                        .HasColumnType("integer")
-                        .HasColumnName("solution");
+                    b.Property<Guid>("SolutionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("solution_id");
 
                     b.Property<int>("State")
                         .HasColumnType("integer")
@@ -135,6 +133,15 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                     b.HasIndex("BookingId")
                         .IsUnique()
                         .HasDatabaseName("ix_claims_booking_id");
+
+                    b.HasIndex("FollowedById")
+                        .HasDatabaseName("ix_claims_followed_by_id");
+
+                    b.HasIndex("ReasonId")
+                        .HasDatabaseName("ix_claims_reason_id");
+
+                    b.HasIndex("SolutionId")
+                        .HasDatabaseName("ix_claims_solution_id");
 
                     b.ToTable("claims", "claims");
                 });
@@ -202,6 +209,10 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("real")
                         .HasColumnName("claim_refund");
 
+                    b.Property<Guid>("CompensationReasonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("compensation_reason_id");
+
                     b.Property<float?>("CustomerUsedVoucher")
                         .HasColumnType("real")
                         .HasColumnName("customer_used_voucher");
@@ -210,9 +221,9 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("real")
                         .HasColumnName("customer_voucher");
 
-                    b.Property<int?>("RefundState")
-                        .HasColumnType("integer")
-                        .HasColumnName("refund_state");
+                    b.Property<Guid>("RefundStateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("refund_state_id");
 
                     b.Property<float?>("SupplierRefund")
                         .HasColumnType("real")
@@ -225,7 +236,36 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_compensations_claim_id");
 
+                    b.HasIndex("CompensationReasonId")
+                        .HasDatabaseName("ix_compensations_compensation_reason_id");
+
+                    b.HasIndex("RefundStateId")
+                        .HasDatabaseName("ix_compensations_refund_state_id");
+
                     b.ToTable("compensations", "claims");
+                });
+
+            modelBuilder.Entity("Modules.Claims.Domain.Entities.CompensationReason", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("label");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id")
+                        .HasName("pk_compensation_reasons");
+
+                    b.ToTable("compensation_reasons", "claims");
                 });
 
             modelBuilder.Entity("Modules.Claims.Domain.Entities.Customer", b =>
@@ -250,6 +290,172 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                     b.ToTable("customers", "claims");
                 });
 
+            modelBuilder.Entity("Modules.Claims.Domain.Entities.FollowedBy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("label");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id")
+                        .HasName("pk_followed_bies");
+
+                    b.ToTable("followed_bies", "claims");
+                });
+
+            modelBuilder.Entity("Modules.Claims.Domain.Entities.Reason", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("label");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id")
+                        .HasName("pk_reasons");
+
+                    b.ToTable("reasons", "claims");
+                });
+
+            modelBuilder.Entity("Modules.Claims.Domain.Entities.RefundState", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("label");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id")
+                        .HasName("pk_refund_states");
+
+                    b.ToTable("refund_states", "claims");
+                });
+
+            modelBuilder.Entity("Modules.Claims.Domain.Entities.SalesChannel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("label");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("language");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sales_channels");
+
+                    b.ToTable("sales_channels", "claims");
+                });
+
+            modelBuilder.Entity("Modules.Claims.Domain.Entities.Service", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("label");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id")
+                        .HasName("pk_services");
+
+                    b.ToTable("services", "claims");
+                });
+
+            modelBuilder.Entity("Modules.Claims.Domain.Entities.SkissimType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("label");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id")
+                        .HasName("pk_skissim_types");
+
+                    b.ToTable("skissim_types", "claims");
+                });
+
+            modelBuilder.Entity("Modules.Claims.Domain.Entities.Solution", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("label");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id")
+                        .HasName("pk_solutions");
+
+                    b.ToTable("solutions", "claims");
+                });
+
             modelBuilder.Entity("Modules.Claims.Domain.Entities.Supplier", b =>
                 {
                     b.Property<Guid>("Id")
@@ -257,17 +463,29 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Label")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnName("label");
+
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("service_id");
 
                     b.Property<int>("SupplierAkioNumber")
                         .HasColumnType("integer")
                         .HasColumnName("supplier_akio_number");
 
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("value");
+
                     b.HasKey("Id")
                         .HasName("pk_suppliers");
+
+                    b.HasIndex("ServiceId")
+                        .HasDatabaseName("ix_suppliers_service_id");
 
                     b.ToTable("suppliers", "claims");
                 });
@@ -317,6 +535,20 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_bookings_customers_customer_id");
 
+                    b.HasOne("Modules.Claims.Domain.Entities.SalesChannel", "SalesChannel")
+                        .WithMany()
+                        .HasForeignKey("SalesChannelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_bookings_sales_channels_sales_channel_id");
+
+                    b.HasOne("Modules.Claims.Domain.Entities.SkissimType", "SkissimType")
+                        .WithMany()
+                        .HasForeignKey("SkissimTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_bookings_skissim_types_skissim_type_id");
+
                     b.HasOne("Modules.Claims.Domain.Entities.Supplier", "Supplier")
                         .WithMany("Bookings")
                         .HasForeignKey("SupplierId")
@@ -325,6 +557,10 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasConstraintName("fk_bookings_suppliers_supplier_id");
 
                     b.Navigation("Customer");
+
+                    b.Navigation("SalesChannel");
+
+                    b.Navigation("SkissimType");
 
                     b.Navigation("Supplier");
                 });
@@ -338,7 +574,33 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_claims_bookings_booking_id");
 
+                    b.HasOne("Modules.Claims.Domain.Entities.FollowedBy", "FollowedBy")
+                        .WithMany()
+                        .HasForeignKey("FollowedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_claims_followed_bies_followed_by_id");
+
+                    b.HasOne("Modules.Claims.Domain.Entities.Reason", "Reason")
+                        .WithMany()
+                        .HasForeignKey("ReasonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_claims_reasons_reason_id");
+
+                    b.HasOne("Modules.Claims.Domain.Entities.Solution", "Solution")
+                        .WithMany()
+                        .HasForeignKey("SolutionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_claims_solutions_solution_id");
+
                     b.Navigation("Booking");
+
+                    b.Navigation("FollowedBy");
+
+                    b.Navigation("Reason");
+
+                    b.Navigation("Solution");
                 });
 
             modelBuilder.Entity("Modules.Claims.Domain.Entities.ClaimDate", b =>
@@ -362,7 +624,37 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_compensations_claims_claim_id");
 
+                    b.HasOne("Modules.Claims.Domain.Entities.CompensationReason", "CompensationReason")
+                        .WithMany()
+                        .HasForeignKey("CompensationReasonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_compensations_compensation_reasons_compensation_reason_id");
+
+                    b.HasOne("Modules.Claims.Domain.Entities.RefundState", "RefundState")
+                        .WithMany()
+                        .HasForeignKey("RefundStateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_compensations_refund_states_refund_state_id");
+
                     b.Navigation("Claim");
+
+                    b.Navigation("CompensationReason");
+
+                    b.Navigation("RefundState");
+                });
+
+            modelBuilder.Entity("Modules.Claims.Domain.Entities.Supplier", b =>
+                {
+                    b.HasOne("Modules.Claims.Domain.Entities.Service", "Service")
+                        .WithMany("Suppliers")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_suppliers_services_service_id");
+
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("Modules.Claims.Domain.Entities.Booking", b =>
@@ -382,6 +674,11 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
             modelBuilder.Entity("Modules.Claims.Domain.Entities.Customer", b =>
                 {
                     b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("Modules.Claims.Domain.Entities.Service", b =>
+                {
+                    b.Navigation("Suppliers");
                 });
 
             modelBuilder.Entity("Modules.Claims.Domain.Entities.Supplier", b =>

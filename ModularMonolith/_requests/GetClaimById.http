@@ -1,4 +1,4 @@
 ### Get claim by id
-@claimId = 019f7b7b-5748-7c5c-9371-5ff9ef7e20d1
+@claimId = 019fae5a-5ce5-73d8-94e4-c05034fe4576
 
 GET {{host}}/api/v1.0/Claim/claim-details/{{claimId}}/information

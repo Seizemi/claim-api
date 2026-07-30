@@ -19,10 +19,10 @@ public sealed class ClaimMappingExtensionsTests
         // Assert
         Assert.Equal(claim.Id, response.Id);
         Assert.Equal(claim.State, response.State);
-        Assert.Equal(claim.FollowedBy, response.FollowedBy);
-        Assert.Equal(claim.Reason, response.Reason);
+        Assert.Equal(claim.FollowedBy?.Id, response.FollowedBy?.Id);
+        Assert.Equal(claim.Reason.Id, response.Reason.Id);
         Assert.Equal(claim.ClaimSummary, response.ClaimSummary);
-        Assert.Equal(claim.Solution, response.Solution);
+        Assert.Equal(claim.Solution.Id, response.Solution.Id);
         Assert.Equal(claim.PurposeOfSolution, response.PurposeOfSolution);
         Assert.Equal(claim.UpdateReason, response.UpdateReason);
         Assert.Equal(claim.CustomerSuppInfo, response.CustomerSuppInfo);
@@ -41,19 +41,20 @@ public sealed class ClaimMappingExtensionsTests
         // Assert
         Assert.Equal(claim.Booking.Id, response.Booking.Id);
         Assert.Equal(claim.Booking.BookingNumber, response.Booking.BookingNumber);
-        Assert.Equal(claim.Booking.SalesChannel, response.Booking.SalesChannel);
+        Assert.Equal(claim.Booking.SalesChannel.Id, response.Booking.SalesChannel.Id);
         Assert.Equal(claim.Booking.Customer.Id, response.Booking.Customer.Id);
         Assert.Equal(claim.Booking.Customer.Name, response.Booking.Customer.Name);
         Assert.Equal(claim.Booking.Customer.AkioNumber, response.Booking.Customer.AkioNumber);
         Assert.Equal(claim.Booking.Supplier.Id, response.Booking.Supplier.Id);
-        Assert.Equal(claim.Booking.Supplier.Name, response.Booking.Supplier.Name);
+        Assert.Equal(claim.Booking.Supplier.Label, response.Booking.Supplier.Label);
         Assert.Equal(claim.Booking.Supplier.SupplierAkioNumber, response.Booking.Supplier.SupplierAkioNumber);
 
         Assert.Equal(claim.ClaimDate.Id, response.ClaimDate.Id);
         Assert.Equal(claim.ClaimDate.DateOfReceivedClaim, response.ClaimDate.DateOfReceivedClaim);
 
         Assert.Equal(claim.Compensation.Id, response.Compensation.Id);
-        Assert.Equal(claim.Compensation.RefundState, response.Compensation.RefundState);
+        Assert.Equal(claim.Compensation.RefundState.Id, response.Compensation.RefundState.Id);
+        Assert.Equal(claim.Compensation.CompensationReason.Id, response.Compensation.CompensationReason.Id);
     }
 
     [Fact]

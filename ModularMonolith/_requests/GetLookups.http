@@ -1,0 +1,2 @@
+﻿### Get Lookups
+GET {{host}}/api/v1.0/Lookups

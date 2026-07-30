@@ -91,7 +91,7 @@ public sealed class ClaimRequestValidatorTests
     }
 
     [Fact]
-    public void Validate_WithSupplierNameEmpty_HasValidationErrorForNestedSupplierName()
+    public void Validate_WithSupplierLabelEmpty_HasValidationErrorForNestedSupplierLabel()
     {
         // Arrange
         var request = ClaimTestDataFactory.CreateClaimRequest();
@@ -99,7 +99,7 @@ public sealed class ClaimRequestValidatorTests
         {
             Booking = request.Booking with
             {
-                Supplier = request.Booking.Supplier with { Name = string.Empty }
+                Supplier = request.Booking.Supplier with { Label = string.Empty }
             }
         };
 
@@ -107,8 +107,152 @@ public sealed class ClaimRequestValidatorTests
         var result = _validator.TestValidate(request);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Booking.Supplier.Name")
-            .WithErrorCode(ClaimErrorCodes.ClaimSupplierNameCannotBeNullOrEmpty);
+        result.ShouldHaveValidationErrorFor("Booking.Supplier.Label")
+            .WithErrorCode(ClaimErrorCodes.ClaimSupplierLabelCannotBeNullOrEmpty);
+    }
+
+    [Fact]
+    public void Validate_WithSupplierValueEmpty_HasValidationErrorForNestedSupplierValue()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest();
+        request = request with
+        {
+            Booking = request.Booking with
+            {
+                Supplier = request.Booking.Supplier with { Value = string.Empty }
+            }
+        };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor("Booking.Supplier.Value")
+            .WithErrorCode(ClaimErrorCodes.ClaimSupplierValueCannotBeNullOrEmpty);
+    }
+
+    [Fact]
+    public void Validate_WithSupplierServiceIdEmpty_HasValidationErrorForNestedSupplierServiceId()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest();
+        request = request with
+        {
+            Booking = request.Booking with
+            {
+                Supplier = request.Booking.Supplier with { ServiceId = Guid.Empty }
+            }
+        };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor("Booking.Supplier.ServiceId")
+            .WithErrorCode(ClaimErrorCodes.ClaimSupplierServiceIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WithReasonIdEmpty_HasValidationErrorForReasonId()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest() with { ReasonId = Guid.Empty };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.ReasonId)
+            .WithErrorCode(ClaimErrorCodes.ClaimReasonIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WithSolutionIdEmpty_HasValidationErrorForSolutionId()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest() with { SolutionId = Guid.Empty };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.SolutionId)
+            .WithErrorCode(ClaimErrorCodes.ClaimSolutionIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WithSalesChannelIdEmpty_HasValidationErrorForNestedSalesChannelId()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest();
+        request = request with { Booking = request.Booking with { SalesChannelId = Guid.Empty } };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor("Booking.SalesChannelId")
+            .WithErrorCode(ClaimErrorCodes.ClaimSalesChannelIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WithSkissimTypeIdEmpty_HasValidationErrorForNestedSkissimTypeId()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest();
+        request = request with { Booking = request.Booking with { SkissimTypeId = Guid.Empty } };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor("Booking.SkissimTypeId")
+            .WithErrorCode(ClaimErrorCodes.ClaimSkissimTypeIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WithNullCompensation_HasValidationErrorForCompensation()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest() with { Compensation = null! };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.Compensation)
+            .WithErrorCode(CompensationErrorCodes.CompensationCannotBeNull);
+    }
+
+    [Fact]
+    public void Validate_WithRefundStateIdEmpty_HasValidationErrorForNestedRefundStateId()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest();
+        request = request with { Compensation = request.Compensation with { RefundStateId = Guid.Empty } };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor("Compensation.RefundStateId")
+            .WithErrorCode(ClaimErrorCodes.ClaimRefundStateIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WithCompensationReasonIdEmpty_HasValidationErrorForNestedCompensationReasonId()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest();
+        request = request with { Compensation = request.Compensation with { CompensationReasonId = Guid.Empty } };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor("Compensation.CompensationReasonId")
+            .WithErrorCode(ClaimErrorCodes.ClaimCompensationReasonIdCannotBeEmpty);
     }
 
     [Fact]

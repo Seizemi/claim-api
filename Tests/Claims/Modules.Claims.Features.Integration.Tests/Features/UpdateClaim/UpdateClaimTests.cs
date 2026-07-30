@@ -24,7 +24,7 @@ public sealed class UpdateClaimTests(IntegrationTestWebAppFactory factory) : Int
         var updated = original with
         {
             State = newState,
-            Reason = "Updated reason",
+            ClaimSummary = "Updated summary",
             Compensation = original.Compensation with { CustomerVoucher = 999.5f }
         };
 
@@ -36,7 +36,7 @@ public sealed class UpdateClaimTests(IntegrationTestWebAppFactory factory) : Int
         Assert.NotNull(claim);
         Assert.Equal(claimId, claim!.Id);
         Assert.Equal(newState, claim.State);
-        Assert.Equal("Updated reason", claim.Reason);
+        Assert.Equal("Updated summary", claim.ClaimSummary);
         Assert.Equal(999.5f, claim.Compensation.CustomerVoucher);
 
         var dbClaim = await DbContext.Claims.SingleAsync(c => c.Id == claimId, TestContext.Current.CancellationToken);
@@ -67,7 +67,7 @@ public sealed class UpdateClaimTests(IntegrationTestWebAppFactory factory) : Int
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
         Assert.NotNull(problem);
-        Assert.True(problem!.Errors.ContainsKey("Booking.Supplier.Name"));
+        Assert.True(problem!.Errors.ContainsKey("Booking.Supplier.Label"));
     }
 
     [Fact]

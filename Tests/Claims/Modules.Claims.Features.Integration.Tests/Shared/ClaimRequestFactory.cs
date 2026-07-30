@@ -15,28 +15,28 @@ internal static class ClaimRequestFactory
 
         return new ClaimRequest(
             State: state ?? fixture.Create<ClaimState>(),
-            FollowedBy: fixture.Create<string>(),
-            Reason: fixture.Create<string>(),
+            FollowedById: LookupTestIds.FollowedById,
+            ReasonId: LookupTestIds.ReasonId,
             ClaimSummary: fixture.Create<string>(),
-            Solution: fixture.Create<ClaimSolution>(),
+            SolutionId: LookupTestIds.SolutionId,
             PurposeOfSolution: fixture.Create<string>(),
             UpdateReason: null,
             CustomerSuppInfo: fixture.Create<string>(),
             SupplierSuppInfo: fixture.Create<string>(),
             Booking: new BookingRequest(
                 BookingNumber: fixture.Create<string>(),
-                SalesChannel: fixture.Create<SalesChannel>(),
+                SalesChannelId: LookupTestIds.SalesChannelId,
                 Language: fixture.Create<Language>(),
-                Service: fixture.Create<BookingService>(),
-                Skissim: fixture.Create<bool>(),
-                SkissimType: fixture.Create<SkissimType>(),
+                SkissimTypeId: LookupTestIds.SkissimTypeId,
                 Product: fixture.Create<string>(),
                 Customer: new CustomerRequest(
                     Name: fixture.Create<string>(),
                     AkioNumber: fixture.Create<int>()),
                 Supplier: new SupplierRequest(
-                    Name: fixture.Create<string>(),
-                    SupplierAkioNumber: fixture.Create<int>())),
+                    Label: fixture.Create<string>(),
+                    Value: fixture.Create<string>(),
+                    SupplierAkioNumber: fixture.Create<int>(),
+                    ServiceId: LookupTestIds.ServiceId)),
             ClaimDate: new ClaimDateRequest(
                 DateOfReceivedClaim: dateOfReceivedClaim ?? DateTimeOffset.UtcNow.AddDays(-fixture.Create<int>() % 30),
                 DateOfStartFollowUp: null,
@@ -49,7 +49,8 @@ internal static class ClaimRequestFactory
                 CustomerUsedVoucher: null,
                 SupplierRefund: null,
                 ClaimRefund: null,
-                RefundState: fixture.Create<RefundState>()));
+                RefundStateId: LookupTestIds.RefundStateId,
+                CompensationReasonId: LookupTestIds.CompensationReasonId));
     }
 
     internal static ClaimRequest WithEmptyBookingNumber(ClaimRequest request) =>
@@ -69,7 +70,7 @@ internal static class ClaimRequestFactory
         {
             Booking = request.Booking with
             {
-                Supplier = request.Booking.Supplier with { Name = string.Empty }
+                Supplier = request.Booking.Supplier with { Label = string.Empty }
             }
         };
 
