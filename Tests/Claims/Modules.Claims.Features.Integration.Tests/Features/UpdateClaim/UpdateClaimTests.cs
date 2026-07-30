@@ -126,6 +126,123 @@ public sealed class UpdateClaimTests(IntegrationTestWebAppFactory factory) : Int
     }
 
     [Fact]
+    public async Task UpdateClaim_NonExistentFollowedById_Returns400ValidationProblem()
+    {
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
+        var request = ClaimRequestFactory.CreateValid() with { FollowedById = Guid.NewGuid() };
+
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.FollowedByIdDoesNotExist"));
+    }
+
+    [Fact]
+    public async Task UpdateClaim_NonExistentReasonId_Returns400ValidationProblem()
+    {
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
+        var request = ClaimRequestFactory.CreateValid() with { ReasonId = Guid.NewGuid() };
+
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.ReasonIdDoesNotExist"));
+    }
+
+    [Fact]
+    public async Task UpdateClaim_NonExistentSolutionId_Returns400ValidationProblem()
+    {
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
+        var request = ClaimRequestFactory.CreateValid() with { SolutionId = Guid.NewGuid() };
+
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.SolutionIdDoesNotExist"));
+    }
+
+    [Fact]
+    public async Task UpdateClaim_NonExistentSalesChannelId_Returns400ValidationProblem()
+    {
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
+        var request = ClaimRequestFactory.CreateValid();
+        request = request with { Booking = request.Booking with { SalesChannelId = Guid.NewGuid() } };
+
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.SalesChannelIdDoesNotExist"));
+    }
+
+    [Fact]
+    public async Task UpdateClaim_NonExistentSkissimTypeId_Returns400ValidationProblem()
+    {
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
+        var request = ClaimRequestFactory.CreateValid();
+        request = request with { Booking = request.Booking with { SkissimTypeId = Guid.NewGuid() } };
+
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.SkissimTypeIdDoesNotExist"));
+    }
+
+    [Fact]
+    public async Task UpdateClaim_NonExistentSupplierServiceId_Returns400ValidationProblem()
+    {
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
+        var request = ClaimRequestFactory.CreateValid();
+        request = request with { Booking = request.Booking with { Supplier = request.Booking.Supplier with { ServiceId = Guid.NewGuid() } } };
+
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.SupplierServiceIdDoesNotExist"));
+    }
+
+    [Fact]
+    public async Task UpdateClaim_NonExistentRefundStateId_Returns400ValidationProblem()
+    {
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
+        var request = ClaimRequestFactory.CreateValid();
+        request = request with { Compensation = request.Compensation with { RefundStateId = Guid.NewGuid() } };
+
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.RefundStateIdDoesNotExist"));
+    }
+
+    [Fact]
+    public async Task UpdateClaim_NonExistentCompensationReasonId_Returns400ValidationProblem()
+    {
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
+        var request = ClaimRequestFactory.CreateValid();
+        request = request with { Compensation = request.Compensation with { CompensationReasonId = Guid.NewGuid() } };
+
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.CompensationReasonIdDoesNotExist"));
+    }
+
+    [Fact]
     public async Task UpdateClaim_MalformedJsonBody_Returns400BadRequest()
     {
         var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);

@@ -180,6 +180,95 @@ public sealed class CreateClaimTests(IntegrationTestWebAppFactory factory) : Int
     }
 
     [Fact]
+    public async Task CreateClaim_NonExistentSolutionId_Returns400ValidationProblem()
+    {
+        var request = ClaimRequestFactory.CreateValid() with { SolutionId = Guid.NewGuid() };
+
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.SolutionIdDoesNotExist"));
+        Assert.Equal(0, await DbContext.Claims.CountAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task CreateClaim_NonExistentSalesChannelId_Returns400ValidationProblem()
+    {
+        var request = ClaimRequestFactory.CreateValid();
+        request = request with { Booking = request.Booking with { SalesChannelId = Guid.NewGuid() } };
+
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.SalesChannelIdDoesNotExist"));
+        Assert.Equal(0, await DbContext.Claims.CountAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task CreateClaim_NonExistentSkissimTypeId_Returns400ValidationProblem()
+    {
+        var request = ClaimRequestFactory.CreateValid();
+        request = request with { Booking = request.Booking with { SkissimTypeId = Guid.NewGuid() } };
+
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.SkissimTypeIdDoesNotExist"));
+        Assert.Equal(0, await DbContext.Claims.CountAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task CreateClaim_NonExistentSupplierServiceId_Returns400ValidationProblem()
+    {
+        var request = ClaimRequestFactory.CreateValid();
+        request = request with { Booking = request.Booking with { Supplier = request.Booking.Supplier with { ServiceId = Guid.NewGuid() } } };
+
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.SupplierServiceIdDoesNotExist"));
+        Assert.Equal(0, await DbContext.Claims.CountAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task CreateClaim_NonExistentRefundStateId_Returns400ValidationProblem()
+    {
+        var request = ClaimRequestFactory.CreateValid();
+        request = request with { Compensation = request.Compensation with { RefundStateId = Guid.NewGuid() } };
+
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.RefundStateIdDoesNotExist"));
+        Assert.Equal(0, await DbContext.Claims.CountAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task CreateClaim_NonExistentCompensationReasonId_Returns400ValidationProblem()
+    {
+        var request = ClaimRequestFactory.CreateValid();
+        request = request with { Compensation = request.Compensation with { CompensationReasonId = Guid.NewGuid() } };
+
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("Claim.CompensationReasonIdDoesNotExist"));
+        Assert.Equal(0, await DbContext.Claims.CountAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
     public async Task CreateClaim_MalformedJsonBody_Returns400BadRequest()
     {
         using var content = new StringContent("{ not valid json", Encoding.UTF8, "application/json");
