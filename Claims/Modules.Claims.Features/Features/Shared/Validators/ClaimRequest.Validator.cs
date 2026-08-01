@@ -88,20 +88,10 @@ internal sealed class SupplierRequestValidator : AbstractValidator<SupplierReque
 {
     public SupplierRequestValidator()
     {
-        RuleFor(x => x.Label)
+        RuleFor(x => x.Id)
             .NotEmpty()
-            .WithErrorCode(ClaimErrorCodes.ClaimSupplierLabelCannotBeNullOrEmpty)
-            .WithMessage(ClaimErrorMessages.ClaimSupplierLabelCannotBeNullOrEmpty);
-
-        RuleFor(x => x.Value)
-            .NotEmpty()
-            .WithErrorCode(ClaimErrorCodes.ClaimSupplierValueCannotBeNullOrEmpty)
-            .WithMessage(ClaimErrorMessages.ClaimSupplierValueCannotBeNullOrEmpty);
-
-        RuleFor(x => x.ServiceId)
-            .NotEmpty()
-            .WithErrorCode(ClaimErrorCodes.ClaimSupplierServiceIdCannotBeEmpty)
-            .WithMessage(ClaimErrorMessages.ClaimSupplierServiceIdCannotBeEmpty);
+            .WithErrorCode(ClaimErrorCodes.ClaimSupplierIdCannotBeEmpty)
+            .WithMessage(ClaimErrorMessages.ClaimSupplierIdCannotBeEmpty);
     }
 }
 

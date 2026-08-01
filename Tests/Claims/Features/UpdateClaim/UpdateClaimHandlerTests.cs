@@ -33,7 +33,6 @@ public sealed class UpdateClaimHandlerTests
         await using var readContext = ClaimsDbContextFactory.Create(databaseName);
         var updated = await readContext.Claims
             .Include(c => c.Booking).ThenInclude(b => b.Customer)
-            .Include(c => c.Booking).ThenInclude(b => b.Supplier)
             .Include(c => c.ClaimDate)
             .Include(c => c.Compensation)
             .SingleAsync(c => c.Id == claim.Id, TestContext.Current.CancellationToken);
@@ -42,8 +41,7 @@ public sealed class UpdateClaimHandlerTests
         Assert.Equal(request.FollowedById, updated.FollowedById);
         Assert.Equal(request.Booking.BookingNumber, updated.Booking.BookingNumber);
         Assert.Equal(request.Booking.Customer.Name, updated.Booking.Customer.Name);
-        Assert.Equal(request.Booking.Supplier.Label, updated.Booking.Supplier.Label);
-        Assert.Equal(request.Booking.Supplier.Value, updated.Booking.Supplier.Value);
+        Assert.Equal(request.Booking.Supplier.Id, updated.Booking.SupplierId);
         Assert.Equal(request.ClaimDate.DateOfReceivedClaim, updated.ClaimDate.DateOfReceivedClaim);
         Assert.Equal(request.Compensation.RefundStateId, updated.Compensation.RefundStateId);
     }

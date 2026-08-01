@@ -30,7 +30,6 @@ internal static class CreateClaimMappingExtensions
     private static Booking MapToBooking(this BookingRequest request, Guid id)
     {
         var customerId = Guid.CreateVersion7();
-        var supplierId = Guid.CreateVersion7();
         return new()
         {
             Id = id,
@@ -41,8 +40,7 @@ internal static class CreateClaimMappingExtensions
             Product = request.Product,
             CustomerId = customerId,
             Customer = request.Customer.MapToCustomer(customerId),
-            SupplierId = supplierId,
-            Supplier = request.Supplier.MapToSupplier(supplierId)
+            SupplierId = request.Supplier.Id
         };
     }
 
@@ -51,15 +49,6 @@ internal static class CreateClaimMappingExtensions
         Id = id,
         Name = request.Name,
         AkioNumber = request.AkioNumber
-    };
-
-    private static Supplier MapToSupplier(this SupplierRequest request, Guid id) => new()
-    {
-        Id = id,
-        Label = request.Label,
-        Value = request.Value,
-        SupplierAkioNumber = request.SupplierAkioNumber,
-        ServiceId = request.ServiceId
     };
 
     private static ClaimDate MapToClaimDate(this ClaimDateRequest request, Guid claimId) => new()

@@ -1,5 +1,5 @@
 ### Update a claim
-@claimId = 019fb04d-5665-7e35-97ce-1b058ce2c6d4
+@claimId = 019fb04d-5662-78ce-95ed-f726755ee301
 
 PUT {{host}}/api/v1.0/Claim/claim-details/{{claimId}}/information
 Content-Type: application/json
@@ -28,7 +28,8 @@ Content-Type: application/json
       "label": "Alpina Resorts SARL",
       "value": "AlpinaResortsSARL",
       "supplierAkioNumber": 654321,
-      "serviceId": "019fb04d-5509-725c-b6b5-56d8118a52b5"
+      "serviceId": "019fb04d-5509-725c-b6b5-56d8118a52b5",
+      "id": "019fb04d-563f-7577-80fb-3e96c7b06f26"
     }
   },
   "claimDate": {

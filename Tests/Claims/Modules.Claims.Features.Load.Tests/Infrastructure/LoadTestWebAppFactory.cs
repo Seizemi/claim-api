@@ -43,6 +43,7 @@ public sealed class LoadTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         context.SalesChannels.Add(new SalesChannel { Id = LookupTestIds.SalesChannelId, Label = "Test channel", Value = "TestChannel", Language = "Fr" });
         context.Services.Add(new Service { Id = LookupTestIds.ServiceId, Label = "Test service", Value = "TestService" });
         context.SkissimTypes.Add(new SkissimType { Id = LookupTestIds.SkissimTypeId, Label = "Test skissim type", Value = "TestSkissimType" });
+        context.Suppliers.Add(new Supplier { Id = LookupTestIds.SupplierId, Label = "Test supplier", Value = "TestSupplier", SupplierAkioNumber = 1, ServiceId = LookupTestIds.ServiceId });
 
         await context.SaveChangesAsync();
     }

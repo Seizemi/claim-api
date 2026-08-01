@@ -49,10 +49,7 @@ public sealed class CreateClaimMappingExtensionsTests
         Assert.Equal(request.Booking.Customer.Name, claim.Booking.Customer.Name);
         Assert.Equal(request.Booking.Customer.AkioNumber, claim.Booking.Customer.AkioNumber);
 
-        Assert.Equal(request.Booking.Supplier.Label, claim.Booking.Supplier.Label);
-        Assert.Equal(request.Booking.Supplier.Value, claim.Booking.Supplier.Value);
-        Assert.Equal(request.Booking.Supplier.SupplierAkioNumber, claim.Booking.Supplier.SupplierAkioNumber);
-        Assert.Equal(request.Booking.Supplier.ServiceId, claim.Booking.Supplier.ServiceId);
+        Assert.Equal(request.Booking.Supplier.Id, claim.Booking.SupplierId);
 
         Assert.Equal(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
         Assert.Equal(request.ClaimDate.DateOfStartFollowUp, claim.ClaimDate.DateOfStartFollowUp);
@@ -82,7 +79,7 @@ public sealed class CreateClaimMappingExtensionsTests
         // Assert
         Assert.Equal(claim.Booking.Id, claim.BookingId);
         Assert.Equal(claim.Booking.Customer.Id, claim.Booking.CustomerId);
-        Assert.Equal(claim.Booking.Supplier.Id, claim.Booking.SupplierId);
+        Assert.Equal(request.Booking.Supplier.Id, claim.Booking.SupplierId);
         Assert.Equal(claim.Id, claim.ClaimDate.ClaimId);
         Assert.Equal(claim.Id, claim.Compensation.ClaimId);
 
@@ -91,7 +88,6 @@ public sealed class CreateClaimMappingExtensionsTests
             claim.Id,
             claim.Booking.Id,
             claim.Booking.Customer.Id,
-            claim.Booking.Supplier.Id,
             claim.ClaimDate.Id,
             claim.Compensation.Id
         };

@@ -91,7 +91,7 @@ public sealed class ClaimRequestValidatorTests
     }
 
     [Fact]
-    public void Validate_WithSupplierLabelEmpty_HasValidationErrorForNestedSupplierLabel()
+    public void Validate_WithSupplierIdEmpty_HasValidationErrorForNestedSupplierId()
     {
         // Arrange
         var request = ClaimTestDataFactory.CreateClaimRequest();
@@ -99,7 +99,7 @@ public sealed class ClaimRequestValidatorTests
         {
             Booking = request.Booking with
             {
-                Supplier = request.Booking.Supplier with { Label = string.Empty }
+                Supplier = request.Booking.Supplier with { Id = Guid.Empty }
             }
         };
 
@@ -107,50 +107,8 @@ public sealed class ClaimRequestValidatorTests
         var result = _validator.TestValidate(request);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Booking.Supplier.Label")
-            .WithErrorCode(ClaimErrorCodes.ClaimSupplierLabelCannotBeNullOrEmpty);
-    }
-
-    [Fact]
-    public void Validate_WithSupplierValueEmpty_HasValidationErrorForNestedSupplierValue()
-    {
-        // Arrange
-        var request = ClaimTestDataFactory.CreateClaimRequest();
-        request = request with
-        {
-            Booking = request.Booking with
-            {
-                Supplier = request.Booking.Supplier with { Value = string.Empty }
-            }
-        };
-
-        // Act
-        var result = _validator.TestValidate(request);
-
-        // Assert
-        result.ShouldHaveValidationErrorFor("Booking.Supplier.Value")
-            .WithErrorCode(ClaimErrorCodes.ClaimSupplierValueCannotBeNullOrEmpty);
-    }
-
-    [Fact]
-    public void Validate_WithSupplierServiceIdEmpty_HasValidationErrorForNestedSupplierServiceId()
-    {
-        // Arrange
-        var request = ClaimTestDataFactory.CreateClaimRequest();
-        request = request with
-        {
-            Booking = request.Booking with
-            {
-                Supplier = request.Booking.Supplier with { ServiceId = Guid.Empty }
-            }
-        };
-
-        // Act
-        var result = _validator.TestValidate(request);
-
-        // Assert
-        result.ShouldHaveValidationErrorFor("Booking.Supplier.ServiceId")
-            .WithErrorCode(ClaimErrorCodes.ClaimSupplierServiceIdCannotBeEmpty);
+        result.ShouldHaveValidationErrorFor("Booking.Supplier.Id")
+            .WithErrorCode(ClaimErrorCodes.ClaimSupplierIdCannotBeEmpty);
     }
 
     [Fact]

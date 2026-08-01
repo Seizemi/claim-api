@@ -39,9 +39,9 @@ internal static class ClaimLookupsValidator
             errors.Add(Error.Validation(ClaimErrorCodes.ClaimSkissimTypeIdDoesNotExist, ClaimErrorMessages.ClaimSkissimTypeIdDoesNotExist));
         }
 
-        if (!await context.Services.AnyAsync(s => s.Id == request.Booking.Supplier.ServiceId, cancellationToken))
+        if (!await context.Suppliers.AnyAsync(s => s.Id == request.Booking.Supplier.Id, cancellationToken))
         {
-            errors.Add(Error.Validation(ClaimErrorCodes.ClaimSupplierServiceIdDoesNotExist, ClaimErrorMessages.ClaimSupplierServiceIdDoesNotExist));
+            errors.Add(Error.Validation(ClaimErrorCodes.ClaimSupplierIdDoesNotExist, ClaimErrorMessages.ClaimSupplierIdDoesNotExist));
         }
 
         if (!await context.RefundStates.AnyAsync(r => r.Id == request.Compensation.RefundStateId, cancellationToken))

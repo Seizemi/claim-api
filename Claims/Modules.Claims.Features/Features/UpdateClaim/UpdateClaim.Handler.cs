@@ -20,8 +20,6 @@ internal sealed class UpdateClaimHandler(ClaimsDbContext context) : IUpdateClaim
         var claim = await context.Claims
             .Include(c => c.Booking)
                 .ThenInclude(b => b.Customer)
-            .Include(c => c.Booking)
-                .ThenInclude(b => b.Supplier)
             .Include(c => c.ClaimDate)
             .Include(c => c.Compensation)
             .FirstOrDefaultAsync(c => c.Id == claimId, cancellationToken);

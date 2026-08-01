@@ -10,4 +10,5 @@ internal static class LookupTestIds
     internal static readonly Guid ServiceId = Guid.Parse("00000000-0000-0000-0000-000000000006");
     internal static readonly Guid SkissimTypeId = Guid.Parse("00000000-0000-0000-0000-000000000007");
     internal static readonly Guid CompensationReasonId = Guid.Parse("00000000-0000-0000-0000-000000000008");
+    internal static readonly Guid SupplierId = Guid.Parse("00000000-0000-0000-0000-000000000009");
 }

@@ -57,17 +57,17 @@ public sealed class UpdateClaimTests(IntegrationTestWebAppFactory factory) : Int
     }
 
     [Fact]
-    public async Task UpdateClaim_InvalidNestedSupplierName_Returns400ValidationProblem()
+    public async Task UpdateClaim_InvalidNestedSupplierId_Returns400ValidationProblem()
     {
         var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
-        var invalidRequest = ClaimRequestFactory.WithEmptySupplierName(ClaimRequestFactory.CreateValid());
+        var invalidRequest = ClaimRequestFactory.WithEmptySupplierId(ClaimRequestFactory.CreateValid());
 
         var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), invalidRequest, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
         Assert.NotNull(problem);
-        Assert.True(problem!.Errors.ContainsKey("Booking.Supplier.Label"));
+        Assert.True(problem!.Errors.ContainsKey("Booking.Supplier.Id"));
     }
 
     [Fact]
@@ -198,18 +198,18 @@ public sealed class UpdateClaimTests(IntegrationTestWebAppFactory factory) : Int
     }
 
     [Fact]
-    public async Task UpdateClaim_NonExistentSupplierServiceId_Returns400ValidationProblem()
+    public async Task UpdateClaim_NonExistentSupplierId_Returns400ValidationProblem()
     {
         var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
         var request = ClaimRequestFactory.CreateValid();
-        request = request with { Booking = request.Booking with { Supplier = request.Booking.Supplier with { ServiceId = Guid.NewGuid() } } };
+        request = request with { Booking = request.Booking with { Supplier = request.Booking.Supplier with { Id = Guid.NewGuid() } } };
 
         var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
         Assert.NotNull(problem);
-        Assert.True(problem!.Errors.ContainsKey("Claim.SupplierServiceIdDoesNotExist"));
+        Assert.True(problem!.Errors.ContainsKey("Claim.SupplierIdDoesNotExist"));
     }
 
     [Fact]

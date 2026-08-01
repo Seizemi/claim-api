@@ -33,10 +33,7 @@ internal static class ClaimRequestFactory
                     Name: fixture.Create<string>(),
                     AkioNumber: fixture.Create<int>()),
                 Supplier: new SupplierRequest(
-                    Label: fixture.Create<string>(),
-                    Value: fixture.Create<string>(),
-                    SupplierAkioNumber: fixture.Create<int>(),
-                    ServiceId: LookupTestIds.ServiceId)),
+                    Id: LookupTestIds.SupplierId)),
             ClaimDate: new ClaimDateRequest(
                 DateOfReceivedClaim: DateTimeOffset.UtcNow.AddDays(-fixture.Create<int>() % 30),
                 DateOfStartFollowUp: null,

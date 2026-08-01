@@ -31,21 +31,13 @@ internal static class UpdateClaimMappingExtensions
         booking.Product = request.Product;
 
         booking.Customer.UpdateFrom(request.Customer);
-        booking.Supplier.UpdateFrom(request.Supplier);
+        booking.SupplierId = request.Supplier.Id;
     }
 
     private static void UpdateFrom(this Customer customer, CustomerRequest request)
     {
         customer.Name = request.Name;
         customer.AkioNumber = request.AkioNumber;
-    }
-
-    private static void UpdateFrom(this Supplier supplier, SupplierRequest request)
-    {
-        supplier.Label = request.Label;
-        supplier.Value = request.Value;
-        supplier.SupplierAkioNumber = request.SupplierAkioNumber;
-        supplier.ServiceId = request.ServiceId;
     }
 
     private static void UpdateFrom(this ClaimDate claimDate, ClaimDateRequest request)

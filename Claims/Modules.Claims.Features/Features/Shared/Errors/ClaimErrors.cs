@@ -6,9 +6,7 @@ internal static class ClaimErrorCodes
     internal const string ClaimIdCannotBeEmpty = "Claim.IdCannotBeEmpty";
     internal const string ClaimBookingNumberCannotBeNullOrEmpty = "Claim.BookingNumberCannotBeNullOrEmpty";
     internal const string ClaimCustomerNameCannotBeNullOrEmpty = "Claim.CustomerNameCannotBeNullOrEmpty";
-    internal const string ClaimSupplierLabelCannotBeNullOrEmpty = "Claim.SupplierLabelCannotBeNullOrEmpty";
-    internal const string ClaimSupplierValueCannotBeNullOrEmpty = "Claim.SupplierValueCannotBeNullOrEmpty";
-    internal const string ClaimSupplierServiceIdCannotBeEmpty = "Claim.SupplierServiceIdCannotBeEmpty";
+    internal const string ClaimSupplierIdCannotBeEmpty = "Claim.SupplierIdCannotBeEmpty";
     internal const string ClaimDateOfDepartureCannotBeSmallerThanDateOfArrival = "Claim.DateOfDepartureCannotBeSmallerThanDateOfArrival";
     internal const string ClaimDateOfArrivalCannotBeNull = "Claim.DateOfArrivalCannotBeNull";
     internal const string ClaimReasonIdCannotBeEmpty = "Claim.ReasonIdCannotBeEmpty";
@@ -22,7 +20,7 @@ internal static class ClaimErrorCodes
     internal const string ClaimSolutionIdDoesNotExist = "Claim.SolutionIdDoesNotExist";
     internal const string ClaimSalesChannelIdDoesNotExist = "Claim.SalesChannelIdDoesNotExist";
     internal const string ClaimSkissimTypeIdDoesNotExist = "Claim.SkissimTypeIdDoesNotExist";
-    internal const string ClaimSupplierServiceIdDoesNotExist = "Claim.SupplierServiceIdDoesNotExist";
+    internal const string ClaimSupplierIdDoesNotExist = "Claim.SupplierIdDoesNotExist";
     internal const string ClaimRefundStateIdDoesNotExist = "Claim.RefundStateIdDoesNotExist";
     internal const string ClaimCompensationReasonIdDoesNotExist = "Claim.CompensationReasonIdDoesNotExist";
 }
@@ -33,9 +31,7 @@ internal static class ClaimErrorMessages
     internal const string ClaimIdCannotBeEmpty = "Claim id cannot be empty.";
     internal const string ClaimBookingNumberCannotBeNullOrEmpty = "Booking number cannot be null or empty.";
     internal const string ClaimCustomerNameCannotBeNullOrEmpty = "Customer name cannot be null or empty.";
-    internal const string ClaimSupplierLabelCannotBeNullOrEmpty = "Supplier label cannot be null or empty.";
-    internal const string ClaimSupplierValueCannotBeNullOrEmpty = "Supplier value cannot be null or empty.";
-    internal const string ClaimSupplierServiceIdCannotBeEmpty = "Supplier service id cannot be empty.";
+    internal const string ClaimSupplierIdCannotBeEmpty = "Supplier id cannot be empty.";
     internal const string ClaimDateOfDepartureCannotBeSmallerThanDateOfArrival = "Date of departure cannot be later than date of arrival.";
     internal const string ClaimDateOfArrivalCannotBeNull = "Date of arrival cannot be null.";
     internal const string ClaimReasonIdCannotBeEmpty = "Reason id cannot be empty.";
@@ -49,7 +45,7 @@ internal static class ClaimErrorMessages
     internal const string ClaimSolutionIdDoesNotExist = "Solution id does not exist.";
     internal const string ClaimSalesChannelIdDoesNotExist = "Sales channel id does not exist.";
     internal const string ClaimSkissimTypeIdDoesNotExist = "Skissim type id does not exist.";
-    internal const string ClaimSupplierServiceIdDoesNotExist = "Supplier service id does not exist.";
+    internal const string ClaimSupplierIdDoesNotExist = "Supplier id does not exist.";
     internal const string ClaimRefundStateIdDoesNotExist = "Refund state id does not exist.";
     internal const string ClaimCompensationReasonIdDoesNotExist = "Compensation reason id does not exist.";
 }

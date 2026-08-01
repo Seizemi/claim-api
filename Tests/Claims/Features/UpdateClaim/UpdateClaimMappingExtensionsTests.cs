@@ -48,10 +48,7 @@ public sealed class UpdateClaimMappingExtensionsTests
         Assert.Equal(request.Booking.Customer.Name, claim.Booking.Customer.Name);
         Assert.Equal(request.Booking.Customer.AkioNumber, claim.Booking.Customer.AkioNumber);
 
-        Assert.Equal(request.Booking.Supplier.Label, claim.Booking.Supplier.Label);
-        Assert.Equal(request.Booking.Supplier.Value, claim.Booking.Supplier.Value);
-        Assert.Equal(request.Booking.Supplier.SupplierAkioNumber, claim.Booking.Supplier.SupplierAkioNumber);
-        Assert.Equal(request.Booking.Supplier.ServiceId, claim.Booking.Supplier.ServiceId);
+        Assert.Equal(request.Booking.Supplier.Id, claim.Booking.SupplierId);
 
         Assert.Equal(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
         Assert.Equal(request.ClaimDate.DateOfStartFollowUp, claim.ClaimDate.DateOfStartFollowUp);
@@ -76,7 +73,6 @@ public sealed class UpdateClaimMappingExtensionsTests
         var originalClaimId = claim.Id;
         var originalBookingId = claim.Booking.Id;
         var originalCustomerId = claim.Booking.Customer.Id;
-        var originalSupplierId = claim.Booking.Supplier.Id;
         var originalClaimDateId = claim.ClaimDate.Id;
         var originalCompensationId = claim.Compensation.Id;
 
@@ -89,11 +85,11 @@ public sealed class UpdateClaimMappingExtensionsTests
         Assert.Equal(originalClaimId, claim.Id);
         Assert.Equal(originalBookingId, claim.Booking.Id);
         Assert.Equal(originalCustomerId, claim.Booking.Customer.Id);
-        Assert.Equal(originalSupplierId, claim.Booking.Supplier.Id);
         Assert.Equal(originalClaimDateId, claim.ClaimDate.Id);
         Assert.Equal(originalCompensationId, claim.Compensation.Id);
         Assert.Equal(claim.Booking.Id, claim.BookingId);
         Assert.Equal(claim.Id, claim.ClaimDate.ClaimId);
         Assert.Equal(claim.Id, claim.Compensation.ClaimId);
+        Assert.Equal(request.Booking.Supplier.Id, claim.Booking.SupplierId);
     }
 }

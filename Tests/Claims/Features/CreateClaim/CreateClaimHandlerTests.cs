@@ -45,7 +45,6 @@ public sealed class CreateClaimHandlerTests
         await using var readContext = ClaimsDbContextFactory.Create(databaseName);
         var persisted = await readContext.Claims
             .Include(c => c.Booking).ThenInclude(b => b.Customer)
-            .Include(c => c.Booking).ThenInclude(b => b.Supplier)
             .Include(c => c.ClaimDate)
             .Include(c => c.Compensation)
             .SingleAsync(c => c.Id == result.Value, TestContext.Current.CancellationToken);
@@ -55,8 +54,7 @@ public sealed class CreateClaimHandlerTests
         Assert.Equal(request.ReasonId, persisted.ReasonId);
         Assert.Equal(request.Booking.BookingNumber, persisted.Booking.BookingNumber);
         Assert.Equal(request.Booking.Customer.Name, persisted.Booking.Customer.Name);
-        Assert.Equal(request.Booking.Supplier.Label, persisted.Booking.Supplier.Label);
-        Assert.Equal(request.Booking.Supplier.Value, persisted.Booking.Supplier.Value);
+        Assert.Equal(request.Booking.Supplier.Id, persisted.Booking.SupplierId);
         Assert.Equal(request.ClaimDate.DateOfReceivedClaim, persisted.ClaimDate.DateOfReceivedClaim);
         Assert.Equal(request.Compensation.RefundStateId, persisted.Compensation.RefundStateId);
     }
@@ -76,7 +74,6 @@ public sealed class CreateClaimHandlerTests
         // Assert
         var claim = await context.Claims
             .Include(c => c.Booking).ThenInclude(b => b.Customer)
-            .Include(c => c.Booking).ThenInclude(b => b.Supplier)
             .Include(c => c.ClaimDate)
             .Include(c => c.Compensation)
             .SingleAsync(c => c.Id == result.Value, TestContext.Current.CancellationToken);
@@ -86,7 +83,6 @@ public sealed class CreateClaimHandlerTests
             claim.Id,
             claim.Booking.Id,
             claim.Booking.Customer.Id,
-            claim.Booking.Supplier.Id,
             claim.ClaimDate.Id,
             claim.Compensation.Id
         };

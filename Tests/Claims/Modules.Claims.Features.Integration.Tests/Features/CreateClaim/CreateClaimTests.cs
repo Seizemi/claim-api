@@ -51,8 +51,7 @@ public sealed class CreateClaimTests(IntegrationTestWebAppFactory factory) : Int
         Assert.Equal(request.Booking.SalesChannelId, claim.Booking.SalesChannel.Id);
         Assert.Equal(request.Booking.Customer.Name, claim.Booking.Customer.Name);
         Assert.Equal(request.Booking.Customer.AkioNumber, claim.Booking.Customer.AkioNumber);
-        Assert.Equal(request.Booking.Supplier.Label, claim.Booking.Supplier.Label);
-        Assert.Equal(request.Booking.Supplier.SupplierAkioNumber, claim.Booking.Supplier.SupplierAkioNumber);
+        Assert.Equal(request.Booking.Supplier.Id, claim.Booking.Supplier.Id);
         DateTimeOffsetAssert.AreClose(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
         Assert.Equal(request.Compensation.CustomerVoucher, claim.Compensation.CustomerVoucher);
         Assert.Equal(request.Compensation.RefundStateId, claim.Compensation.RefundState.Id);
@@ -101,16 +100,16 @@ public sealed class CreateClaimTests(IntegrationTestWebAppFactory factory) : Int
     }
 
     [Fact]
-    public async Task CreateClaim_EmptySupplierName_Returns400ValidationProblem()
+    public async Task CreateClaim_EmptySupplierId_Returns400ValidationProblem()
     {
-        var request = ClaimRequestFactory.WithEmptySupplierName(ClaimRequestFactory.CreateValid());
+        var request = ClaimRequestFactory.WithEmptySupplierId(ClaimRequestFactory.CreateValid());
 
         var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
         Assert.NotNull(problem);
-        Assert.True(problem!.Errors.ContainsKey("Booking.Supplier.Label"));
+        Assert.True(problem!.Errors.ContainsKey("Booking.Supplier.Id"));
     }
 
     [Fact]
@@ -224,17 +223,17 @@ public sealed class CreateClaimTests(IntegrationTestWebAppFactory factory) : Int
     }
 
     [Fact]
-    public async Task CreateClaim_NonExistentSupplierServiceId_Returns400ValidationProblem()
+    public async Task CreateClaim_NonExistentSupplierId_Returns400ValidationProblem()
     {
         var request = ClaimRequestFactory.CreateValid();
-        request = request with { Booking = request.Booking with { Supplier = request.Booking.Supplier with { ServiceId = Guid.NewGuid() } } };
+        request = request with { Booking = request.Booking with { Supplier = request.Booking.Supplier with { Id = Guid.NewGuid() } } };
 
         var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
         Assert.NotNull(problem);
-        Assert.True(problem!.Errors.ContainsKey("Claim.SupplierServiceIdDoesNotExist"));
+        Assert.True(problem!.Errors.ContainsKey("Claim.SupplierIdDoesNotExist"));
         Assert.Equal(0, await DbContext.Claims.CountAsync(TestContext.Current.CancellationToken));
     }
 

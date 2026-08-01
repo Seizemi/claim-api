@@ -19,7 +19,9 @@ internal static class ClaimTestDataFactory
 
         context.SalesChannels.Add(new SalesChannel { Id = request.Booking.SalesChannelId, Label = "SalesChannel", Value = "SalesChannel", Language = "en" });
         context.SkissimTypes.Add(new SkissimType { Id = request.Booking.SkissimTypeId, Label = "SkissimType", Value = "SkissimType" });
-        context.Services.Add(new Service { Id = request.Booking.Supplier.ServiceId, Label = "Service", Value = "Service" });
+        var serviceId = Guid.CreateVersion7();
+        context.Services.Add(new Service { Id = serviceId, Label = "Service", Value = "Service" });
+        context.Suppliers.Add(new Supplier { Id = request.Booking.Supplier.Id, Label = "Supplier", Value = "Supplier", SupplierAkioNumber = 1, ServiceId = serviceId });
         context.RefundStates.Add(new RefundState { Id = request.Compensation.RefundStateId, Label = "RefundState", Value = "RefundState" });
         context.CompensationReasons.Add(new CompensationReason { Id = request.Compensation.CompensationReasonId, Label = "CompensationReason", Value = "CompensationReason" });
 
@@ -114,10 +116,7 @@ internal static class ClaimTestDataFactory
                     Name: fixture.Create<string>(),
                     AkioNumber: fixture.Create<int>()),
                 Supplier: new SupplierRequest(
-                    Label: fixture.Create<string>(),
-                    Value: fixture.Create<string>(),
-                    SupplierAkioNumber: fixture.Create<int>(),
-                    ServiceId: fixture.Create<Guid>())),
+                    Id: fixture.Create<Guid>())),
             ClaimDate: new ClaimDateRequest(
                 DateOfReceivedClaim: fixture.Create<DateTimeOffset>(),
                 DateOfStartFollowUp: null,
