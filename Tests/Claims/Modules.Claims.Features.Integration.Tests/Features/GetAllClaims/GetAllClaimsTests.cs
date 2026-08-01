@@ -128,4 +128,29 @@ public sealed class GetAllClaimsTests(IntegrationTestWebAppFactory factory) : In
         Assert.NotNull(problem);
         Assert.Equal("Bad request", problem!.Title);
     }
+
+    [Fact]
+    public async Task GetAllClaims_SeededClaim_ReturnsFlatSummaryFields()
+    {
+        var claimRequest = ClaimRequestFactory.CreateValid();
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client, claimRequest);
+
+        var response = await Client.GetAsync(RouteConsts.DashboardClaim, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var paged = await response.Content.ReadFromJsonAsync<PagedResponse>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(paged);
+        var item = Assert.Single(paged!.Items);
+
+        Assert.Equal(claimId, item.Id);
+        Assert.Equal(claimRequest.Booking.Customer.Name, item.CustomerName);
+        Assert.Equal(claimRequest.Booking.Language, item.Language);
+        Assert.Equal(claimRequest.Booking.BookingNumber, item.BookingNumber);
+        Assert.Equal("Test supplier", item.SupplierLabel);
+        Assert.Equal(1, item.SupplierAkioNumber);
+        Assert.Equal(claimRequest.Booking.Customer.AkioNumber, item.CustomerAkioNumber);
+        Assert.Equal("Test follower", item.FollowedByLabel);
+        DateTimeOffsetAssert.AreClose(claimRequest.ClaimDate.DateOfReceivedClaim, item.DateOfReceivedClaim);
+        DateTimeOffsetAssert.AreClose(claimRequest.ClaimDate.DateOfStartFollowUp, item.DateOfStartFollowUp);
+    }
 }

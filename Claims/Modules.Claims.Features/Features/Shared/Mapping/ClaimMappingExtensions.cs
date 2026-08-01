@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Modules.Claims.Domain;
 using Modules.Claims.Domain.Entities;
 using Modules.Claims.Features.Features.Shared.Responses;
@@ -6,6 +7,18 @@ namespace Modules.Claims.Features.Features.Shared.Mapping;
 
 internal static class ClaimMappingExtensions
 {
+    internal static readonly Expression<Func<Claim, ClaimSummaryResponse>> ToSummaryResponse = claim => new ClaimSummaryResponse(
+        claim.Id,
+        claim.Booking.Customer.Name,
+        claim.Booking.Language,
+        claim.Booking.BookingNumber,
+        claim.Booking.Supplier.Label,
+        claim.ClaimDate.DateOfStartFollowUp,
+        claim.ClaimDate.DateOfReceivedClaim,
+        claim.Booking.Supplier.SupplierAkioNumber,
+        claim.Booking.Customer.AkioNumber,
+        claim.FollowedBy != null ? claim.FollowedBy.Label : null);
+
     internal static ClaimResponse MapToResponse(this Claim claim) => new(
         claim.Id,
         claim.State,

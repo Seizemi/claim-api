@@ -1,3 +1,4 @@
+using Modules.Claims.Domain.Entities;
 using Modules.Claims.Domain.Enums;
 using Modules.Claims.Features.Features.GetClaimsByState;
 using Modules.Claims.Features.Features.Shared.Requests;
@@ -109,6 +110,41 @@ public sealed class GetClaimsByStateHandlerTests
         Assert.Equal(
             new[] { claims[2].Id, claims[3].Id },
             result.Value.Items.Select(c => c.Id).ToArray());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenMatchingClaimHasNestedBookingCustomerSupplier_MapsFlatSummaryFields()
+    {
+        // Arrange
+        await using var context = ClaimsDbContextFactory.Create();
+
+        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow, ClaimState.AwaitingSupplier);
+        var followedBy = new FollowedBy { Id = Guid.CreateVersion7(), Label = "Jane Doe", Value = "jane-doe" };
+        claim.FollowedById = followedBy.Id;
+        claim.FollowedBy = followedBy;
+        context.Claims.Add(claim);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var handler = new GetClaimsByStateHandler(context);
+        var request = new GetClaimsByStateRequest(ClaimState.AwaitingSupplier);
+
+        // Act
+        var result = await handler.HandleAsync(request, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.False(result.IsError);
+        var response = Assert.Single(result.Value.Items);
+
+        Assert.Equal(claim.Id, response.Id);
+        Assert.Equal(claim.Booking.Customer.Name, response.CustomerName);
+        Assert.Equal(claim.Booking.Language, response.Language);
+        Assert.Equal(claim.Booking.BookingNumber, response.BookingNumber);
+        Assert.Equal(claim.Booking.Supplier.Label, response.SupplierLabel);
+        Assert.Equal(claim.ClaimDate.DateOfStartFollowUp, response.DateOfStartFollowUp);
+        Assert.Equal(claim.ClaimDate.DateOfReceivedClaim, response.DateOfReceivedClaim);
+        Assert.Equal(claim.Booking.Supplier.SupplierAkioNumber, response.SupplierAkioNumber);
+        Assert.Equal(claim.Booking.Customer.AkioNumber, response.CustomerAkioNumber);
+        Assert.Equal("Jane Doe", response.FollowedByLabel);
     }
 
     [Fact]

@@ -1,3 +1,4 @@
+using Modules.Claims.Domain.Entities;
 using Modules.Claims.Features.Features.GetAllClaims;
 using Modules.Claims.Features.Features.Shared.Requests;
 using Modules.Claims.Features.Tests.Shared;
@@ -109,7 +110,7 @@ public sealed class GetAllClaimsHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenClaimHasNestedBookingCustomerSupplier_MapsAllNestedFields()
+    public async Task HandleAsync_WhenClaimHasNestedBookingCustomerSupplier_MapsFlatSummaryFields()
     {
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
@@ -129,13 +130,39 @@ public sealed class GetAllClaimsHandlerTests
         var response = Assert.Single(result.Value.Items);
 
         Assert.Equal(claim.Id, response.Id);
-        Assert.Equal(claim.Booking.BookingNumber, response.Booking.BookingNumber);
-        Assert.Equal(claim.Booking.Customer.Name, response.Booking.Customer.Name);
-        Assert.Equal(claim.Booking.Customer.AkioNumber, response.Booking.Customer.AkioNumber);
-        Assert.Equal(claim.Booking.Supplier.Label, response.Booking.Supplier.Label);
-        Assert.Equal(claim.Booking.Supplier.SupplierAkioNumber, response.Booking.Supplier.SupplierAkioNumber);
-        Assert.Equal(claim.ClaimDate.DateOfReceivedClaim, response.ClaimDate.DateOfReceivedClaim);
-        Assert.Equal(claim.Compensation.Id, response.Compensation.Id);
+        Assert.Equal(claim.Booking.Customer.Name, response.CustomerName);
+        Assert.Equal(claim.Booking.Language, response.Language);
+        Assert.Equal(claim.Booking.BookingNumber, response.BookingNumber);
+        Assert.Equal(claim.Booking.Supplier.Label, response.SupplierLabel);
+        Assert.Equal(claim.ClaimDate.DateOfStartFollowUp, response.DateOfStartFollowUp);
+        Assert.Equal(claim.ClaimDate.DateOfReceivedClaim, response.DateOfReceivedClaim);
+        Assert.Equal(claim.Booking.Supplier.SupplierAkioNumber, response.SupplierAkioNumber);
+        Assert.Equal(claim.Booking.Customer.AkioNumber, response.CustomerAkioNumber);
+        Assert.Null(response.FollowedByLabel);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenClaimHasFollowedBy_MapsFollowedByLabel()
+    {
+        // Arrange
+        await using var context = ClaimsDbContextFactory.Create();
+
+        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        var followedBy = new FollowedBy { Id = Guid.CreateVersion7(), Label = "Jane Doe", Value = "jane-doe" };
+        claim.FollowedById = followedBy.Id;
+        claim.FollowedBy = followedBy;
+        context.Claims.Add(claim);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var handler = new GetAllClaimsHandler(context);
+        var request = new GetAllClaimsRequest();
+
+        // Act
+        var result = await handler.HandleAsync(request, TestContext.Current.CancellationToken);
+
+        // Assert
+        var response = Assert.Single(result.Value.Items);
+        Assert.Equal("Jane Doe", response.FollowedByLabel);
     }
 
     [Fact]

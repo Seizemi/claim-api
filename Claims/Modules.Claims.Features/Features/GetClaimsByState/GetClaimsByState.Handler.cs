@@ -21,37 +21,20 @@ internal sealed class GetClaimsByStateHandler(ClaimsDbContext context) : IGetCla
     {
         var claimsQuery = context.Claims
             .Where(c => c.State == request.ClaimState)
-            .Include(c => c.Booking)
-                .ThenInclude(b => b.Customer)
-            .Include(c => c.Booking)
-                .ThenInclude(b => b.Supplier)
-                    .ThenInclude(s => s.Service)
-            .Include(c => c.Booking)
-                .ThenInclude(b => b.SalesChannel)
-            .Include(c => c.Booking)
-                .ThenInclude(b => b.SkissimType)
-            .Include(c => c.ClaimDate)
-            .Include(c => c.Compensation)
-                .ThenInclude(comp => comp.RefundState)
-            .Include(c => c.Compensation)
-                .ThenInclude(comp => comp.CompensationReason)
-            .Include(c => c.Reason)
-            .Include(c => c.Solution)
-            .Include(c => c.FollowedBy)
-            .AsNoTracking()
             .OrderByDescending(c => c.ClaimDate.DateOfReceivedClaim);
 
         var totalCount = await claimsQuery.CountAsync(cancellationToken);
 
-        var claims = await claimsQuery
+        var items = await claimsQuery
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
+            .Select(ClaimMappingExtensions.ToSummaryResponse)
             .ToListAsync(cancellationToken);
 
         var totalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize);
 
         return new PagedResponse(
-            claims.Select(c => c.MapToResponse()).ToList(),
+            items,
             request.PageNumber,
             request.PageSize,
             totalCount,

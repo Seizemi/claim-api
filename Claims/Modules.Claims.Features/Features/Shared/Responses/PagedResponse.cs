@@ -1,7 +1,7 @@
 namespace Modules.Claims.Features.Features.Shared.Responses;
 
 public sealed record PagedResponse(
-    IReadOnlyList<ClaimResponse> Items,
+    IReadOnlyList<ClaimSummaryResponse> Items,
     int PageNumber,
     int PageSize,
     int TotalCount,
