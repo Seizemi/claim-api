@@ -188,7 +188,6 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     booking_number = table.Column<string>(type: "text", nullable: false),
                     sales_channel_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    language = table.Column<int>(type: "integer", nullable: true),
                     skissim_type_id = table.Column<Guid>(type: "uuid", nullable: false),
                     product = table.Column<string>(type: "text", nullable: true),
                     customer_id = table.Column<Guid>(type: "uuid", nullable: false),

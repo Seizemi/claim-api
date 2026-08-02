@@ -32,7 +32,7 @@ internal static class ClaimErrorMessages
     internal const string ClaimBookingNumberCannotBeNullOrEmpty = "Booking number cannot be null or empty.";
     internal const string ClaimCustomerNameCannotBeNullOrEmpty = "Customer name cannot be null or empty.";
     internal const string ClaimSupplierIdCannotBeEmpty = "Supplier id cannot be empty.";
-    internal const string ClaimDateOfDepartureCannotBeSmallerThanDateOfArrival = "Date of departure cannot be later than date of arrival.";
+    internal const string ClaimDateOfDepartureCannotBeSmallerThanDateOfArrival = "Date of departure cannot be before than date of arrival.";
     internal const string ClaimDateOfArrivalCannotBeNull = "Date of arrival cannot be null.";
     internal const string ClaimReasonIdCannotBeEmpty = "Reason id cannot be empty.";
     internal const string ClaimSolutionIdCannotBeEmpty = "Solution id cannot be empty.";

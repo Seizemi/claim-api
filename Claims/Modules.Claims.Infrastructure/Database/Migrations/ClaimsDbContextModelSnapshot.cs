@@ -39,10 +39,6 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("customer_id");
 
-                    b.Property<int?>("Language")
-                        .HasColumnType("integer")
-                        .HasColumnName("language");
-
                     b.Property<string>("Product")
                         .HasColumnType("text")
                         .HasColumnName("product");

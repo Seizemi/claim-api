@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Modules.Claims.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ClaimsDbContext))]
-    [Migration("20260726133049_InitialCreate")]
+    [Migration("20260802145758_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -41,10 +41,6 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid")
                         .HasColumnName("customer_id");
-
-                    b.Property<int?>("Language")
-                        .HasColumnType("integer")
-                        .HasColumnName("language");
 
                     b.Property<string>("Product")
                         .HasColumnType("text")

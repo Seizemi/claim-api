@@ -35,7 +35,6 @@ internal static class CreateClaimMappingExtensions
             Id = id,
             BookingNumber = request.BookingNumber,
             SalesChannelId = request.SalesChannelId,
-            Language = request.Language,
             SkissimTypeId = request.SkissimTypeId,
             Product = request.Product,
             CustomerId = customerId,

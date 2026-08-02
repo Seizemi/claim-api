@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
+using Modules.Claims.Domain;
 using Modules.Claims.Domain.Enums;
 using Modules.Claims.Features.Features.Shared.Responses;
 using Modules.Claims.Features.Integration.Tests.Infrastructure;
@@ -144,10 +145,11 @@ public sealed class GetClaimsByStateTests(IntegrationTestWebAppFactory factory) 
         var paged = await response.Content.ReadFromJsonAsync<PagedResponse>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
         Assert.NotNull(paged);
         var item = Assert.Single(paged!.Items);
+        var expectedSeason = SeasonCalculator.Compute(claimRequest.ClaimDate.DateOfArrival!.Value);
 
         Assert.Equal(claimId, item.Id);
         Assert.Equal(claimRequest.Booking.Customer.Name, item.CustomerName);
-        Assert.Equal(claimRequest.Booking.Language, item.Language);
+        Assert.Equal("Fr", item.Language);
         Assert.Equal(claimRequest.Booking.BookingNumber, item.BookingNumber);
         Assert.Equal("Test supplier", item.SupplierLabel);
         Assert.Equal(1, item.SupplierAkioNumber);
@@ -155,5 +157,7 @@ public sealed class GetClaimsByStateTests(IntegrationTestWebAppFactory factory) 
         Assert.Equal("Test follower", item.FollowedByLabel);
         DateTimeOffsetAssert.AreClose(claimRequest.ClaimDate.DateOfReceivedClaim, item.DateOfReceivedClaim);
         DateTimeOffsetAssert.AreClose(claimRequest.ClaimDate.DateOfStartFollowUp, item.DateOfStartFollowUp);
+        Assert.Equal(expectedSeason.SeasonLabel, item.SeasonLabel);
+        Assert.Equal(expectedSeason.SeasonValue, item.SeasonValue);
     }
 }

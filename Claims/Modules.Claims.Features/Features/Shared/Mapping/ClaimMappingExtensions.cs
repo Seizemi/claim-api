@@ -10,14 +10,20 @@ internal static class ClaimMappingExtensions
     internal static readonly Expression<Func<Claim, ClaimSummaryResponse>> ToSummaryResponse = claim => new ClaimSummaryResponse(
         claim.Id,
         claim.Booking.Customer.Name,
-        claim.Booking.Language,
+        claim.Booking.SalesChannel.Language,
         claim.Booking.BookingNumber,
         claim.Booking.Supplier.Label,
         claim.ClaimDate.DateOfStartFollowUp,
         claim.ClaimDate.DateOfReceivedClaim,
         claim.Booking.Supplier.SupplierAkioNumber,
         claim.Booking.Customer.AkioNumber,
-        claim.FollowedBy != null ? claim.FollowedBy.Label : null);
+        claim.FollowedBy != null ? claim.FollowedBy.Label : null,
+        claim.ClaimDate.DateOfArrival.HasValue
+            ? SeasonCalculator.Compute(claim.ClaimDate.DateOfArrival.Value).SeasonLabel
+            : null,
+        claim.ClaimDate.DateOfArrival.HasValue
+            ? SeasonCalculator.Compute(claim.ClaimDate.DateOfArrival.Value).SeasonValue
+            : null);
 
     internal static ClaimResponse MapToResponse(this Claim claim) => new(
         claim.Id,
@@ -47,7 +53,6 @@ internal static class ClaimMappingExtensions
             booking.Id,
             booking.BookingNumber,
             booking.SalesChannel.MapToResponse(),
-            booking.Language,
             seasonLabel,
             seasonValue,
             booking.SkissimType.MapToResponse(),

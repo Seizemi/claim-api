@@ -1,3 +1,4 @@
+using Modules.Claims.Domain;
 using Modules.Claims.Domain.Entities;
 using Modules.Claims.Features.Features.GetAllClaims;
 using Modules.Claims.Features.Features.Shared.Requests;
@@ -116,6 +117,7 @@ public sealed class GetAllClaimsHandlerTests
         await using var context = ClaimsDbContextFactory.Create();
 
         var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        claim.ClaimDate.DateOfArrival = new DateTimeOffset(2025, 8, 15, 0, 0, 0, TimeSpan.Zero);
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -128,10 +130,11 @@ public sealed class GetAllClaimsHandlerTests
         // Assert
         Assert.False(result.IsError);
         var response = Assert.Single(result.Value.Items);
+        var expectedSeason = SeasonCalculator.Compute(claim.ClaimDate.DateOfArrival.Value);
 
         Assert.Equal(claim.Id, response.Id);
         Assert.Equal(claim.Booking.Customer.Name, response.CustomerName);
-        Assert.Equal(claim.Booking.Language, response.Language);
+        Assert.Equal(claim.Booking.SalesChannel.Language, response.Language);
         Assert.Equal(claim.Booking.BookingNumber, response.BookingNumber);
         Assert.Equal(claim.Booking.Supplier.Label, response.SupplierLabel);
         Assert.Equal(claim.ClaimDate.DateOfStartFollowUp, response.DateOfStartFollowUp);
@@ -139,6 +142,30 @@ public sealed class GetAllClaimsHandlerTests
         Assert.Equal(claim.Booking.Supplier.SupplierAkioNumber, response.SupplierAkioNumber);
         Assert.Equal(claim.Booking.Customer.AkioNumber, response.CustomerAkioNumber);
         Assert.Null(response.FollowedByLabel);
+        Assert.Equal(expectedSeason.SeasonLabel, response.SeasonLabel);
+        Assert.Equal(expectedSeason.SeasonValue, response.SeasonValue);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenClaimHasNoDateOfArrival_ReturnsNullSeasonFields()
+    {
+        // Arrange
+        await using var context = ClaimsDbContextFactory.Create();
+
+        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        context.Claims.Add(claim);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var handler = new GetAllClaimsHandler(context);
+        var request = new GetAllClaimsRequest();
+
+        // Act
+        var result = await handler.HandleAsync(request, TestContext.Current.CancellationToken);
+
+        // Assert
+        var response = Assert.Single(result.Value.Items);
+        Assert.Null(response.SeasonLabel);
+        Assert.Null(response.SeasonValue);
     }
 
     [Fact]

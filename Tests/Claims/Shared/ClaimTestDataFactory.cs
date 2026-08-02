@@ -109,7 +109,6 @@ internal static class ClaimTestDataFactory
             Booking: new BookingRequest(
                 BookingNumber: fixture.Create<string>(),
                 SalesChannelId: fixture.Create<Guid>(),
-                Language: fixture.Create<Language>(),
                 SkissimTypeId: fixture.Create<Guid>(),
                 Product: fixture.Create<string>(),
                 Customer: new CustomerRequest(

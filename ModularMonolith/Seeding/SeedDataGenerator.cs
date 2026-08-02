@@ -227,7 +227,6 @@ internal static class SeedDataGenerator
             BookingNumber = $"BK{random.Next(100000, 999999)}",
             SalesChannelId = salesChannel.Id,
             SalesChannel = salesChannel,
-            Language = RandomEnum<Language>(random),
             SkissimTypeId = skissimType.Id,
             SkissimType = skissimType,
             Product = PickRandom(Products, random),

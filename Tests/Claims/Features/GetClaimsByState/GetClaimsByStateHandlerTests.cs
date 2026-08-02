@@ -1,3 +1,4 @@
+using Modules.Claims.Domain;
 using Modules.Claims.Domain.Entities;
 using Modules.Claims.Domain.Enums;
 using Modules.Claims.Features.Features.GetClaimsByState;
@@ -119,6 +120,7 @@ public sealed class GetClaimsByStateHandlerTests
         await using var context = ClaimsDbContextFactory.Create();
 
         var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow, ClaimState.AwaitingSupplier);
+        claim.ClaimDate.DateOfArrival = new DateTimeOffset(2025, 8, 15, 0, 0, 0, TimeSpan.Zero);
         var followedBy = new FollowedBy { Id = Guid.CreateVersion7(), Label = "Jane Doe", Value = "jane-doe" };
         claim.FollowedById = followedBy.Id;
         claim.FollowedBy = followedBy;
@@ -134,10 +136,11 @@ public sealed class GetClaimsByStateHandlerTests
         // Assert
         Assert.False(result.IsError);
         var response = Assert.Single(result.Value.Items);
+        var expectedSeason = SeasonCalculator.Compute(claim.ClaimDate.DateOfArrival.Value);
 
         Assert.Equal(claim.Id, response.Id);
         Assert.Equal(claim.Booking.Customer.Name, response.CustomerName);
-        Assert.Equal(claim.Booking.Language, response.Language);
+        Assert.Equal(claim.Booking.SalesChannel.Language, response.Language);
         Assert.Equal(claim.Booking.BookingNumber, response.BookingNumber);
         Assert.Equal(claim.Booking.Supplier.Label, response.SupplierLabel);
         Assert.Equal(claim.ClaimDate.DateOfStartFollowUp, response.DateOfStartFollowUp);
@@ -145,6 +148,8 @@ public sealed class GetClaimsByStateHandlerTests
         Assert.Equal(claim.Booking.Supplier.SupplierAkioNumber, response.SupplierAkioNumber);
         Assert.Equal(claim.Booking.Customer.AkioNumber, response.CustomerAkioNumber);
         Assert.Equal("Jane Doe", response.FollowedByLabel);
+        Assert.Equal(expectedSeason.SeasonLabel, response.SeasonLabel);
+        Assert.Equal(expectedSeason.SeasonValue, response.SeasonValue);
     }
 
     [Fact]

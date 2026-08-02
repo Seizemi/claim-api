@@ -26,7 +26,6 @@ internal static class ClaimRequestFactory
             Booking: new BookingRequest(
                 BookingNumber: fixture.Create<string>(),
                 SalesChannelId: LookupTestIds.SalesChannelId,
-                Language: fixture.Create<Language>(),
                 SkissimTypeId: LookupTestIds.SkissimTypeId,
                 Product: fixture.Create<string>(),
                 Customer: new CustomerRequest(
