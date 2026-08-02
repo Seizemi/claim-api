@@ -4,18 +4,18 @@ Content-Type: application/json
 
 {
   "state": "AwaitingSupplier",
-  "followedById": "019fc308-5a36-7003-9964-17abba88f565",
-  "reasonId": "019fc308-5a34-71ee-92d5-16d0d17eb1c6",
+  "followedById": "019fc32f-9a0e-718e-a13b-6ed9b48dd703",
+  "reasonId": "019fc32f-9a0d-71f7-ba4b-daf50ef442d2",
   "claimSummary": "Customer was denied check-in due to overbooking by the supplier.",
-  "solutionId": "019fc308-5a35-7186-acad-9c97ff2cf3ad",
+  "solutionId": "019fc32f-9a0d-71cd-b553-2c018a18d22c",
   "purposeOfSolution": "Full refund of accommodation cost",
   "updateReason": null,
   "customerSuppInfo": "Customer requested written confirmation of refund.",
   "supplierSuppInfo": "Supplier acknowledged the overbooking by email.",
   "booking": {
     "bookingNumber": "BK-2026-000123",
-    "salesChannelId": "019fc308-5a3b-7048-9bf5-67f9398bdc7f",
-    "skissimTypeId": "019fc308-5a3c-7029-a1c9-794cfd5bd0cc",
+    "salesChannelId": "019fc32f-9a10-703c-a805-83b87a573d19",
+    "skissimTypeId": "019fc32f-9a11-725a-ad6a-a10f3375eee2",
     "product": "Chalet Alpina - 7 nights",
     "customer": {
       "name": "John Smith",
@@ -25,24 +25,24 @@ Content-Type: application/json
       "label": "Alpina Resorts SARL",
       "value": "AlpinaResortsSARL",
       "supplierAkioNumber": 654321,
-      "serviceId": "019fc308-5b50-71ef-b352-1f79c0e75609",
-      "id": "019fc308-5b50-71ef-b352-1f79c0e75609"
+      "serviceId": "019fc32f-9a10-71dd-b25c-1740936b576c",
+      "id": "019fc32f-9b7a-7032-83c6-1773a7c45261"
     }
   },
   "claimDate": {
-    "dateOfReceivedClaim": "2026-07-15T09:00:00Z",
-    "dateOfStartFollowUp": "2026-07-15T10:00:00Z",
+    "dateOfReceivedClaim": "2026-07-15",
+    "dateOfStartFollowUp": "2026-07-15",
     "dateLastUpdate": null,
-    "dateOfDeparture": "2026-07-18T00:00:00Z",
+    "dateOfDeparture": "2026-07-18",
     "dateEndOfFollowUp": null,
-    "dateOfArrival": "2026-07-17T00:00:00Z"
+    "dateOfArrival": "2026-07-17"
   },
   "compensation": {
     "customerVoucher": null,
     "customerUsedVoucher": null,
     "supplierRefund": null,
     "claimRefund": 350.00,
-    "refundStateId": "019fc308-5a36-7049-873e-266e635f0d2c",
-    "compensationReasonId": "019fc308-5a36-77cd-b1bc-7d323cf68431"
+    "refundStateId": "019fc32f-9a0e-7017-af8c-4eee07556c20",
+    "compensationReasonId": "019fc32f-9a0e-70d3-96fd-0fed0da19056"
   }
 }

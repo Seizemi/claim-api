@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Modules.Claims.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ClaimsDbContext))]
-    [Migration("20260802145758_InitialCreate")]
+    [Migration("20260802154541_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -153,28 +153,28 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("claim_id");
 
-                    b.Property<DateTimeOffset?>("DateEndOfFollowUp")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly?>("DateEndOfFollowUp")
+                        .HasColumnType("date")
                         .HasColumnName("date_end_of_follow_up");
 
-                    b.Property<DateTimeOffset?>("DateLastUpdate")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly?>("DateLastUpdate")
+                        .HasColumnType("date")
                         .HasColumnName("date_last_update");
 
-                    b.Property<DateTimeOffset?>("DateOfArrival")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly?>("DateOfArrival")
+                        .HasColumnType("date")
                         .HasColumnName("date_of_arrival");
 
-                    b.Property<DateTimeOffset?>("DateOfDeparture")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly?>("DateOfDeparture")
+                        .HasColumnType("date")
                         .HasColumnName("date_of_departure");
 
-                    b.Property<DateTimeOffset?>("DateOfReceivedClaim")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly?>("DateOfReceivedClaim")
+                        .HasColumnType("date")
                         .HasColumnName("date_of_received_claim");
 
-                    b.Property<DateTimeOffset?>("DateOfStartFollowUp")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly?>("DateOfStartFollowUp")
+                        .HasColumnType("date")
                         .HasColumnName("date_of_start_follow_up");
 
                     b.HasKey("Id")

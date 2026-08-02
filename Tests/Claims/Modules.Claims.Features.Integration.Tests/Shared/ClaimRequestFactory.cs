@@ -6,11 +6,11 @@ namespace Modules.Claims.Features.Integration.Tests.Shared;
 
 internal static class ClaimRequestFactory
 {
-    internal static ClaimRequest CreateValid(DateTimeOffset? dateOfReceivedClaim = null, ClaimState? state = null)
+    internal static ClaimRequest CreateValid(DateOnly? dateOfReceivedClaim = null, ClaimState? state = null)
     {
         var fixture = new Fixture();
 
-        var dateOfArrival = fixture.Create<DateTimeOffset>().ToUniversalTime();
+        var dateOfArrival = DateOnly.FromDateTime(fixture.Create<DateTime>());
         var dateOfDeparture = dateOfArrival.AddDays(Math.Abs(fixture.Create<int>()) % 30);
 
         return new ClaimRequest(
@@ -34,7 +34,7 @@ internal static class ClaimRequestFactory
                 Supplier: new SupplierRequest(
                     Id: LookupTestIds.SupplierId)),
             ClaimDate: new ClaimDateRequest(
-                DateOfReceivedClaim: dateOfReceivedClaim ?? DateTimeOffset.UtcNow.AddDays(-fixture.Create<int>() % 30),
+                DateOfReceivedClaim: dateOfReceivedClaim ?? DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-fixture.Create<int>() % 30),
                 DateOfStartFollowUp: null,
                 DateLastUpdate: null,
                 DateOfDeparture: dateOfDeparture,
@@ -84,8 +84,8 @@ internal static class ClaimRequestFactory
         {
             ClaimDate = request.ClaimDate with
             {
-                DateOfDeparture = DateTimeOffset.UtcNow.AddDays(-1),
-                DateOfArrival = DateTimeOffset.UtcNow
+                DateOfDeparture = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1),
+                DateOfArrival = DateOnly.FromDateTime(DateTime.UtcNow)
             }
         };
 }

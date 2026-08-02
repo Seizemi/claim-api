@@ -40,7 +40,7 @@ internal static class ClaimMappingExtensions
         claim.ClaimDate.MapToResponse(),
         claim.Compensation.MapToResponse());
 
-    private static BookingResponse MapToResponse(this Booking booking, DateTimeOffset? dateOfArrival)
+    private static BookingResponse MapToResponse(this Booking booking, DateOnly? dateOfArrival)
     {
         string? seasonValue = null;
         string? seasonLabel = null;

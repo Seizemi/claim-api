@@ -13,7 +13,7 @@ public sealed class GetClaimByIdHandlerTests
     {
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -55,7 +55,7 @@ public sealed class GetClaimByIdHandlerTests
     {
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         context.ChangeTracker.Clear();

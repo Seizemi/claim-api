@@ -52,7 +52,7 @@ public sealed class CreateClaimTests(IntegrationTestWebAppFactory factory) : Int
         Assert.Equal(request.Booking.Customer.Name, claim.Booking.Customer.Name);
         Assert.Equal(request.Booking.Customer.AkioNumber, claim.Booking.Customer.AkioNumber);
         Assert.Equal(request.Booking.Supplier.Id, claim.Booking.Supplier.Id);
-        DateTimeOffsetAssert.AreClose(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
+        Assert.Equal(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
         Assert.Equal(request.Compensation.CustomerVoucher, claim.Compensation.CustomerVoucher);
         Assert.Equal(request.Compensation.RefundStateId, claim.Compensation.RefundState.Id);
 

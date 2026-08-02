@@ -222,8 +222,8 @@ public sealed class ClaimRequestValidatorTests
         {
             ClaimDate = request.ClaimDate with
             {
-                DateOfDeparture = DateTimeOffset.UtcNow.AddDays(-1),
-                DateOfArrival = DateTimeOffset.UtcNow
+                DateOfDeparture = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1),
+                DateOfArrival = DateOnly.FromDateTime(DateTime.UtcNow)
             }
         };
 

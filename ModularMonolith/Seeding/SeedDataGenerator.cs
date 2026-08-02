@@ -244,8 +244,9 @@ internal static class SeedDataGenerator
 
     private static ClaimDate GenerateClaimDate(Guid claimId, Random random)
     {
-        var dateOfReceivedClaim = DateTimeOffset.UtcNow.AddDays(-random.Next(0, 730));
-        var dateOfArrival = DateTimeOffset.UtcNow.AddDays(random.Next(-365, 365));
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var dateOfReceivedClaim = today.AddDays(-random.Next(0, 730));
+        var dateOfArrival = today.AddDays(random.Next(-365, 365));
         var dateOfDeparture = dateOfArrival.AddDays(random.Next(1, 21));
 
         return new ClaimDate

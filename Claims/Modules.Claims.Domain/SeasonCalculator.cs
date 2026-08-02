@@ -4,7 +4,7 @@ namespace Modules.Claims.Domain;
 
 public static class SeasonCalculator
 {
-    public static (string SeasonValue, string SeasonLabel) Compute(DateTimeOffset dateOfArrival)
+    public static (string SeasonValue, string SeasonLabel) Compute(DateOnly dateOfArrival)
     {
         bool isSummer = dateOfArrival.Month is >= 5 and <= 10;
 

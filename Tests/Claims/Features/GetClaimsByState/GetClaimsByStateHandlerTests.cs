@@ -16,7 +16,7 @@ public sealed class GetClaimsByStateHandlerTests
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
 
-        context.Claims.Add(ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow, ClaimState.AwaitingClient));
+        context.Claims.Add(ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow), ClaimState.AwaitingClient));
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var handler = new GetClaimsByStateHandler(context);
@@ -38,8 +38,8 @@ public sealed class GetClaimsByStateHandlerTests
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
 
-        var matching = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow, ClaimState.AwaitingSupplier);
-        var otherState = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow, ClaimState.AwaitingClient);
+        var matching = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow), ClaimState.AwaitingSupplier);
+        var otherState = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow), ClaimState.AwaitingClient);
 
         context.Claims.AddRange(matching, otherState);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -62,9 +62,9 @@ public sealed class GetClaimsByStateHandlerTests
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
 
-        var oldest = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow.AddDays(-10), ClaimState.Terminate);
-        var middle = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow.AddDays(-5), ClaimState.Terminate);
-        var newest = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow, ClaimState.Terminate);
+        var oldest = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-10), ClaimState.Terminate);
+        var middle = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-5), ClaimState.Terminate);
+        var newest = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow), ClaimState.Terminate);
 
         context.Claims.AddRange(oldest, newest, middle);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -89,7 +89,7 @@ public sealed class GetClaimsByStateHandlerTests
         await using var context = ClaimsDbContextFactory.Create();
 
         var claims = Enumerable.Range(0, 5)
-            .Select(i => ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow.AddDays(-i), ClaimState.ClosedWithoutResponse))
+            .Select(i => ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-i), ClaimState.ClosedWithoutResponse))
             .ToList();
 
         context.Claims.AddRange(claims);
@@ -119,8 +119,8 @@ public sealed class GetClaimsByStateHandlerTests
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
 
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow, ClaimState.AwaitingSupplier);
-        claim.ClaimDate.DateOfArrival = new DateTimeOffset(2025, 8, 15, 0, 0, 0, TimeSpan.Zero);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow), ClaimState.AwaitingSupplier);
+        claim.ClaimDate.DateOfArrival = new DateOnly(2025, 8, 15);
         var followedBy = new FollowedBy { Id = Guid.CreateVersion7(), Label = "Jane Doe", Value = "jane-doe" };
         claim.FollowedById = followedBy.Id;
         claim.FollowedBy = followedBy;
@@ -158,7 +158,7 @@ public sealed class GetClaimsByStateHandlerTests
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
 
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow, ClaimState.AwaitingSupplier);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow), ClaimState.AwaitingSupplier);
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         context.ChangeTracker.Clear();

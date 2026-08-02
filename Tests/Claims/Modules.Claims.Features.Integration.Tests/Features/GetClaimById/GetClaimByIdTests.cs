@@ -28,7 +28,7 @@ public sealed class GetClaimByIdTests(IntegrationTestWebAppFactory factory) : In
         Assert.Equal(request.Booking.BookingNumber, claim.Booking.BookingNumber);
         Assert.Equal(request.Booking.Customer.Name, claim.Booking.Customer.Name);
         Assert.Equal(request.Booking.Supplier.Id, claim.Booking.Supplier.Id);
-        DateTimeOffsetAssert.AreClose(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
+        Assert.Equal(request.ClaimDate.DateOfReceivedClaim, claim.ClaimDate.DateOfReceivedClaim);
         Assert.Equal(request.Compensation.CustomerVoucher, claim.Compensation.CustomerVoucher);
     }
 

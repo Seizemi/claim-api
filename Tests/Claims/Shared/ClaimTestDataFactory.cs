@@ -28,7 +28,7 @@ internal static class ClaimTestDataFactory
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    internal static Claim CreateClaim(DateTimeOffset dateOfReceivedClaim, ClaimState? state = null)
+    internal static Claim CreateClaim(DateOnly dateOfReceivedClaim, ClaimState? state = null)
     {
         var fixture = new Fixture();
         var claimId = Guid.CreateVersion7();
@@ -117,12 +117,12 @@ internal static class ClaimTestDataFactory
                 Supplier: new SupplierRequest(
                     Id: fixture.Create<Guid>())),
             ClaimDate: new ClaimDateRequest(
-                DateOfReceivedClaim: fixture.Create<DateTimeOffset>(),
+                DateOfReceivedClaim: DateOnly.FromDateTime(fixture.Create<DateTime>()),
                 DateOfStartFollowUp: null,
                 DateLastUpdate: null,
-                DateOfDeparture: new DateTimeOffset(2025, 9, 15, 0, 0, 0, TimeSpan.Zero),
+                DateOfDeparture: new DateOnly(2025, 9, 15),
                 DateEndOfFollowUp: null,
-                DateOfArrival: new DateTimeOffset(2025, 8, 15, 0, 0, 0, TimeSpan.Zero)),
+                DateOfArrival: new DateOnly(2025, 8, 15)),
             Compensation: new CompensationRequest(
                 CustomerVoucher: fixture.Create<float>(),
                 CustomerUsedVoucher: null,

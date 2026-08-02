@@ -282,12 +282,12 @@ namespace Modules.Claims.Infrastructure.Database.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    date_of_received_claim = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    date_of_start_follow_up = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    date_last_update = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    date_of_departure = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    date_end_of_follow_up = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    date_of_arrival = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    date_of_received_claim = table.Column<DateOnly>(type: "date", nullable: true),
+                    date_of_start_follow_up = table.Column<DateOnly>(type: "date", nullable: true),
+                    date_last_update = table.Column<DateOnly>(type: "date", nullable: true),
+                    date_of_departure = table.Column<DateOnly>(type: "date", nullable: true),
+                    date_end_of_follow_up = table.Column<DateOnly>(type: "date", nullable: true),
+                    date_of_arrival = table.Column<DateOnly>(type: "date", nullable: true),
                     claim_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>

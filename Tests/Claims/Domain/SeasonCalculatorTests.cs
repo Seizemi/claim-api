@@ -18,7 +18,7 @@ public sealed class SeasonCalculatorTests
         int year, int month, int day, string expectedSeasonValue, string expectedSeasonLabel)
     {
         // Arrange
-        var dateOfArrival = new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.Zero);
+        var dateOfArrival = new DateOnly(year, month, day);
 
         // Act
         var (seasonValue, seasonLabel) = SeasonCalculator.Compute(dateOfArrival);

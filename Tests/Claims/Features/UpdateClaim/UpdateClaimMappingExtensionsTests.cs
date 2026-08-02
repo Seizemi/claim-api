@@ -10,7 +10,7 @@ public sealed class UpdateClaimMappingExtensionsTests
     public void UpdateFrom_WithValidRequest_UpdatesTopLevelClaimFields()
     {
         // Arrange
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow.AddDays(-1));
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1));
         var request = ClaimTestDataFactory.CreateClaimRequest();
 
         // Act
@@ -32,7 +32,7 @@ public sealed class UpdateClaimMappingExtensionsTests
     public void UpdateFrom_WithValidRequest_UpdatesNestedBookingCustomerSupplierClaimDateCompensationFields()
     {
         // Arrange
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow.AddDays(-1));
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1));
         var request = ClaimTestDataFactory.CreateClaimRequest();
 
         // Act
@@ -68,7 +68,7 @@ public sealed class UpdateClaimMappingExtensionsTests
     public void UpdateFrom_WithValidRequest_DoesNotChangeEntityIdentitiesOrForeignKeys()
     {
         // Arrange
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow.AddDays(-1));
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1));
         var originalClaimId = claim.Id;
         var originalBookingId = claim.Booking.Id;
         var originalCustomerId = claim.Booking.Customer.Id;

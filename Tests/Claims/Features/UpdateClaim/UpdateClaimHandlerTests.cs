@@ -15,7 +15,7 @@ public sealed class UpdateClaimHandlerTests
         // Arrange
         var databaseName = Guid.NewGuid().ToString();
         await using var writeContext = ClaimsDbContextFactory.Create(databaseName);
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow.AddDays(-1));
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1));
         writeContext.Claims.Add(claim);
         await writeContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         writeContext.ChangeTracker.Clear();
@@ -69,7 +69,7 @@ public sealed class UpdateClaimHandlerTests
     {
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 

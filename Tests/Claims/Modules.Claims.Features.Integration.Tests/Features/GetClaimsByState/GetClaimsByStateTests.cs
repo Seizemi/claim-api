@@ -16,7 +16,7 @@ public sealed class GetClaimsByStateTests(IntegrationTestWebAppFactory factory) 
     [Fact]
     public async Task GetClaimsByState_ClaimsInMultipleStates_ReturnsOnlyMatchingState()
     {
-        var baseDate = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var baseDate = new DateOnly(2026, 1, 1);
         var matchingId = await ClaimApiSeedHelper.SeedClaimAsync(
             Client,
             ClaimRequestFactory.CreateValid(baseDate, ClaimState.AwaitingSupplier));
@@ -37,7 +37,7 @@ public sealed class GetClaimsByStateTests(IntegrationTestWebAppFactory factory) 
     [Fact]
     public async Task GetClaimsByState_MultipleSeededClaimsMatchingState_ReturnsPagedResponseOrderedByReceivedDateDescending()
     {
-        var baseDate = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var baseDate = new DateOnly(2026, 1, 1);
         var oldestId = await ClaimApiSeedHelper.SeedClaimAsync(Client, ClaimRequestFactory.CreateValid(baseDate, ClaimState.Terminate));
         var middleId = await ClaimApiSeedHelper.SeedClaimAsync(Client, ClaimRequestFactory.CreateValid(baseDate.AddDays(1), ClaimState.Terminate));
         var newestId = await ClaimApiSeedHelper.SeedClaimAsync(Client, ClaimRequestFactory.CreateValid(baseDate.AddDays(2), ClaimState.Terminate));
@@ -57,7 +57,7 @@ public sealed class GetClaimsByStateTests(IntegrationTestWebAppFactory factory) 
     [Fact]
     public async Task GetClaimsByState_PageSizeSmallerThanTotal_ReturnsCorrectPageAndTotalPages()
     {
-        var baseDate = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var baseDate = new DateOnly(2026, 1, 1);
         var ids = new List<Guid>();
         for (var i = 0; i < 5; i++)
         {
@@ -155,8 +155,8 @@ public sealed class GetClaimsByStateTests(IntegrationTestWebAppFactory factory) 
         Assert.Equal(1, item.SupplierAkioNumber);
         Assert.Equal(claimRequest.Booking.Customer.AkioNumber, item.CustomerAkioNumber);
         Assert.Equal("Test follower", item.FollowedByLabel);
-        DateTimeOffsetAssert.AreClose(claimRequest.ClaimDate.DateOfReceivedClaim, item.DateOfReceivedClaim);
-        DateTimeOffsetAssert.AreClose(claimRequest.ClaimDate.DateOfStartFollowUp, item.DateOfStartFollowUp);
+        Assert.Equal(claimRequest.ClaimDate.DateOfReceivedClaim, item.DateOfReceivedClaim);
+        Assert.Equal(claimRequest.ClaimDate.DateOfStartFollowUp, item.DateOfStartFollowUp);
         Assert.Equal(expectedSeason.SeasonLabel, item.SeasonLabel);
         Assert.Equal(expectedSeason.SeasonValue, item.SeasonValue);
     }

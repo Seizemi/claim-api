@@ -10,7 +10,7 @@ internal static class ClaimRequestFactory
     {
         var fixture = new Fixture();
 
-        var dateOfArrival = fixture.Create<DateTimeOffset>().ToUniversalTime();
+        var dateOfArrival = DateOnly.FromDateTime(fixture.Create<DateTime>());
         var dateOfDeparture = dateOfArrival.AddDays(Math.Abs(fixture.Create<int>()) % 30);
 
         return new ClaimRequest(
@@ -34,7 +34,7 @@ internal static class ClaimRequestFactory
                 Supplier: new SupplierRequest(
                     Id: LookupTestIds.SupplierId)),
             ClaimDate: new ClaimDateRequest(
-                DateOfReceivedClaim: DateTimeOffset.UtcNow.AddDays(-fixture.Create<int>() % 30),
+                DateOfReceivedClaim: DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-fixture.Create<int>() % 30),
                 DateOfStartFollowUp: null,
                 DateLastUpdate: null,
                 DateOfDeparture: dateOfDeparture,

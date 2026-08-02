@@ -11,7 +11,7 @@ public sealed class ClaimMappingExtensionsTests
     public void MapToResponse_WithValidClaim_MapsTopLevelFields()
     {
         // Arrange
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
 
         // Act
         var response = claim.MapToResponse();
@@ -33,7 +33,7 @@ public sealed class ClaimMappingExtensionsTests
     public void MapToResponse_WithValidClaim_MapsNestedBookingCustomerSupplierClaimDateCompensationFields()
     {
         // Arrange
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
 
         // Act
         var response = claim.MapToResponse();
@@ -61,8 +61,8 @@ public sealed class ClaimMappingExtensionsTests
     public void MapToResponse_WithDateOfArrival_ComputesSeasonFromSeasonCalculator()
     {
         // Arrange
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
-        claim.ClaimDate.DateOfArrival = new DateTimeOffset(2025, 8, 15, 0, 0, 0, TimeSpan.Zero);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
+        claim.ClaimDate.DateOfArrival = new DateOnly(2025, 8, 15);
         var (expectedSeasonValue, expectedSeasonLabel) = SeasonCalculator.Compute(claim.ClaimDate.DateOfArrival.Value);
 
         // Act
@@ -77,7 +77,7 @@ public sealed class ClaimMappingExtensionsTests
     public void MapToResponse_WithNullDateOfArrival_ReturnsNullSeasonFields()
     {
         // Arrange
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
         claim.ClaimDate.DateOfArrival = null;
 
         // Act

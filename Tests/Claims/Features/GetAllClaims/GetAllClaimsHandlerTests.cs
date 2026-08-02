@@ -33,9 +33,9 @@ public sealed class GetAllClaimsHandlerTests
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
 
-        var oldest = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow.AddDays(-10));
-        var middle = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow.AddDays(-5));
-        var newest = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        var oldest = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-10));
+        var middle = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-5));
+        var newest = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
 
         context.Claims.AddRange(oldest, newest, middle);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -61,7 +61,7 @@ public sealed class GetAllClaimsHandlerTests
         await using var context = ClaimsDbContextFactory.Create();
 
         var claims = Enumerable.Range(0, 5)
-            .Select(i => ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow.AddDays(-i)))
+            .Select(i => ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-i)))
             .ToList();
 
         context.Claims.AddRange(claims);
@@ -93,8 +93,8 @@ public sealed class GetAllClaimsHandlerTests
         await using var context = ClaimsDbContextFactory.Create();
 
         context.Claims.AddRange(
-            ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow),
-            ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow.AddDays(-1)));
+            ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow)),
+            ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1)));
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var handler = new GetAllClaimsHandler(context);
@@ -116,8 +116,8 @@ public sealed class GetAllClaimsHandlerTests
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
 
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
-        claim.ClaimDate.DateOfArrival = new DateTimeOffset(2025, 8, 15, 0, 0, 0, TimeSpan.Zero);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
+        claim.ClaimDate.DateOfArrival = new DateOnly(2025, 8, 15);
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -152,7 +152,7 @@ public sealed class GetAllClaimsHandlerTests
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
 
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -174,7 +174,7 @@ public sealed class GetAllClaimsHandlerTests
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
 
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
         var followedBy = new FollowedBy { Id = Guid.CreateVersion7(), Label = "Jane Doe", Value = "jane-doe" };
         claim.FollowedById = followedBy.Id;
         claim.FollowedBy = followedBy;
@@ -198,7 +198,7 @@ public sealed class GetAllClaimsHandlerTests
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
 
-        var claim = ClaimTestDataFactory.CreateClaim(DateTimeOffset.UtcNow);
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         context.ChangeTracker.Clear();
