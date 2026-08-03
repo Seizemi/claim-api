@@ -21,7 +21,8 @@ internal sealed class GetClaimsByStateHandler(ClaimsDbContext context) : IGetCla
     {
         var claimsQuery = context.Claims
             .Where(c => c.State == request.ClaimState)
-            .OrderByDescending(c => c.ClaimDate.DateOfReceivedClaim);
+            .OrderByDescending(c => c.ClaimDate.DateOfReceivedClaim)
+            .ThenBy(c => c.Id);
 
         var totalCount = await claimsQuery.CountAsync(cancellationToken);
 

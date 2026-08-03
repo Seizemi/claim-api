@@ -23,7 +23,8 @@ internal sealed class GetAllClaimsHandler(ClaimsDbContext context) : IGetAllClai
         var pageSize = request.PageSize;
 
         var claimsQuery = context.Claims
-            .OrderByDescending(c => c.ClaimDate.DateOfReceivedClaim);
+            .OrderByDescending(c => c.ClaimDate.DateOfReceivedClaim)
+            .ThenBy(c => c.Id);
 
         var totalCount = await claimsQuery.CountAsync(cancellationToken);
 
