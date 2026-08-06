@@ -27,4 +27,62 @@ public sealed class SeasonCalculatorTests
         Assert.Equal(expectedSeasonValue, seasonValue);
         Assert.Equal(expectedSeasonLabel, seasonLabel);
     }
+
+    [Theory]
+    [InlineData("ete2025", 2025, 5, 1, 2025, 10, 31)]
+    [InlineData("ete2026", 2026, 5, 1, 2026, 10, 31)]
+    [InlineData("hiver2025-2026", 2025, 11, 1, 2026, 4, 30)]
+    public void TryResolveDateRange_WithValidSeasonValue_ReturnsExpectedRange(
+        string seasonValue,
+        int expectedStartYear, int expectedStartMonth, int expectedStartDay,
+        int expectedEndYear, int expectedEndMonth, int expectedEndDay)
+    {
+        // Act
+        var result = SeasonCalculator.TryResolveDateRange(seasonValue, out var startDate, out var endDate);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(new DateOnly(expectedStartYear, expectedStartMonth, expectedStartDay), startDate);
+        Assert.Equal(new DateOnly(expectedEndYear, expectedEndMonth, expectedEndDay), endDate);
+    }
+
+    [Theory]
+    [InlineData("not-a-season")]
+    [InlineData("ete20255")]
+    [InlineData("eteabcd")]
+    [InlineData("hiver2025-2028")]
+    [InlineData("hiver2025_2026")]
+    [InlineData("")]
+    public void TryResolveDateRange_WithInvalidSeasonValue_ReturnsFalse(string seasonValue)
+    {
+        // Act
+        var result = SeasonCalculator.TryResolveDateRange(seasonValue, out var startDate, out var endDate);
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal(default, startDate);
+        Assert.Equal(default, endDate);
+    }
+
+    [Theory]
+    [InlineData(2025, 5, 1)]
+    [InlineData(2025, 8, 15)]
+    [InlineData(2025, 10, 31)]
+    [InlineData(2025, 11, 1)]
+    [InlineData(2025, 12, 25)]
+    [InlineData(2026, 1, 1)]
+    [InlineData(2026, 4, 30)]
+    public void TryResolveDateRange_RoundTripsWithCompute(int year, int month, int day)
+    {
+        // Arrange
+        var dateOfArrival = new DateOnly(year, month, day);
+        var (seasonValue, _) = SeasonCalculator.Compute(dateOfArrival);
+
+        // Act
+        var result = SeasonCalculator.TryResolveDateRange(seasonValue, out var startDate, out var endDate);
+
+        // Assert
+        Assert.True(result);
+        Assert.InRange(dateOfArrival.DayNumber, startDate.DayNumber, endDate.DayNumber);
+    }
 }

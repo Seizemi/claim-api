@@ -122,6 +122,7 @@ public class ClaimsDbContext(DbContextOptions<ClaimsDbContext> options) : DbCont
             entity.HasKey(x => x.Id);
             entity.Property(x => x.ClaimId).IsRequired();
             entity.HasIndex(x => x.DateOfReceivedClaim);
+            entity.HasIndex(x => x.DateOfArrival);
         });
 
         modelBuilder.Entity<Compensation>(entity =>

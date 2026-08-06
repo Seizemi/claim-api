@@ -7,5 +7,6 @@ internal static class RouteConsts
     internal const string DashboardClaim = $"{BaseRoute}/dashboard/claim";
     internal const string ClaimDetails = $"{BaseRoute}/claim-details/{{claimId}}/information";
     internal const string ClaimsByState = $"{BaseRoute}/by-state/{{claimState}}";
+    internal const string ClaimsBySeason = $"{BaseRoute}/by-season/{{seasonValue}}";
     internal const string GetClaimByIdRouteName = "GetClaimById";
 }
