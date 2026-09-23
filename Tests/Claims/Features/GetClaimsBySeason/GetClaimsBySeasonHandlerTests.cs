@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Modules.Claims.Domain;
 using Modules.Claims.Domain.Enums;
 using Modules.Claims.Features.Features.GetClaimsBySeason;
@@ -20,7 +21,7 @@ public sealed class GetClaimsBySeasonHandlerTests
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var handler = new GetClaimsBySeasonHandler(context);
+        var handler = new GetClaimsBySeasonHandler(context, new FakeTimeProvider());
         var request = new GetClaimsBySeasonRequest("hiver2025-2026");
 
         // Act
@@ -45,7 +46,7 @@ public sealed class GetClaimsBySeasonHandlerTests
         context.Claims.AddRange(matching, otherSeason);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var handler = new GetClaimsBySeasonHandler(context);
+        var handler = new GetClaimsBySeasonHandler(context, new FakeTimeProvider());
         var request = new GetClaimsBySeasonRequest("ete2025");
 
         // Act
@@ -70,7 +71,7 @@ public sealed class GetClaimsBySeasonHandlerTests
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var handler = new GetClaimsBySeasonHandler(context);
+        var handler = new GetClaimsBySeasonHandler(context, new FakeTimeProvider());
         var request = new GetClaimsBySeasonRequest("ete2025");
 
         // Act
@@ -98,7 +99,7 @@ public sealed class GetClaimsBySeasonHandlerTests
         context.Claims.AddRange(oldest, newest, middle);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var handler = new GetClaimsBySeasonHandler(context);
+        var handler = new GetClaimsBySeasonHandler(context, new FakeTimeProvider());
         var request = new GetClaimsBySeasonRequest("ete2025");
 
         // Act
@@ -122,7 +123,7 @@ public sealed class GetClaimsBySeasonHandlerTests
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var handler = new GetClaimsBySeasonHandler(context);
+        var handler = new GetClaimsBySeasonHandler(context, new FakeTimeProvider());
         var request = new GetClaimsBySeasonRequest("ete2025");
 
         // Act
@@ -157,7 +158,7 @@ public sealed class GetClaimsBySeasonHandlerTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         context.ChangeTracker.Clear();
 
-        var handler = new GetClaimsBySeasonHandler(context);
+        var handler = new GetClaimsBySeasonHandler(context, new FakeTimeProvider());
         var request = new GetClaimsBySeasonRequest("ete2025");
 
         // Act

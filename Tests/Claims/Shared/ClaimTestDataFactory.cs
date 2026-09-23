@@ -28,7 +28,12 @@ internal static class ClaimTestDataFactory
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    internal static Claim CreateClaim(DateOnly dateOfReceivedClaim, ClaimState? state = null)
+    internal static Claim CreateClaim(
+        DateOnly dateOfReceivedClaim,
+        ClaimState? state = null,
+        Guid? lockedByUserId = null,
+        string? lockedByUserName = null,
+        DateTimeOffset? lockedAt = null)
     {
         var fixture = new Fixture();
         var claimId = Guid.CreateVersion7();
@@ -88,7 +93,10 @@ internal static class ClaimTestDataFactory
                 RefundState = new RefundState { Id = Guid.CreateVersion7(), Label = fixture.Create<string>(), Value = fixture.Create<string>() },
                 CompensationReasonId = fixture.Create<Guid>(),
                 CompensationReason = new CompensationReason { Id = Guid.CreateVersion7(), Label = fixture.Create<string>(), Value = fixture.Create<string>() }
-            }
+            },
+            LockedByUserId = lockedByUserId,
+            LockedByUserName = lockedByUserName,
+            LockedAt = lockedAt
         };
     }
 
@@ -129,6 +137,7 @@ internal static class ClaimTestDataFactory
                 SupplierRefund: null,
                 ClaimRefund: null,
                 RefundStateId: fixture.Create<Guid>(),
-                CompensationReasonId: fixture.Create<Guid>()));
+                CompensationReasonId: fixture.Create<Guid>()),
+            EditingUserId: fixture.Create<Guid>());
     }
 }

@@ -15,4 +15,7 @@ public sealed record ClaimResponse(
     string? SupplierSuppInfo,
     BookingResponse Booking,
     ClaimDateResponse ClaimDate,
-    CompensationResponse Compensation);
+    CompensationResponse Compensation,
+    bool IsLocked,
+    string? LockedByUserName,
+    DateTimeOffset? LockedAt);

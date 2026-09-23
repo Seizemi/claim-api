@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Modules.Claims.Domain;
 using Modules.Claims.Features.Features.Shared.Mapping;
 using Modules.Claims.Features.Tests.Shared;
@@ -14,7 +15,7 @@ public sealed class ClaimMappingExtensionsTests
         var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
 
         // Act
-        var response = claim.MapToResponse();
+        var response = claim.MapToResponse(new FakeTimeProvider());
 
         // Assert
         Assert.Equal(claim.Id, response.Id);
@@ -36,7 +37,7 @@ public sealed class ClaimMappingExtensionsTests
         var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
 
         // Act
-        var response = claim.MapToResponse();
+        var response = claim.MapToResponse(new FakeTimeProvider());
 
         // Assert
         Assert.Equal(claim.Booking.Id, response.Booking.Id);
@@ -66,7 +67,7 @@ public sealed class ClaimMappingExtensionsTests
         var (expectedSeasonValue, expectedSeasonLabel) = SeasonCalculator.Compute(claim.ClaimDate.DateOfArrival.Value);
 
         // Act
-        var response = claim.MapToResponse();
+        var response = claim.MapToResponse(new FakeTimeProvider());
 
         // Assert
         Assert.Equal(expectedSeasonValue, response.Booking.SeasonValue);
@@ -81,7 +82,7 @@ public sealed class ClaimMappingExtensionsTests
         claim.ClaimDate.DateOfArrival = null;
 
         // Act
-        var response = claim.MapToResponse();
+        var response = claim.MapToResponse(new FakeTimeProvider());
 
         // Assert
         Assert.Null(response.Booking.SeasonValue);

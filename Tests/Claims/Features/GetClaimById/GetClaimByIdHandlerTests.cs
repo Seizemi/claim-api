@@ -1,4 +1,5 @@
 using ErrorOr;
+using Microsoft.Extensions.Time.Testing;
 using Modules.Claims.Features.Features.GetClaimById;
 using Modules.Claims.Features.Features.Shared.Errors;
 using Modules.Claims.Features.Tests.Shared;
@@ -17,7 +18,7 @@ public sealed class GetClaimByIdHandlerTests
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var handler = new GetClaimByIdHandler(context);
+        var handler = new GetClaimByIdHandler(context, new FakeTimeProvider());
 
         // Act
         var result = await handler.HandleAsync(claim.Id, TestContext.Current.CancellationToken);
@@ -38,7 +39,7 @@ public sealed class GetClaimByIdHandlerTests
     {
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
-        var handler = new GetClaimByIdHandler(context);
+        var handler = new GetClaimByIdHandler(context, new FakeTimeProvider());
 
         // Act
         var result = await handler.HandleAsync(Guid.CreateVersion7(), TestContext.Current.CancellationToken);
@@ -60,12 +61,86 @@ public sealed class GetClaimByIdHandlerTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         context.ChangeTracker.Clear();
 
-        var handler = new GetClaimByIdHandler(context);
+        var handler = new GetClaimByIdHandler(context, new FakeTimeProvider());
 
         // Act
         await handler.HandleAsync(claim.Id, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Empty(context.ChangeTracker.Entries());
+    }
+
+    [Fact]
+    public async Task HandleAsync_ClaimActivelyLocked_ReturnsIsLockedTrueWithHolderName()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        await using var context = ClaimsDbContextFactory.Create();
+        var claim = ClaimTestDataFactory.CreateClaim(
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            lockedByUserId: Guid.CreateVersion7(),
+            lockedByUserName: "Alice",
+            lockedAt: timeProvider.GetUtcNow());
+        context.Claims.Add(claim);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var handler = new GetClaimByIdHandler(context, timeProvider);
+
+        // Act
+        var result = await handler.HandleAsync(claim.Id, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.False(result.IsError);
+        Assert.True(result.Value.IsLocked);
+        Assert.Equal("Alice", result.Value.LockedByUserName);
+        Assert.NotNull(result.Value.LockedAt);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ClaimLockExpired_ReturnsIsLockedFalse()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        await using var context = ClaimsDbContextFactory.Create();
+        var claim = ClaimTestDataFactory.CreateClaim(
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            lockedByUserId: Guid.CreateVersion7(),
+            lockedByUserName: "Alice",
+            lockedAt: timeProvider.GetUtcNow());
+        context.Claims.Add(claim);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        timeProvider.Advance(TimeSpan.FromMinutes(20));
+
+        var handler = new GetClaimByIdHandler(context, timeProvider);
+
+        // Act
+        var result = await handler.HandleAsync(claim.Id, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.False(result.IsError);
+        Assert.False(result.Value.IsLocked);
+        Assert.Null(result.Value.LockedByUserName);
+        Assert.Null(result.Value.LockedAt);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ClaimNotLocked_ReturnsIsLockedFalse()
+    {
+        // Arrange
+        await using var context = ClaimsDbContextFactory.Create();
+        var claim = ClaimTestDataFactory.CreateClaim(DateOnly.FromDateTime(DateTime.UtcNow));
+        context.Claims.Add(claim);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var handler = new GetClaimByIdHandler(context, new FakeTimeProvider());
+
+        // Act
+        var result = await handler.HandleAsync(claim.Id, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.False(result.IsError);
+        Assert.False(result.Value.IsLocked);
+        Assert.Null(result.Value.LockedByUserName);
     }
 }

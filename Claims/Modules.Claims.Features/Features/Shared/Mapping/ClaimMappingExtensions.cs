@@ -25,20 +25,31 @@ internal static class ClaimMappingExtensions
             ? SeasonCalculator.Compute(claim.ClaimDate.DateOfArrival.Value).SeasonValue
             : null);
 
-    internal static ClaimResponse MapToResponse(this Claim claim) => new(
-        claim.Id,
-        claim.State,
-        claim.FollowedBy?.MapToResponse(),
-        claim.Reason.MapToResponse(),
-        claim.ClaimSummary,
-        claim.Solution.MapToResponse(),
-        claim.PurposeOfSolution,
-        claim.UpdateReason,
-        claim.CustomerSuppInfo,
-        claim.SupplierSuppInfo,
-        claim.Booking.MapToResponse(claim.ClaimDate.DateOfArrival),
-        claim.ClaimDate.MapToResponse(),
-        claim.Compensation.MapToResponse());
+    private static readonly TimeSpan LockTtl = TimeSpan.FromMinutes(15);
+
+    internal static ClaimResponse MapToResponse(this Claim claim, TimeProvider timeProvider)
+    {
+        var isLocked = claim.LockedByUserId is not null
+            && claim.LockedAt > timeProvider.GetUtcNow() - LockTtl;
+
+        return new(
+            claim.Id,
+            claim.State,
+            claim.FollowedBy?.MapToResponse(),
+            claim.Reason.MapToResponse(),
+            claim.ClaimSummary,
+            claim.Solution.MapToResponse(),
+            claim.PurposeOfSolution,
+            claim.UpdateReason,
+            claim.CustomerSuppInfo,
+            claim.SupplierSuppInfo,
+            claim.Booking.MapToResponse(claim.ClaimDate.DateOfArrival),
+            claim.ClaimDate.MapToResponse(),
+            claim.Compensation.MapToResponse(),
+            isLocked,
+            isLocked ? claim.LockedByUserName : null,
+            isLocked ? claim.LockedAt : null);
+    }
 
     private static BookingResponse MapToResponse(this Booking booking, DateOnly? dateOfArrival)
     {

@@ -1,5 +1,6 @@
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Time.Testing;
 using Modules.Claims.Features.Features.Shared.Errors;
 using Modules.Claims.Features.Features.UpdateClaim;
 using Modules.Claims.Features.Tests.Shared;
@@ -22,7 +23,7 @@ public sealed class UpdateClaimHandlerTests
 
         var request = ClaimTestDataFactory.CreateClaimRequest();
         await ClaimTestDataFactory.SeedLookupsAsync(writeContext, request, TestContext.Current.CancellationToken);
-        var handler = new UpdateClaimHandler(writeContext);
+        var handler = new UpdateClaimHandler(writeContext, new FakeTimeProvider());
 
         // Act
         var result = await handler.HandleAsync(claim.Id, request, TestContext.Current.CancellationToken);
@@ -51,7 +52,7 @@ public sealed class UpdateClaimHandlerTests
     {
         // Arrange
         await using var context = ClaimsDbContextFactory.Create();
-        var handler = new UpdateClaimHandler(context);
+        var handler = new UpdateClaimHandler(context, new FakeTimeProvider());
         var request = ClaimTestDataFactory.CreateClaimRequest();
 
         // Act
@@ -73,7 +74,7 @@ public sealed class UpdateClaimHandlerTests
         context.Claims.Add(claim);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var handler = new UpdateClaimHandler(context);
+        var handler = new UpdateClaimHandler(context, new FakeTimeProvider());
         var request = ClaimTestDataFactory.CreateClaimRequest();
         await ClaimTestDataFactory.SeedLookupsAsync(context, request, TestContext.Current.CancellationToken);
 
@@ -82,5 +83,87 @@ public sealed class UpdateClaimHandlerTests
 
         // Assert
         Assert.Equal(1, await context.Claims.CountAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task HandleAsync_LockedByAnotherActiveUser_ReturnsConflictError()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        await using var context = ClaimsDbContextFactory.Create();
+        var lockHolderId = Guid.CreateVersion7();
+        var claim = ClaimTestDataFactory.CreateClaim(
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            lockedByUserId: lockHolderId,
+            lockedByUserName: "Alice",
+            lockedAt: timeProvider.GetUtcNow());
+        context.Claims.Add(claim);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var handler = new UpdateClaimHandler(context, timeProvider);
+        var request = ClaimTestDataFactory.CreateClaimRequest() with { EditingUserId = Guid.CreateVersion7() };
+
+        // Act
+        var result = await handler.HandleAsync(claim.Id, request, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.True(result.IsError);
+        var error = Assert.Single(result.Errors);
+        Assert.Equal(ErrorType.Conflict, error.Type);
+        Assert.Equal(ClaimErrorCodes.ClaimLockedByAnotherUser, error.Code);
+    }
+
+    [Fact]
+    public async Task HandleAsync_LockedByRequestingUser_Succeeds()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        await using var context = ClaimsDbContextFactory.Create();
+        var lockHolderId = Guid.CreateVersion7();
+        var claim = ClaimTestDataFactory.CreateClaim(
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            lockedByUserId: lockHolderId,
+            lockedByUserName: "Alice",
+            lockedAt: timeProvider.GetUtcNow());
+        context.Claims.Add(claim);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var handler = new UpdateClaimHandler(context, timeProvider);
+        var request = ClaimTestDataFactory.CreateClaimRequest() with { EditingUserId = lockHolderId };
+        await ClaimTestDataFactory.SeedLookupsAsync(context, request, TestContext.Current.CancellationToken);
+
+        // Act
+        var result = await handler.HandleAsync(claim.Id, request, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.False(result.IsError);
+    }
+
+    [Fact]
+    public async Task HandleAsync_LockExpired_Succeeds()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        await using var context = ClaimsDbContextFactory.Create();
+        var lockHolderId = Guid.CreateVersion7();
+        var claim = ClaimTestDataFactory.CreateClaim(
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            lockedByUserId: lockHolderId,
+            lockedByUserName: "Alice",
+            lockedAt: timeProvider.GetUtcNow());
+        context.Claims.Add(claim);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        timeProvider.Advance(TimeSpan.FromMinutes(20));
+
+        var handler = new UpdateClaimHandler(context, timeProvider);
+        var request = ClaimTestDataFactory.CreateClaimRequest() with { EditingUserId = Guid.CreateVersion7() };
+        await ClaimTestDataFactory.SeedLookupsAsync(context, request, TestContext.Current.CancellationToken);
+
+        // Act
+        var result = await handler.HandleAsync(claim.Id, request, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.False(result.IsError);
     }
 }

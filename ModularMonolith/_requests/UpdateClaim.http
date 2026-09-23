@@ -46,5 +46,6 @@ Content-Type: application/json
     "claimRefund": 400.00,
     "refundStateId": "019fc32f-9a0e-7017-af8c-4eee07556c20",
     "compensationReasonId": "019fc32f-9a0e-70d3-96fd-0fed0da19056"
-  }
+  },
+  "editingUserId": "019fc32f-9a0e-718e-a13b-6ed9b48dd703"
 }

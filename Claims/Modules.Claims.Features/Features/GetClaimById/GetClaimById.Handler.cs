@@ -13,7 +13,7 @@ internal interface IGetClaimByIdHandler : IHandler
     Task<ErrorOr<ClaimResponse>> HandleAsync(Guid claimId, CancellationToken cancellationToken);
 }
 
-internal sealed class GetClaimByIdHandler(ClaimsDbContext context) : IGetClaimByIdHandler
+internal sealed class GetClaimByIdHandler(ClaimsDbContext context, TimeProvider timeProvider) : IGetClaimByIdHandler
 {
     public async Task<ErrorOr<ClaimResponse>> HandleAsync(Guid claimId, CancellationToken cancellationToken)
     {
@@ -45,6 +45,6 @@ internal sealed class GetClaimByIdHandler(ClaimsDbContext context) : IGetClaimBy
                 ClaimErrorMessages.ClaimCannotBeNull);
         }
 
-        return claim.MapToResponse();
+        return claim.MapToResponse(timeProvider);
     }
 }

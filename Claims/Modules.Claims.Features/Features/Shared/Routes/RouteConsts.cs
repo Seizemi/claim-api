@@ -8,5 +8,9 @@ internal static class RouteConsts
     internal const string ClaimDetails = $"{BaseRoute}/claim-details/{{claimId}}/information";
     internal const string ClaimsByState = $"{BaseRoute}/by-state/{{claimState}}";
     internal const string ClaimsBySeason = $"{BaseRoute}/by-season/{{seasonValue}}";
+    internal const string ClaimLock = $"{BaseRoute}/claim-details/{{claimId}}/lock";
+    internal const string ClaimUnlock = $"{BaseRoute}/claim-details/{{claimId}}/unlock";
     internal const string GetClaimByIdRouteName = "GetClaimById";
+    internal const string AcquireClaimLockRouteName = "AcquireClaimLock";
+    internal const string ReleaseClaimLockRouteName = "ReleaseClaimLock";
 }

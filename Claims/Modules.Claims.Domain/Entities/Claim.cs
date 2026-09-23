@@ -21,4 +21,7 @@ public class Claim
     public Booking Booking { get; set; } = null!;
     public ClaimDate ClaimDate { get; set; } = null!;
     public Compensation Compensation { get; set; } = null!;
+    public Guid? LockedByUserId { get; set; }
+    public string? LockedByUserName { get; set; }
+    public DateTimeOffset? LockedAt { get; set; }
 }

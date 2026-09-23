@@ -114,7 +114,8 @@ public sealed class GetClaimByIdEndpointTests
             claimId,
             default,
             null, null, null, null, null, null, null, null,
-            null!, null!, null!);
+            null!, null!, null!,
+            false, null, null);
 
         var validatorMock = new Mock<IValidator<GetClaimByIdRequest>>();
         validatorMock

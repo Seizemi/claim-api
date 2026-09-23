@@ -23,6 +23,9 @@ internal static class ClaimErrorCodes
     internal const string ClaimSupplierIdDoesNotExist = "Claim.SupplierIdDoesNotExist";
     internal const string ClaimRefundStateIdDoesNotExist = "Claim.RefundStateIdDoesNotExist";
     internal const string ClaimCompensationReasonIdDoesNotExist = "Claim.CompensationReasonIdDoesNotExist";
+    internal const string ClaimLockUserIdCannotBeEmpty = "Claim.Lock.UserIdCannotBeEmpty";
+    internal const string ClaimLockUserNameCannotBeNullOrEmpty = "Claim.Lock.UserNameCannotBeNullOrEmpty";
+    internal const string ClaimLockedByAnotherUser = "Claim.LockedByAnotherUser";
 }
 
 internal static class ClaimErrorMessages
@@ -48,4 +51,7 @@ internal static class ClaimErrorMessages
     internal const string ClaimSupplierIdDoesNotExist = "Supplier id does not exist.";
     internal const string ClaimRefundStateIdDoesNotExist = "Refund state id does not exist.";
     internal const string ClaimCompensationReasonIdDoesNotExist = "Compensation reason id does not exist.";
+    internal const string ClaimLockUserIdCannotBeEmpty = "User id cannot be empty.";
+    internal const string ClaimLockUserNameCannotBeNullOrEmpty = "User name cannot be null or empty.";
+    internal const string ClaimLockedByAnotherUser = "Claim is currently locked for editing by another user.";
 }

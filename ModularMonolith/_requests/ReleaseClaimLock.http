@@ -1,0 +1,9 @@
+### Release the edit lock for a claim
+@claimId = 019fc335-f288-7cbb-94ef-55b8d52801e3
+
+POST {{host}}/api/v1.0/Claim/claim-details/{{claimId}}/unlock
+Content-Type: application/json
+
+{
+  "userId": "019fc32f-9a0e-718e-a13b-6ed9b48dd703"
+}

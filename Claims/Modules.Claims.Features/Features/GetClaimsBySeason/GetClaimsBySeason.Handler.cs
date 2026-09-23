@@ -14,7 +14,7 @@ internal interface IGetClaimsBySeasonHandler : IHandler
     Task<ErrorOr<IReadOnlyList<ClaimResponse>>> HandleAsync(GetClaimsBySeasonRequest request, CancellationToken cancellationToken);
 }
 
-internal sealed class GetClaimsBySeasonHandler(ClaimsDbContext context) : IGetClaimsBySeasonHandler
+internal sealed class GetClaimsBySeasonHandler(ClaimsDbContext context, TimeProvider timeProvider) : IGetClaimsBySeasonHandler
 {
     public async Task<ErrorOr<IReadOnlyList<ClaimResponse>>> HandleAsync(GetClaimsBySeasonRequest request, CancellationToken cancellationToken)
     {
@@ -44,6 +44,6 @@ internal sealed class GetClaimsBySeasonHandler(ClaimsDbContext context) : IGetCl
             .ThenBy(c => c.Id)
             .ToListAsync(cancellationToken);
 
-        return claims.Select(ClaimMappingExtensions.MapToResponse).ToList();
+        return claims.Select(c => c.MapToResponse(timeProvider)).ToList();
     }
 }

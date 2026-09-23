@@ -12,6 +12,7 @@ public static class DependencyInjection
     {
         services.AddClaimsInfrastructure(configuration, enableSensitiveDataLogging);
         services.AddMemoryCache();
+        services.AddSingleton(TimeProvider.System);
         services.RegisterHandlersFromAssemblyContaining(typeof(DependencyInjection));
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
 

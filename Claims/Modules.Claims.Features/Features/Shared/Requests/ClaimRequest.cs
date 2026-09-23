@@ -14,4 +14,5 @@ public sealed record ClaimRequest(
     string? SupplierSuppInfo,
     BookingRequest Booking,
     ClaimDateRequest ClaimDate,
-    CompensationRequest Compensation);
+    CompensationRequest Compensation,
+    Guid EditingUserId);

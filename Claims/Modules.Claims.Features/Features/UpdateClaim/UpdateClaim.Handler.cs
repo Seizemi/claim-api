@@ -13,7 +13,7 @@ internal interface IUpdateClaimHandler : IHandler
     Task<ErrorOr<Updated>> HandleAsync(Guid claimId, ClaimRequest request, CancellationToken cancellationToken);
 }
 
-internal sealed class UpdateClaimHandler(ClaimsDbContext context) : IUpdateClaimHandler
+internal sealed class UpdateClaimHandler(ClaimsDbContext context, TimeProvider timeProvider) : IUpdateClaimHandler
 {
     public async Task<ErrorOr<Updated>> HandleAsync(Guid claimId, ClaimRequest request, CancellationToken cancellationToken)
     {
@@ -29,6 +29,18 @@ internal sealed class UpdateClaimHandler(ClaimsDbContext context) : IUpdateClaim
             return Error.Validation(
                 ClaimErrorCodes.ClaimCannotBeNull,
                 ClaimErrorMessages.ClaimCannotBeNull);
+        }
+
+        var staleThreshold = timeProvider.GetUtcNow().AddMinutes(-15);
+        var isLockedByAnotherUser = claim.LockedByUserId is not null
+            && claim.LockedByUserId != request.EditingUserId
+            && claim.LockedAt > staleThreshold;
+
+        if (isLockedByAnotherUser)
+        {
+            return Error.Conflict(
+                ClaimErrorCodes.ClaimLockedByAnotherUser,
+                $"Claim is currently locked by {claim.LockedByUserName}.");
         }
 
         var lookupErrors = await context.ValidateLookupsExistAsync(request, cancellationToken);

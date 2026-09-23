@@ -115,6 +115,8 @@ public class ClaimsDbContext(DbContextOptions<ClaimsDbContext> options) : DbCont
                 .WithMany()
                 .HasForeignKey(x => x.FollowedById)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.Property(x => x.LockedByUserName).HasMaxLength(256);
         });
 
         modelBuilder.Entity<ClaimDate>(entity =>
