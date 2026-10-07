@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using ModularMonolith.Testing;
 using Modules.Claims.Infrastructure.Database;
 using Xunit;
 
@@ -13,11 +14,16 @@ public abstract class IntegrationTestBase : IAsyncLifetime
     protected IntegrationTestBase(IntegrationTestWebAppFactory factory)
     {
         _factory = factory;
-        Client = factory.CreateClient();
+        Client = factory.CreateClient(TestUser.Alice);
         _resetHelper = new DatabaseResetHelper(factory.Services);
     }
 
+    /// <summary>Signed in as <see cref="TestUser.Alice"/>, an Agent.</summary>
     protected HttpClient Client { get; }
+
+    protected HttpClient CreateClient(TestUser user) => _factory.CreateClient(user);
+
+    protected HttpClient CreateAnonymousClient() => _factory.CreateAnonymousClient();
 
     protected ClaimsDbContext DbContext =>
         (_scope ??= _factory.Services.CreateScope())

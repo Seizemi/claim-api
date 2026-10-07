@@ -7,9 +7,12 @@
     <UserSecretsId>4d918d49-a850-467b-bc3c-ea9ef3d48554</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+    <!-- The Dockerfile builds the API and the React app: its context is the folder holding ClaimApi and claim-client. -->
+    <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Identity.Web" Version="4.16.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12">
       <PrivateAssets>all</PrivateAssets>
@@ -17,10 +20,18 @@
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+    <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="ModularMonolith.Tests" />
+    <InternalsVisibleTo Include="ModularMonolith.Testing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Authentication\Modules.Authentication.Features\Modules.Authentication.Features.csproj" />
     <ProjectReference Include="..\Claims\Modules.Claims.Features\Modules.Claims.Features.csproj" />
+    <ProjectReference Include="..\Users\Modules.Users.Features\Modules.Users.Features.csproj" />
   </ItemGroup>
 
 </Project>

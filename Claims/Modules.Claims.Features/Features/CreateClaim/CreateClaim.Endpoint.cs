@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Modules.Claims.Features.Features.Shared.Requests;
 using Modules.Claims.Features.Features.Shared.Routes;
 using Modules.Common.Features;
+using Modules.Common.Features.Authorization;
 
 namespace Modules.Claims.Features.Features.CreateClaim;
 
@@ -13,7 +14,8 @@ public sealed class CreateClaimEndpoint : IEndpointModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost(RouteConsts.NewClaim, Handle);
+        app.MapPost(RouteConsts.NewClaim, Handle)
+            .RequireAuthorization(AuthPolicies.Agent);
     }
 
     private static async Task<IResult> Handle(

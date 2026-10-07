@@ -14,6 +14,5 @@ internal sealed class DatabaseResetHelper(IServiceProvider services)
         await context.Claims.ExecuteDeleteAsync();
         await context.Bookings.ExecuteDeleteAsync();
         await context.Customers.ExecuteDeleteAsync();
-        await context.Users.ExecuteDeleteAsync();
     }
 }

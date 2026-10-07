@@ -1,0 +1,34 @@
+# Used instead of a root .dockerignore because the build context is the folder above ClaimApi.
+# Paths are relative to that folder. Only the two source trees the Dockerfile copies are sent,
+# without secrets, local settings, tests or build outputs.
+*
+!ClaimApi
+!claim-client
+
+# Secrets and local configuration
+**/.env*
+**/secrets.json
+**/*.pfx
+**/*.user
+**/appsettings.*.local.json
+
+# Tooling and VCS
+**/.git
+**/.vs
+**/.vscode
+**/.idea
+**/.claude
+
+# Build outputs and dependencies
+**/bin
+**/obj
+**/node_modules
+claim-client/build
+claim-client/coverage
+
+# Not needed in the image
+ClaimApi/Tests
+ClaimApi/TestResults
+ClaimApi/ModularMonolith/_requests
+ClaimApi/docker-compose*
+ClaimApi/**/Dockerfile*

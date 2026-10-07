@@ -16,18 +16,29 @@ services:
       retries: 5
 
   claimapi:
-    build:
-      context: .
-      dockerfile: ModularMonolith/Dockerfile
+    # https://localhost:7001: the same URL, and the same registered redirect URI, as dotnet run.
+    # HTTPS is required: the __Host- session cookie is only accepted over a secure connection.
     ports:
-      - "8080:8080"
+      - "7001:8081"
+    # Dev tenant values and the dev certificate password (git-ignored; copy .env.local.example).
+    env_file:
+      - path: .env.local
+        required: false
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:8080
+      # Production behavior, as in Azure: the React build is served from wwwroot (no YARP, no user-secrets).
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTPS_PORTS: "8081"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/claimapi.pfx
       ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=claimapi;Username=postgres;Password=postgres
+      # Keys that encrypt the session cookie, kept in a volume so restarting the container doesn't sign users out.
+      DataProtection__KeysDirectory: /keys
+    volumes:
+      - ~/.aspnet/https:/https:ro
+      - dataprotection-keys:/keys
     depends_on:
       postgres:
         condition: service_healthy
 
 volumes:
   postgres-data:
+  dataprotection-keys:

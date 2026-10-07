@@ -10,12 +10,12 @@ namespace Modules.Claims.Features.Features.UpdateClaim;
 
 internal interface IUpdateClaimHandler : IHandler
 {
-    Task<ErrorOr<Updated>> HandleAsync(Guid claimId, ClaimRequest request, CancellationToken cancellationToken);
+    Task<ErrorOr<Updated>> HandleAsync(Guid claimId, ClaimRequest request, Guid editingUserId, CancellationToken cancellationToken);
 }
 
 internal sealed class UpdateClaimHandler(ClaimsDbContext context, TimeProvider timeProvider) : IUpdateClaimHandler
 {
-    public async Task<ErrorOr<Updated>> HandleAsync(Guid claimId, ClaimRequest request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Updated>> HandleAsync(Guid claimId, ClaimRequest request, Guid editingUserId, CancellationToken cancellationToken)
     {
         var claim = await context.Claims
             .Include(c => c.Booking)
@@ -33,7 +33,7 @@ internal sealed class UpdateClaimHandler(ClaimsDbContext context, TimeProvider t
 
         var staleThreshold = timeProvider.GetUtcNow().AddMinutes(-15);
         var isLockedByAnotherUser = claim.LockedByUserId is not null
-            && claim.LockedByUserId != request.EditingUserId
+            && claim.LockedByUserId != editingUserId
             && claim.LockedAt > staleThreshold;
 
         if (isLockedByAnotherUser)

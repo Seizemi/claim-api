@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using Modules.Claims.Features.Features.Shared.Requests;
 using Modules.Claims.Features.Features.Shared.Routes;
 using Modules.Common.Features;
+using Modules.Common.Features.Authorization;
 
 namespace Modules.Claims.Features.Features.GetClaimsBySeason;
 
@@ -12,7 +13,8 @@ public sealed class GetClaimsBySeasonEndpoint : IEndpointModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet(RouteConsts.ClaimsBySeason, Handle);
+        app.MapGet(RouteConsts.ClaimsBySeason, Handle)
+            .RequireAuthorization(AuthPolicies.Agent);
     }
 
     private static async Task<IResult> Handle(

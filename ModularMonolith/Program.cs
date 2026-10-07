@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using ModularMonolith.Authentication;
 using ModularMonolith.Seeding;
+using ModularMonolith.Spa;
 using Modules.Claims.Features;
 using Modules.Claims.Infrastructure.Database;
 using Modules.Common.Features;
@@ -8,6 +10,8 @@ using Modules.Common.Features;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddClaimsModule(builder.Configuration, builder.Environment.IsDevelopment());
+builder.Services.AddBffAuthentication(builder.Configuration);
+builder.Services.AddSpaHosting(builder.Configuration, builder.Environment);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -32,6 +36,9 @@ if (app.Configuration.GetValue("Seeding:Enabled", defaultValue: true))
 }
 
 app.UseExceptionHandler();
+app.UseSpaStaticFiles(app.Environment);
+app.UseRouting();
+app.UseBffAuthentication();
 
 if (app.Environment.IsDevelopment())
 {
@@ -39,8 +46,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapEndpointModulesFromAssemblyContaining(typeof(DependencyInjection));
-app.MapHealthChecks("/health");
+app.MapEndpointModulesFromAssemblyContaining(typeof(Modules.Claims.Features.DependencyInjection));
+app.MapEndpointModulesFromAssemblyContaining(typeof(Modules.Authentication.Features.DependencyInjection));
+app.MapEndpointModulesFromAssemblyContaining(typeof(Modules.Users.Features.DependencyInjection));
+app.MapEndpointModulesFromAssemblyContaining(typeof(Program));
+app.MapSpa(app.Environment);
 
 app.Run();
 

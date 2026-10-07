@@ -11,12 +11,15 @@ using Modules.Claims.Features.Features.Shared.Requests;
 using Modules.Claims.Features.Features.UpdateClaim;
 using Modules.Claims.Features.Tests.Shared;
 using Modules.Common.Features;
+using Modules.Common.Features.Authorization;
 using Xunit;
 
 namespace Modules.Claims.Features.Tests.Features.UpdateClaim;
 
 public sealed class UpdateClaimEndpointTests
 {
+    private static readonly CurrentUser CurrentUser = new(Guid.CreateVersion7(), "Alice");
+
     [Fact]
     public void AddRoutes_Always_RegistersPutOnClaimDetailsRoute()
     {
@@ -61,6 +64,7 @@ public sealed class UpdateClaimEndpointTests
             typeof(UpdateClaimEndpoint),
             claimId,
             request,
+            CurrentUser,
             claimIdValidatorMock.Object,
             requestValidatorMock.Object,
             handlerMock.Object,
@@ -73,7 +77,7 @@ public sealed class UpdateClaimEndpointTests
             v => v.ValidateAsync(It.IsAny<ClaimRequest>(), It.IsAny<CancellationToken>()),
             Times.Never);
         handlerMock.Verify(
-            h => h.HandleAsync(It.IsAny<Guid>(), It.IsAny<ClaimRequest>(), It.IsAny<CancellationToken>()),
+            h => h.HandleAsync(It.IsAny<Guid>(), It.IsAny<ClaimRequest>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -104,6 +108,7 @@ public sealed class UpdateClaimEndpointTests
             typeof(UpdateClaimEndpoint),
             claimId,
             request,
+            CurrentUser,
             claimIdValidatorMock.Object,
             requestValidatorMock.Object,
             handlerMock.Object,
@@ -113,7 +118,7 @@ public sealed class UpdateClaimEndpointTests
         var problem = Assert.IsType<IStatusCodeHttpResult>(result, exactMatch: false);
         Assert.Equal(StatusCodes.Status400BadRequest, problem.StatusCode);
         handlerMock.Verify(
-            h => h.HandleAsync(It.IsAny<Guid>(), It.IsAny<ClaimRequest>(), It.IsAny<CancellationToken>()),
+            h => h.HandleAsync(It.IsAny<Guid>(), It.IsAny<ClaimRequest>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -136,7 +141,7 @@ public sealed class UpdateClaimEndpointTests
 
         var handlerMock = new Mock<IUpdateClaimHandler>();
         handlerMock
-            .Setup(h => h.HandleAsync(claimId, request, It.IsAny<CancellationToken>()))
+            .Setup(h => h.HandleAsync(claimId, request, CurrentUser.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Error.Validation(ClaimErrorCodes.ClaimCannotBeNull, ClaimErrorMessages.ClaimCannotBeNull));
 
         // Act
@@ -144,6 +149,7 @@ public sealed class UpdateClaimEndpointTests
             typeof(UpdateClaimEndpoint),
             claimId,
             request,
+            CurrentUser,
             claimIdValidatorMock.Object,
             requestValidatorMock.Object,
             handlerMock.Object,
@@ -173,7 +179,7 @@ public sealed class UpdateClaimEndpointTests
 
         var handlerMock = new Mock<IUpdateClaimHandler>();
         handlerMock
-            .Setup(h => h.HandleAsync(claimId, request, It.IsAny<CancellationToken>()))
+            .Setup(h => h.HandleAsync(claimId, request, CurrentUser.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Updated);
 
         // Act
@@ -181,6 +187,7 @@ public sealed class UpdateClaimEndpointTests
             typeof(UpdateClaimEndpoint),
             claimId,
             request,
+            CurrentUser,
             claimIdValidatorMock.Object,
             requestValidatorMock.Object,
             handlerMock.Object,
@@ -189,5 +196,6 @@ public sealed class UpdateClaimEndpointTests
         // Assert
         var okResult = Assert.IsType<Ok>(result);
         Assert.Equal(StatusCodes.Status200OK, okResult.StatusCode);
+        handlerMock.Verify(h => h.HandleAsync(claimId, request, CurrentUser.Id, It.IsAny<CancellationToken>()), Times.Once);
     }
 }

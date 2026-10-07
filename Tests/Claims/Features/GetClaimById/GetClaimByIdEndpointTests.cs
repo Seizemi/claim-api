@@ -113,7 +113,7 @@ public sealed class GetClaimByIdEndpointTests
         var claimResponse = new ClaimResponse(
             claimId,
             default,
-            null, null, null, null, null, null, null, null,
+            null, null!, null, null!, null, null, null, null,
             null!, null!, null!,
             false, null, null);
 
