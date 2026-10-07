@@ -11,7 +11,6 @@ public class ClaimsDbContext(DbContextOptions<ClaimsDbContext> options) : DbCont
     public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<ClaimDate> ClaimDates { get; set; }
     public DbSet<Compensation> Compensations { get; set; }
-    public DbSet<User> Users { get; set; }
     public DbSet<Reason> Reasons { get; set; }
     public DbSet<Solution> Solutions { get; set; }
     public DbSet<FollowedBy> FollowedBies { get; set; }
@@ -143,16 +142,6 @@ public class ClaimsDbContext(DbContextOptions<ClaimsDbContext> options) : DbCont
                 .HasForeignKey(x => x.CompensationReasonId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.FirstName).IsRequired();
-            entity.Property(x => x.LastName).IsRequired();
-            entity.Property(x => x.Email).IsRequired();
-            entity.HasIndex(x => x.Email).IsUnique();
-            entity.Property(x => x.Role).IsRequired();
         });
 
         modelBuilder.Entity<Reason>(entity =>

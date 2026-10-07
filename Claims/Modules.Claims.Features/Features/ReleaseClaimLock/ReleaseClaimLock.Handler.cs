@@ -2,22 +2,21 @@ using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Modules.Claims.Features.Abstractions;
 using Modules.Claims.Features.Features.Shared.Errors;
-using Modules.Claims.Features.Features.Shared.Requests;
 using Modules.Claims.Infrastructure.Database;
 
 namespace Modules.Claims.Features.Features.ReleaseClaimLock;
 
 internal interface IReleaseClaimLockHandler : IHandler
 {
-    Task<ErrorOr<Success>> HandleAsync(Guid claimId, ReleaseClaimLockRequest request, CancellationToken cancellationToken);
+    Task<ErrorOr<Success>> HandleAsync(Guid claimId, Guid userId, CancellationToken cancellationToken);
 }
 
 internal sealed class ReleaseClaimLockHandler(ClaimsDbContext context) : IReleaseClaimLockHandler
 {
-    public async Task<ErrorOr<Success>> HandleAsync(Guid claimId, ReleaseClaimLockRequest request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> HandleAsync(Guid claimId, Guid userId, CancellationToken cancellationToken)
     {
         var rowsAffected = await context.Claims
-            .Where(c => c.Id == claimId && c.LockedByUserId == request.UserId)
+            .Where(c => c.Id == claimId && c.LockedByUserId == userId)
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(c => c.LockedByUserId, (Guid?)null)
                 .SetProperty(c => c.LockedByUserName, (string?)null)

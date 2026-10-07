@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using Modules.Claims.Features.Features.Shared.Requests;
 using Modules.Claims.Features.Features.Shared.Routes;
 using Modules.Common.Features;
+using Modules.Common.Features.Authorization;
 
 namespace Modules.Claims.Features.Features.GetClaimById;
 
@@ -13,7 +14,8 @@ public sealed class GetClaimByIdEndpoint : IEndpointModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet(RouteConsts.ClaimDetails, Handle)
-            .WithName(RouteConsts.GetClaimByIdRouteName);
+            .WithName(RouteConsts.GetClaimByIdRouteName)
+            .RequireAuthorization(AuthPolicies.Agent);
     }
 
     private static async Task<IResult> Handle(

@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\ModularMonolith\ModularMonolith.csproj" />
     <ProjectReference Include="..\..\..\Claims\Modules.Claims.Features\Modules.Claims.Features.csproj" />
+    <ProjectReference Include="..\..\Shared\ModularMonolith.Testing.csproj" />
   </ItemGroup>
 
 </Project>

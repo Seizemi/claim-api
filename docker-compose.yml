@@ -2,5 +2,6 @@ services:
   claimapi:
     image: ${DOCKER_REGISTRY-}claimapi
     build:
-      context: .
-      dockerfile: ModularMonolith/Dockerfile
+      # The folder holding both repositories (ClaimApi/ and claim-client/): the image contains the API and the React build.
+      context: ..
+      dockerfile: ClaimApi/ModularMonolith/Dockerfile

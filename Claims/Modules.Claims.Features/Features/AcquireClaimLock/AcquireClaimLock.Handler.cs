@@ -3,15 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using Modules.Claims.Features.Abstractions;
 using Modules.Claims.Features.Features.Shared.Errors;
 using Modules.Claims.Features.Features.Shared.Mapping;
-using Modules.Claims.Features.Features.Shared.Requests;
 using Modules.Claims.Features.Features.Shared.Responses;
 using Modules.Claims.Infrastructure.Database;
+using Modules.Common.Features.Authorization;
 
 namespace Modules.Claims.Features.Features.AcquireClaimLock;
 
 internal interface IAcquireClaimLockHandler : IHandler
 {
-    Task<ErrorOr<AcquireClaimLockResponse>> HandleAsync(Guid claimId, AcquireClaimLockRequest request, CancellationToken cancellationToken);
+    Task<ErrorOr<AcquireClaimLockResponse>> HandleAsync(Guid claimId, CurrentUser user, CancellationToken cancellationToken);
 }
 
 internal sealed class AcquireClaimLockHandler(ClaimsDbContext context, TimeProvider timeProvider) : IAcquireClaimLockHandler
@@ -19,7 +19,7 @@ internal sealed class AcquireClaimLockHandler(ClaimsDbContext context, TimeProvi
     private static readonly TimeSpan LockTtl = TimeSpan.FromMinutes(15);
 
     public async Task<ErrorOr<AcquireClaimLockResponse>> HandleAsync(
-        Guid claimId, AcquireClaimLockRequest request, CancellationToken cancellationToken)
+        Guid claimId, CurrentUser user, CancellationToken cancellationToken)
     {
         var now = timeProvider.GetUtcNow();
         var staleThreshold = now - LockTtl;
@@ -28,8 +28,8 @@ internal sealed class AcquireClaimLockHandler(ClaimsDbContext context, TimeProvi
             .Where(c => c.Id == claimId
                 && (c.LockedByUserId == null || c.LockedAt < staleThreshold))
             .ExecuteUpdateAsync(setters => setters
-                .SetProperty(c => c.LockedByUserId, request.UserId)
-                .SetProperty(c => c.LockedByUserName, request.UserName)
+                .SetProperty(c => c.LockedByUserId, user.Id)
+                .SetProperty(c => c.LockedByUserName, user.DisplayName)
                 .SetProperty(c => c.LockedAt, now),
                 cancellationToken);
 
@@ -56,7 +56,7 @@ internal sealed class AcquireClaimLockHandler(ClaimsDbContext context, TimeProvi
                 .AsNoTracking()
                 .FirstAsync(c => c.Id == claimId, cancellationToken);
 
-            return new AcquireClaimLockResponse(true, request.UserId, request.UserName, now, claim.MapToResponse(timeProvider));
+            return new AcquireClaimLockResponse(true, user.Id, user.DisplayName, now, claim.MapToResponse(timeProvider));
         }
 
         var current = await context.Claims

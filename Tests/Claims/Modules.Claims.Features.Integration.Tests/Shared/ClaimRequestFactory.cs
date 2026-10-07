@@ -46,8 +46,7 @@ internal static class ClaimRequestFactory
                 SupplierRefund: null,
                 ClaimRefund: null,
                 RefundStateId: LookupTestIds.RefundStateId,
-                CompensationReasonId: LookupTestIds.CompensationReasonId),
-            EditingUserId: fixture.Create<Guid>());
+                CompensationReasonId: LookupTestIds.CompensationReasonId));
     }
 
     internal static ClaimRequest WithEmptyBookingNumber(ClaimRequest request) =>

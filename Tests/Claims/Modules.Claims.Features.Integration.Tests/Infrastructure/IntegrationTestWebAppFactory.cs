@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using ModularMonolith.Testing;
 using Modules.Claims.Domain.Entities;
 using Modules.Claims.Features.Integration.Tests.Shared;
 using Modules.Claims.Infrastructure.Database;
@@ -54,9 +55,16 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
         await base.DisposeAsync();
     }
 
+    /// <summary>A client without a session, sending the CSRF header like the React app.</summary>
+    internal HttpClient CreateAnonymousClient() => CreateClient().WithCsrfHeader();
+
+    /// <summary>A client signed in as <paramref name="user"/>, sending the CSRF header like the React app.</summary>
+    internal HttpClient CreateClient(TestUser user) => CreateAnonymousClient().SignInAs(user);
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseSetting("ConnectionStrings:Postgres", ConnectionString);
         builder.UseSetting("Seeding:Enabled", "false");
+        builder.UseTestAuthentication();
     }
 }

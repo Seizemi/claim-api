@@ -26,7 +26,7 @@ public sealed class UpdateClaimHandlerTests
         var handler = new UpdateClaimHandler(writeContext, new FakeTimeProvider());
 
         // Act
-        var result = await handler.HandleAsync(claim.Id, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(claim.Id, request, Guid.CreateVersion7(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.False(result.IsError);
@@ -56,7 +56,7 @@ public sealed class UpdateClaimHandlerTests
         var request = ClaimTestDataFactory.CreateClaimRequest();
 
         // Act
-        var result = await handler.HandleAsync(Guid.CreateVersion7(), request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(Guid.CreateVersion7(), request, Guid.CreateVersion7(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.True(result.IsError);
@@ -79,7 +79,7 @@ public sealed class UpdateClaimHandlerTests
         await ClaimTestDataFactory.SeedLookupsAsync(context, request, TestContext.Current.CancellationToken);
 
         // Act
-        await handler.HandleAsync(claim.Id, request, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(claim.Id, request, Guid.CreateVersion7(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(1, await context.Claims.CountAsync(TestContext.Current.CancellationToken));
@@ -101,10 +101,11 @@ public sealed class UpdateClaimHandlerTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var handler = new UpdateClaimHandler(context, timeProvider);
-        var request = ClaimTestDataFactory.CreateClaimRequest() with { EditingUserId = Guid.CreateVersion7() };
+        var request = ClaimTestDataFactory.CreateClaimRequest();
+        var editingUserId = Guid.CreateVersion7();
 
         // Act
-        var result = await handler.HandleAsync(claim.Id, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(claim.Id, request, editingUserId, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.True(result.IsError);
@@ -129,11 +130,12 @@ public sealed class UpdateClaimHandlerTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var handler = new UpdateClaimHandler(context, timeProvider);
-        var request = ClaimTestDataFactory.CreateClaimRequest() with { EditingUserId = lockHolderId };
+        var request = ClaimTestDataFactory.CreateClaimRequest();
+        var editingUserId = lockHolderId;
         await ClaimTestDataFactory.SeedLookupsAsync(context, request, TestContext.Current.CancellationToken);
 
         // Act
-        var result = await handler.HandleAsync(claim.Id, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(claim.Id, request, editingUserId, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.False(result.IsError);
@@ -157,11 +159,12 @@ public sealed class UpdateClaimHandlerTests
         timeProvider.Advance(TimeSpan.FromMinutes(20));
 
         var handler = new UpdateClaimHandler(context, timeProvider);
-        var request = ClaimTestDataFactory.CreateClaimRequest() with { EditingUserId = Guid.CreateVersion7() };
+        var request = ClaimTestDataFactory.CreateClaimRequest();
+        var editingUserId = Guid.CreateVersion7();
         await ClaimTestDataFactory.SeedLookupsAsync(context, request, TestContext.Current.CancellationToken);
 
         // Act
-        var result = await handler.HandleAsync(claim.Id, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(claim.Id, request, editingUserId, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.False(result.IsError);

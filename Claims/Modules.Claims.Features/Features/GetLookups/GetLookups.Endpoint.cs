@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Modules.Claims.Features.Features.Shared.Routes;
 using Modules.Common.Features;
+using Modules.Common.Features.Authorization;
 
 namespace Modules.Claims.Features.Features.GetLookups;
 
@@ -10,7 +11,8 @@ public sealed class GetLookupsEndpoint : IEndpointModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet(LookupRouteConsts.Lookups, Handle);
+        app.MapGet(LookupRouteConsts.Lookups, Handle)
+            .RequireAuthorization(AuthPolicies.Agent);
     }
 
     private static async Task<IResult> Handle(

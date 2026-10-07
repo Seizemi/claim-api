@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using ModularMonolith.Testing;
 using Modules.Claims.Domain.Entities;
 using Modules.Claims.Features.Load.Tests.Shared;
 using Modules.Claims.Infrastructure.Database;
@@ -54,8 +55,12 @@ public sealed class LoadTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         await base.DisposeAsync();
     }
 
+    /// <summary>A client signed in as <paramref name="user"/>, sending the CSRF header like the React app.</summary>
+    internal HttpClient CreateClient(TestUser user) => CreateClient().WithCsrfHeader().SignInAs(user);
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseSetting("ConnectionStrings:Postgres", ConnectionString);
+        builder.UseTestAuthentication();
     }
 }

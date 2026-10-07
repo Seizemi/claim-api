@@ -137,7 +137,6 @@ internal static class ClaimTestDataFactory
                 SupplierRefund: null,
                 ClaimRefund: null,
                 RefundStateId: fixture.Create<Guid>(),
-                CompensationReasonId: fixture.Create<Guid>()),
-            EditingUserId: fixture.Create<Guid>());
+                CompensationReasonId: fixture.Create<Guid>()));
     }
 }

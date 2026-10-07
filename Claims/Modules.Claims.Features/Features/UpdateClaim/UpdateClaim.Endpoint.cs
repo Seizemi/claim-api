@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Modules.Claims.Features.Features.Shared.Requests;
 using Modules.Claims.Features.Features.Shared.Routes;
 using Modules.Common.Features;
+using Modules.Common.Features.Authorization;
 
 namespace Modules.Claims.Features.Features.UpdateClaim;
 
@@ -13,12 +14,14 @@ public sealed class UpdateClaimEndpoint : IEndpointModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut(RouteConsts.ClaimDetails, Handle);
+        app.MapPut(RouteConsts.ClaimDetails, Handle)
+            .RequireAuthorization(AuthPolicies.Agent);
     }
 
     private static async Task<IResult> Handle(
         Guid claimId,
         [FromBody] ClaimRequest request,
+        CurrentUser currentUser,
         IValidator<GetClaimByIdRequest> claimIdValidator,
         IValidator<ClaimRequest> requestValidator,
         IUpdateClaimHandler handler,
@@ -37,7 +40,7 @@ public sealed class UpdateClaimEndpoint : IEndpointModule
             return Results.ValidationProblem(requestValidation.ToDictionary());
         }
 
-        var response = await handler.HandleAsync(claimId, request, cancellationToken);
+        var response = await handler.HandleAsync(claimId, request, currentUser.Id, cancellationToken);
         if (response.IsError)
         {
             return response.Errors.ToProblem();
