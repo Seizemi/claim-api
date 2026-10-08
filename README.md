@@ -125,6 +125,7 @@ There are **two external tenants**, one for **dev** and one for **prod**. They a
 | Item | Value |
 |---|---|
 | Web app registration name | `partner-portal-web` |
+| Graph app registration name | `partner-portal-graph` |
 | App role `Supervisor`: value / ID | `Supervisor` / `c8e346c2-7745-4b10-9754-fd9e7566363d` |
 | App role `Agent`: value / ID | `Agent` / `7a412abe-ac73-4ed9-ad1e-5c3c8fceef53` |
 | Sign-in callback path | `/signin-oidc` |
@@ -215,6 +216,34 @@ dotnet user-secrets set "AzureAd:ClientId" "<web-client-id>"
 dotnet user-secrets set "AzureAd:ClientSecret" "<web-client-secret>"
 ```
 
+### Checklist: phase 2 (user management)
+
+Supervisors create and delete Agents from the application. The backend does it through Microsoft Graph with a **separate** app registration, `partner-portal-graph`, so the powerful Graph permissions stay isolated from the sign-in app.
+
+**9. Register `partner-portal-graph`**
+- [ ] *App registrations > New registration*. Name `partner-portal-graph`, supported account types: *Accounts in this organizational directory only*. **No redirect URI**: it's a daemon (client credentials), nobody signs in with it.
+- [ ] *Certificates & secrets*: dev tenant only, a **client secret** is allowed (store it in user-secrets, never commit it). Prod tenant: a **certificate** stored in Key Vault.
+- [ ] Record the **Application (client) ID**.
+
+**10. Graph application permissions**
+- [ ] *API permissions > Add a permission > Microsoft Graph > **Application permissions*** (not *Delegated*): `User.ReadWrite.All`, `AppRoleAssignment.ReadWrite.All` and `Application.Read.All` (needed to list and create role assignments on `partner-portal-web`; without it those calls return 403).
+- [ ] Remove the default delegated `User.Read`: the app never acts on behalf of a user.
+- [ ] *Grant admin consent for <tenant>*. All three permissions must show *Granted* in the *Status* column. Without consent, every Graph call returns 403.
+- [ ] `AppRoleAssignment.ReadWrite.All` is highly privileged (it can grant any permission to any app): restrict who can read this registration's credential and rotate it.
+
+**11. Store the dev values locally** (read by the backend from step 2.3)
+
+```bash
+cd ModularMonolith
+dotnet user-secrets set "PartnerUsers:TenantId" "<tenant-id>"
+dotnet user-secrets set "PartnerUsers:TenantDomain" "<subdomain>.onmicrosoft.com"
+dotnet user-secrets set "PartnerUsers:GraphClientId" "<graph-client-id>"
+dotnet user-secrets set "PartnerUsers:GraphClientSecret" "<graph-client-secret>"
+dotnet user-secrets set "PartnerUsers:AppServicePrincipalId" "<web-app-service-principal-object-id>"
+```
+
+For Docker, add the same values to `.env.local` (see `.env.local.example`). The role GUIDs and the assignable roles aren't secret and live in `appsettings.json`.
+
 ### Values to collect per tenant
 
 | Value | Where to find it |
@@ -224,6 +253,7 @@ dotnet user-secrets set "AzureAd:ClientSecret" "<web-client-secret>"
 | Authority (`https://<subdomain>.ciamlogin.com/`) | Built from the tenant domain |
 | `partner-portal-web` client ID | App registration *Overview* > Application (client) ID |
 | `partner-portal-web` service principal object ID | *Enterprise applications* > partner-portal-web > Object ID (not the app registration's Object ID) |
+| `partner-portal-graph` client ID | App registration *Overview* > Application (client) ID |
 
 Don't write the actual values in this README or in any committed file. Dev values go in `dotnet user-secrets` (and `.env.local` for Docker). Prod values go in the App Service settings. Secrets (client secret, certificates) go in user-secrets locally and in Key Vault in Azure.
 
