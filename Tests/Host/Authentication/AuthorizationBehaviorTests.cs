@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using ModularMonolith.Authentication;
 using ModularMonolith.Testing;
+using Modules.Common.Features.Authorization;
 using Xunit;
 
 namespace ModularMonolith.Tests.Authentication;

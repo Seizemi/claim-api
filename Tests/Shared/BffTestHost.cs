@@ -10,7 +10,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.Identity.Web;
@@ -20,6 +23,9 @@ using ModularMonolith.Authentication;
 using ModularMonolith.Spa;
 using Modules.Common.Features;
 using Modules.Common.Features.Authorization;
+using Modules.Users.Features;
+using Modules.Users.Features.RoleAssignment;
+using Modules.Users.Infrastructure.Database;
 using Xunit;
 using AuthenticationModule = Modules.Authentication.Features;
 using UsersModule = Modules.Users.Features;
@@ -28,7 +34,7 @@ namespace ModularMonolith.Testing;
 
 /// <summary>
 /// An in-memory host running the real BFF authentication setup (cookie, OpenID Connect, policies, 401/403 handling,
-/// CSRF middleware) and the host's endpoints, without the database Program.cs needs. Entra's metadata is replaced by
+/// CSRF middleware) and the host's endpoints, without PostgreSQL. Entra's metadata is replaced by
 /// a static configuration so no network call is made, and the session cookie is issued by a test-only sign-in endpoint.
 /// </summary>
 public sealed class BffTestHost : IAsyncDisposable
@@ -49,7 +55,15 @@ public sealed class BffTestHost : IAsyncDisposable
         ["AzureAd:ClientSecret"] = "test-client-secret",
         ["AzureAd:CallbackPath"] = "/signin-oidc",
         ["AzureAd:SignedOutCallbackPath"] = "/signout-callback-oidc",
-        ["Session:LifetimeHours"] = "8"
+        ["Session:LifetimeHours"] = "8",
+        // Placeholders: the Graph client is only built on first use, and tests replace IPartnerUserService.
+        ["PartnerUsers:TenantId"] = "11111111-1111-1111-1111-111111111111",
+        ["PartnerUsers:TenantDomain"] = "contoso.onmicrosoft.com",
+        ["PartnerUsers:GraphClientId"] = "44444444-4444-4444-4444-444444444444",
+        ["PartnerUsers:GraphClientSecret"] = "test-graph-secret",
+        ["PartnerUsers:AppServicePrincipalId"] = "55555555-5555-5555-5555-555555555555",
+        ["PartnerUsers:AssignableRoles:0"] = "Agent",
+        ["App:PublicUrl"] = "https://localhost:7001"
     };
 
     private readonly WebApplication _app;
@@ -65,7 +79,11 @@ public sealed class BffTestHost : IAsyncDisposable
 
     public FakeTimeProvider Time { get; }
 
-    public static async Task<BffTestHost> StartAsync(IReadOnlyDictionary<string, string?>? settings = null)
+    /// <param name="settings">Configuration; <see cref="ValidSettings"/> by default.</param>
+    /// <param name="configureServices">Runs after the real registrations, e.g. to replace a service with a mock.</param>
+    public static async Task<BffTestHost> StartAsync(
+        IReadOnlyDictionary<string, string?>? settings = null,
+        Action<IServiceCollection>? configureServices = null)
     {
         // Production environment: no user-secrets are loaded, and the SPA is served from (an empty) wwwroot.
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions { EnvironmentName = Environments.Production });
@@ -76,6 +94,8 @@ public sealed class BffTestHost : IAsyncDisposable
         builder.Services.AddSingleton<TimeProvider>(time);
         builder.Services.AddProblemDetails();
         builder.Services.AddHealthChecks();
+        builder.Services.AddUsersModule(builder.Configuration);
+        UseInMemoryUsersDatabase(builder.Services);
         builder.Services.AddBffAuthentication(builder.Configuration);
         builder.Services.AddSingleton<IDataProtectionProvider, EphemeralDataProtectionProvider>();
         builder.Services.PostConfigure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
@@ -88,6 +108,8 @@ public sealed class BffTestHost : IAsyncDisposable
             options.Configuration = configuration;
             options.ConfigurationManager = new StaticConfigurationManager<OpenIdConnectConfiguration>(configuration);
         });
+
+        configureServices?.Invoke(builder.Services);
 
         var app = builder.Build();
         app.UseRouting();
@@ -149,6 +171,21 @@ public sealed class BffTestHost : IAsyncDisposable
     {
         Client.Dispose();
         await _app.DisposeAsync();
+    }
+
+    /// <summary>
+    /// The Users module's table lives in an in-memory database of its own for each host, and the role assignment
+    /// worker doesn't run: tests stay deterministic and need no PostgreSQL.
+    /// </summary>
+    private static void UseInMemoryUsersDatabase(IServiceCollection services)
+    {
+        services.RemoveAll<DbContextOptions<UsersDbContext>>();
+        services.RemoveAll<IDbContextOptionsConfiguration<UsersDbContext>>();
+        var databaseName = $"users-{Guid.NewGuid()}";
+        services.AddDbContext<UsersDbContext>(options => options.UseInMemoryDatabase(databaseName));
+
+        var worker = services.Single(descriptor => descriptor.ImplementationType == typeof(RoleAssignmentWorker));
+        services.Remove(worker);
     }
 
     private static void MapTestEndpoints(IEndpointRouteBuilder app)
