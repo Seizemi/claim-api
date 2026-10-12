@@ -95,7 +95,9 @@ public sealed class AzureAdSettingsValidatorTests
     [Fact]
     public async Task StartAsync_WithoutAzureAdConfiguration_FailsWithClearMessage()
     {
-        var settings = new Dictionary<string, string?> { ["Session:LifetimeHours"] = "8" };
+        var settings = BffTestHost.ValidSettings
+            .Where(setting => !setting.Key.StartsWith("AzureAd:", StringComparison.Ordinal))
+            .ToDictionary();
 
         var exception = await Assert.ThrowsAsync<OptionsValidationException>(() => BffTestHost.StartAsync(settings));
 

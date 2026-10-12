@@ -65,6 +65,7 @@ Runs the real container image: the API serving the React build, in `Production`,
 2. In `ClaimApi`, copy `.env.local.example` to **`.env.local`** (git-ignored) and fill it in:
    - the dev tenant values: the user-secrets keys with `__` instead of `:` (for example `AzureAd__ClientId`). `AzureAd__Authority` is the full URL, `https://<subdomain>.ciamlogin.com/`, with `https://` only once;
    - `ASPNETCORE_Kestrel__Certificates__Default__Password`: the certificate password, without quotes. Avoid `$`, which Docker Compose treats as a variable.
+3. Make sure `../local-feed` holds the `ClaimPartners.Users` version the API references (see "Changing the `ClaimPartners.Users` package"). The image restores it from there; the build fails with `NU1101`/`NU1102` otherwise.
 
 **Each time**, from the command line in `ClaimApi`:
 1. `docker compose up --build` (`--build` makes sure the image contains your latest code)
@@ -86,9 +87,12 @@ About the image: it contains the compiled API and the React build only (no sourc
 
 | Symptom | Cause and fix |
 |---|---|
-| The API stops at startup naming an `AzureAd` key | The value is missing or still a placeholder: set it in user-secrets (A) or `.env.local` (B). |
+| The API stops at startup naming an `AzureAd` or `PartnerUsers` key | The value is missing or still a placeholder: set it in user-secrets (A) or `.env.local` (B). |
+| `NU1101` / `NU1102` for `ClaimPartners.Users` | The referenced version isn't in `../local-feed`: pack it there (see "Changing the `ClaimPartners.Users` package"). |
+| `Name or service not known` for `postgres` (B) | A stale Postgres container from an older run isn't on the compose network: `docker compose up -d --force-recreate` (data stays in the volume). |
 | `The certificate data cannot be read with the provided password` (B) | The password in `.env.local` doesn't match the exported certificate. Re-export with the password in single quotes, and make sure `.env.local` is saved. |
 | `Unable to retrieve document from 'https://https://...'` or sign-in fails right away | `AzureAd:Authority` is wrong (for example `https://` written twice). |
+| A new user stays *En attente* (Pending) | Their role is assigned in the background, normally within seconds; click *Actualiser*. The log line `Role assignment attempt N for user ... failed` gives the reason; after about 50 minutes of failures the user becomes *Échec* (Failed) and can be deleted from the page. Rows are in `users.pending_role_assignments`. |
 | Port 7001 already in use | The other way is still running: stop `dotnet run` or `docker compose down`. |
 | Pages don't load with way A | The React dev server isn't running: `npm start` in `claim-client`. |
 | Old code in the container (B) | Start with `docker compose up --build`. |
@@ -118,7 +122,7 @@ Postgres runs in Docker in both ways and is exposed to your host, so you can con
 
 The application signs users in with **Microsoft Entra External ID** using the Backend-for-Frontend (BFF) pattern: the API is a confidential client, holds the session in an encrypted cookie, and no token ever reaches the browser. The full design is in [`Document/Authentication/partner-user-management-feature.md`](../Document/Authentication/partner-user-management-feature.md).
 
-There are **two external tenants**, one for **dev** and one for **prod**. They are configured **identically** with this checklist: every change made in one is reproduced in the other. Only the tenant-specific IDs differ. The role GUIDs are the same in both.
+There are **two external tenants**, one for **dev** and one for **prod**. They are configured **identically** with this checklist: every change made in one is reproduced in the other. Only the tenant-specific IDs differ. Keep the role GUIDs below the same in both too: the application doesn't depend on them (it finds each role by its value), but identical tenants are easier to compare.
 
 ### Fixed values (identical in every tenant)
 
@@ -242,7 +246,16 @@ dotnet user-secrets set "PartnerUsers:GraphClientSecret" "<graph-client-secret>"
 dotnet user-secrets set "PartnerUsers:AppServicePrincipalId" "<web-app-service-principal-object-id>"
 ```
 
-For Docker, add the same values to `.env.local` (see `.env.local.example`). The role GUIDs and the assignable roles aren't secret and live in `appsettings.json`.
+For Docker, add the same values to `.env.local` (see `.env.local.example`). The assignable roles aren't secret and live in `appsettings.json`. Role IDs are not configured: the backend reads them from `partner-portal-web` by value (`Supervisor`, `Agent`) on its first user-management call.
+
+**Changing the `ClaimPartners.Users` package** (phase 2: local feed, declared in `nuget.config`)
+
+The Users module references the package with a `PackageReference`, restored from `../local-feed` (the folder next to `ClaimApi`). Packages named `ClaimPartners.*` are only ever restored from that feed. NuGet caches every version, so each change gets a **new** version:
+
+1. From `PartnerUsers/`: `dotnet pack src/ClaimPartners.Users -c Release -o ../local-feed /p:Version=1.0.0-dev.2`
+2. Bump `ClaimPartners.Users` to the same version in `Users/Modules.Users.Features/Modules.Users.Features.csproj` **and** `Tests/Users/Modules.Users.Features.Tests.csproj`.
+
+Only the Users module compiles against the package (its compile assets are private), which keeps Graph user management out of the other modules.
 
 ### Values to collect per tenant
 

@@ -8,15 +8,26 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!-- From ../local-feed during phase 2 (nuget.config). Pack a new version for every change to the package.
+         Compile assets stay private: only this module codes against the package, so Graph user management stays
+         behind the Users module (projects referencing the module still get its DLL at run time). -->
+    <PackageReference Include="ClaimPartners.Users" Version="1.0.0-dev.5" PrivateAssets="compile;contentfiles;analyzers;build" />
+    <PackageReference Include="ErrorOr" Version="2.0.1" />
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="Microsoft.Identity.Web" Version="4.16.0" />
   </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="Modules.Users.Features.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+    <!-- The in-memory test host removes the role assignment worker. -->
+    <InternalsVisibleTo Include="ModularMonolith.Testing" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Modules.Common.Features\Modules.Common.Features.csproj" />
+    <ProjectReference Include="..\Modules.Users.Infrastructure\Modules.Users.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

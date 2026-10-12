@@ -1,4 +1,4 @@
-using ModularMonolith.Authentication;
+using Modules.Common.Features.Authorization;
 
 namespace ModularMonolith.Testing;
 

@@ -1,9 +1,11 @@
 # Used instead of a root .dockerignore because the build context is the folder above ClaimApi.
-# Paths are relative to that folder. Only the two source trees the Dockerfile copies are sent,
-# without secrets, local settings, tests or build outputs.
+# Paths are relative to that folder. Only what the Dockerfile copies is sent: the two source trees, without
+# secrets, local settings, tests or build outputs, and the local NuGet feed (phase 2), without symbol packages.
 *
 !ClaimApi
 !claim-client
+!local-feed
+local-feed/*.snupkg
 
 # Secrets and local configuration
 **/.env*

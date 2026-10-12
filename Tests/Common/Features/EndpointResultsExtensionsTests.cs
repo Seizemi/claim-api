@@ -57,6 +57,28 @@ public sealed class EndpointResultsExtensionsTests
     }
 
     [Fact]
+    public void ToProblem_WithCustomHttpStatusType_ReturnsThatStatus()
+    {
+        var errors = new List<Error> { Error.Custom(StatusCodes.Status502BadGateway, "User.DirectoryUnavailable", "Unavailable.") };
+
+        var result = errors.ToProblem();
+
+        var problem = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status502BadGateway, problem.StatusCode);
+    }
+
+    [Fact]
+    public void ToProblem_WithCustomTypeOutsideHttpErrorRange_Returns500()
+    {
+        var errors = new List<Error> { Error.Custom(42, "Custom.Error", "Custom.") };
+
+        var result = errors.ToProblem();
+
+        var problem = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status500InternalServerError, problem.StatusCode);
+    }
+
+    [Fact]
     public void ToProblem_WithUnspecifiedErrorType_Returns500()
     {
         var errors = new List<Error> { Error.Failure("Claim.Unexpected", "Something went wrong.") };

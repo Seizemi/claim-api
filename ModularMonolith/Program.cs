@@ -6,10 +6,13 @@ using ModularMonolith.Spa;
 using Modules.Claims.Features;
 using Modules.Claims.Infrastructure.Database;
 using Modules.Common.Features;
+using Modules.Users.Features;
+using Modules.Users.Infrastructure.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddClaimsModule(builder.Configuration, builder.Environment.IsDevelopment());
+builder.Services.AddUsersModule(builder.Configuration);
 builder.Services.AddBffAuthentication(builder.Configuration);
 builder.Services.AddSpaHosting(builder.Configuration, builder.Environment);
 builder.Services.AddEndpointsApiExplorer();
@@ -26,6 +29,10 @@ using (var migrationScope = app.Services.CreateScope())
 {
     var claimDbContext = migrationScope.ServiceProvider.GetRequiredService<ClaimsDbContext>();
     await claimDbContext.Database.MigrateAsync();
+
+    // Before the role assignment worker starts (with the app), which reads its table.
+    var usersDbContext = migrationScope.ServiceProvider.GetRequiredService<UsersDbContext>();
+    await usersDbContext.Database.MigrateAsync();
 }
 
 if (app.Configuration.GetValue("Seeding:Enabled", defaultValue: true))

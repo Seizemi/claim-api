@@ -23,6 +23,8 @@ public static class EndpointResultsExtensions
             ErrorType.Validation => StatusCodes.Status400BadRequest,
             ErrorType.NotFound => StatusCodes.Status404NotFound,
             ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
+            // Error.Custom(type: <HTTP status code>, ...) for statuses ErrorType has no member for, e.g. 502.
+            var type when (int)type is >= 400 and <= 599 => (int)type,
             _ => StatusCodes.Status500InternalServerError
         };
 
