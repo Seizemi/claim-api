@@ -21,7 +21,7 @@
     <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.10.0" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.10.0" />
     <!-- The module keeps the package private: tests mock its IPartnerUserService, so they reference it directly. -->
-    <PackageReference Include="ClaimPartners.Users" Version="1.0.0-dev.5" />
+    <PackageReference Include="ClaimPartners.Users" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
