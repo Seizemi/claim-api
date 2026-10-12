@@ -26,6 +26,13 @@ The application (API + React app) can be started in two ways. Both open at **`ht
     claim-client/
   ```
 - Dev tenant values (authority, tenant ID, client ID, client secret): see [Values to collect per tenant](#values-to-collect-per-tenant). Never commit them.
+- A GitHub token to restore the `ClaimPartners.Users` package: GitHub Packages requires one, even for public packages (see [The `ClaimPartners.Users` package](#the-claimpartnersusers-package)).
+  1. GitHub > *Settings > Developer settings > Personal access tokens > **Tokens (classic)*** > *Generate new token (classic)*, with **`read:packages`** as the only scope and an expiration date. GitHub Packages doesn't accept fine-grained tokens.
+  2. Store it in the user environment variable `NUGET_TOKEN`, read by `nuget.config` and passed to the Docker build:
+     ```powershell
+     [Environment]::SetEnvironmentVariable('NUGET_TOKEN', '<token>', 'User')
+     ```
+  3. Restart your terminals and Visual Studio so they see it.
 - Once, in `claim-client`: `npm install`
 
 The database is created, migrated and seeded (1000 claims) automatically when the API starts.
@@ -65,7 +72,7 @@ Runs the real container image: the API serving the React build, in `Production`,
 2. In `ClaimApi`, copy `.env.local.example` to **`.env.local`** (git-ignored) and fill it in:
    - the dev tenant values: the user-secrets keys with `__` instead of `:` (for example `AzureAd__ClientId`). `AzureAd__Authority` is the full URL, `https://<subdomain>.ciamlogin.com/`, with `https://` only once;
    - `ASPNETCORE_Kestrel__Certificates__Default__Password`: the certificate password, without quotes. Avoid `$`, which Docker Compose treats as a variable.
-3. Make sure `../local-feed` holds the `ClaimPartners.Users` version the API references (see "Changing the `ClaimPartners.Users` package"). The image restores it from there; the build fails with `NU1101`/`NU1102` otherwise.
+3. Make sure `NUGET_TOKEN` is set (see [Prerequisites](#prerequisites)). Compose passes it to the image build as a build secret, so it never ends up in the image.
 
 **Each time**, from the command line in `ClaimApi`:
 1. `docker compose up --build` (`--build` makes sure the image contains your latest code)
@@ -88,7 +95,9 @@ About the image: it contains the compiled API and the React build only (no sourc
 | Symptom | Cause and fix |
 |---|---|
 | The API stops at startup naming an `AzureAd` or `PartnerUsers` key | The value is missing or still a placeholder: set it in user-secrets (A) or `.env.local` (B). |
-| `NU1101` / `NU1102` for `ClaimPartners.Users` | The referenced version isn't in `../local-feed`: pack it there (see "Changing the `ClaimPartners.Users` package"). |
+| `401 (Unauthorized)` from `nuget.pkg.github.com` | `NUGET_TOKEN` is missing, expired or lacks `read:packages`, or the terminal / Visual Studio was started before it was set (see [Prerequisites](#prerequisites)). |
+| `NU1101` / `NU1102` for `ClaimPartners.Users` | `NUGET_TOKEN` isn't visible to the restore (NuGet then reports the package as not found rather than a 401), or the referenced version isn't published: check the tags and the `package-publish` workflow runs of `claim-partners-users`. |
+| Compose says the `nuget_token` secret or `NUGET_TOKEN` is missing (B) | Set `NUGET_TOKEN` (see [Prerequisites](#prerequisites)) and restart the terminal or Visual Studio. |
 | `Name or service not known` for `postgres` (B) | A stale Postgres container from an older run isn't on the compose network: `docker compose up -d --force-recreate` (data stays in the volume). |
 | `The certificate data cannot be read with the provided password` (B) | The password in `.env.local` doesn't match the exported certificate. Re-export with the password in single quotes, and make sure `.env.local` is saved. |
 | `Unable to retrieve document from 'https://https://...'` or sign-in fails right away | `AzureAd:Authority` is wrong (for example `https://` written twice). |
@@ -248,14 +257,16 @@ dotnet user-secrets set "PartnerUsers:AppServicePrincipalId" "<web-app-service-p
 
 For Docker, add the same values to `.env.local` (see `.env.local.example`). The assignable roles aren't secret and live in `appsettings.json`. Role IDs are not configured: the backend reads them from `partner-portal-web` by value (`Supervisor`, `Agent`) on its first user-management call.
 
-**Changing the `ClaimPartners.Users` package** (phase 2: local feed, declared in `nuget.config`)
+### The `ClaimPartners.Users` package
 
-The Users module references the package with a `PackageReference`, restored from `../local-feed` (the folder next to `ClaimApi`). Packages named `ClaimPartners.*` are only ever restored from that feed. NuGet caches every version, so each change gets a **new** version:
+The Users module references the package with a `PackageReference`, restored from GitHub Packages (`https://nuget.pkg.github.com/Seizemi/index.json`, declared in `nuget.config` with the token from `NUGET_TOKEN`, see [Prerequisites](#prerequisites)). Packages named `ClaimPartners.*` are only ever restored from that feed.
 
-1. From `PartnerUsers/`: `dotnet pack src/ClaimPartners.Users -c Release -o ../local-feed /p:Version=1.0.0-dev.2`
-2. Bump `ClaimPartners.Users` to the same version in `Users/Modules.Users.Features/Modules.Users.Features.csproj` **and** `Tests/Users/Modules.Users.Features.Tests.csproj`.
+The package is built and published by its own repository, [claim-partners-users](https://github.com/Seizemi/claim-partners-users), when a `pkg-v<version>` tag is pushed (see its README). To use a new version:
 
-Only the Users module compiles against the package (its compile assets are private), which keeps Graph user management out of the other modules.
+1. Publish it from `PartnerUsers/`: a prerelease tag to try a change (`pkg-v1.1.0-rc.1`), a release tag once it's ready (`pkg-v1.1.0`).
+2. Set `ClaimPartners.Users` to that version in `Users/Modules.Users.Features/Modules.Users.Features.csproj` **and** `Tests/Users/Modules.Users.Features.Tests.csproj`.
+
+Published versions are immutable and NuGet caches every version, so each change gets a **new** version. Only the Users module compiles against the package (its compile assets are private), which keeps Graph user management out of the other modules.
 
 ### Values to collect per tenant
 

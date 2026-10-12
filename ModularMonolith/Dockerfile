@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
 
 # One image for the whole application: the API (BFF) serving the React build from wwwroot.
-# Build context: the folder holding both repositories side by side (ClaimApi/ and claim-client/) and the local
-# NuGet feed (local-feed/) the API restores ClaimPartners.Users from.
-# Run it with docker compose from ClaimApi (see README), or from that parent folder:
-#   docker build -f ClaimApi/ModularMonolith/Dockerfile -t claimapi .
+# Build context: the folder holding both repositories side by side (ClaimApi/ and claim-client/).
+# Run it with docker compose from ClaimApi (see README), or from that parent folder, with the GitHub Packages token
+# in the NUGET_TOKEN environment variable:
+#   docker build -f ClaimApi/ModularMonolith/Dockerfile --secret id=nuget_token,env=NUGET_TOKEN -t claimapi .
 # What the build can see is limited by Dockerfile.dockerignore, next to this file.
 
 # 1. Build the React app
@@ -23,14 +23,14 @@ RUN npm run build
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend
 # Release by default. Visual Studio passes Debug when it starts the compose project with the debugger.
 ARG BUILD_CONFIGURATION=Release
-# Same layout as on disk: ClaimApi/nuget.config restores ClaimPartners.* from ../local-feed (phase 2).
-# The cache mount keeps restored packages between builds, so a changed package needs a new version (README).
-# Phase 3: GitHub Packages, with the feed token passed as a build secret.
 WORKDIR /src
-COPY local-feed/ ./local-feed/
 COPY ClaimApi/ ./ClaimApi/
 WORKDIR /src/ClaimApi
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
+# ClaimApi/nuget.config restores ClaimPartners.* from GitHub Packages with the token in NUGET_TOKEN. The token is a
+# build secret: it exists only while this command runs and is never written to an image layer.
+# The cache mount keeps restored packages between builds.
+RUN --mount=type=secret,id=nuget_token,env=NUGET_TOKEN,required=true \
+    --mount=type=cache,id=nuget,target=/root/.nuget/packages \
     dotnet publish ModularMonolith/ModularMonolith.csproj -c $BUILD_CONFIGURATION -o /app /p:UseAppHost=false
 
 # 3. Runtime image: published output only (no source code, no SDK, no secrets)

@@ -5,3 +5,10 @@ services:
       # The folder holding both repositories (ClaimApi/ and claim-client/): the image contains the API and the React build.
       context: ..
       dockerfile: ClaimApi/ModularMonolith/Dockerfile
+      # GitHub Packages token for ClaimPartners.Users, from the NUGET_TOKEN environment variable (README).
+      secrets:
+        - nuget_token
+
+secrets:
+  nuget_token:
+    environment: NUGET_TOKEN
