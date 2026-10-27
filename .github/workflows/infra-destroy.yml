@@ -1,0 +1,76 @@
+name: infra-destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "destroy" to delete the staging and shared Azure resources and the GitHub environment staging'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    environment: infrastructure # the only environment the Terraform identity trusts
+    env:
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_tfstate_resource_group_name: ${{ vars.TFSTATE_RESOURCE_GROUP }}
+      TF_VAR_tfstate_storage_account_name: ${{ vars.TFSTATE_STORAGE_ACCOUNT }}
+      TF_IN_AUTOMATION: "true"
+      TF_INPUT: "false"
+    steps:
+      - name: Check the confirmation
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          if [ "$CONFIRM" != "destroy" ]; then
+            echo "::error::Nothing destroyed: type \"destroy\" to confirm."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.6
+          terraform_wrapper: false
+
+      # Same backend settings for every root.
+      - name: Backend settings
+        run: |
+          echo "TF_CLI_ARGS_init=-backend-config=resource_group_name=$TF_VAR_tfstate_resource_group_name -backend-config=storage_account_name=$TF_VAR_tfstate_storage_account_name" >> "$GITHUB_ENV"
+
+      - name: github
+        working-directory: infrastructure/github
+        env:
+          GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+        run: |
+          terraform init
+          terraform destroy -auto-approve
+
+      - name: azure/environment (staging)
+        working-directory: infrastructure/azure/environment
+        env:
+          TF_VAR_entra: ${{ secrets.ENTRA_STAGING }}
+          TF_VAR_deployer_principal_name: id-claim-terraform-frc
+        run: |
+          terraform init
+          terraform workspace select -or-create staging
+          terraform destroy -var-file=tfvars/staging.tfvars -auto-approve
+
+      - name: azure/shared
+        working-directory: infrastructure/azure/shared
+        run: |
+          terraform init
+          terraform destroy -auto-approve
