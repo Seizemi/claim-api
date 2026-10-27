@@ -1,0 +1,9 @@
+# Copy to staging.entra.tfvars (git-ignored) and fill in with the DEV External ID tenant values (staging uses it).
+entra = {
+  authority                = "https://<subdomain>.ciamlogin.com/"
+  tenant_id                = "<external-tenant-id>"
+  tenant_domain            = "<subdomain>.onmicrosoft.com"
+  web_client_id            = "<partner-portal-web client id>"
+  web_service_principal_id = "<partner-portal-web service principal object id>"
+  graph_client_id          = "<partner-portal-graph client id>"
+}

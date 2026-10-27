@@ -1,0 +1,16 @@
+# Terraform working files. The state lives in Azure Storage (see README); .terraform.lock.hcl IS committed.
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Tenant identifiers of each environment (<workspace>.entra.tfvars): kept out of git like every tenant value. The
+# .example files and the other <workspace>.tfvars (sizing, no tenant value) are committed.
+*.entra.tfvars
+terraform.tfvars
