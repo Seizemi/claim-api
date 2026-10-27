@@ -32,7 +32,12 @@ terraform {
 
 # Subscription from ARM_SUBSCRIPTION_ID.
 provider "azurerm" {
-  features {}
+  features {
+    # Azure creates the "Application Insights Smart Detection" action group outside Terraform; it would block the destroy.
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
   storage_use_azuread = true
 }
 
