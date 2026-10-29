@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -11,11 +11,13 @@
     <!-- From GitHub Packages (nuget.config). Every change to the package is published under a new version.
          Compile assets stay private: only this module codes against the package, so Graph user management stays
          behind the Users module (projects referencing the module still get its DLL at run time). -->
-    <PackageReference Include="ClaimPartners.Users" Version="1.0.0" PrivateAssets="compile;contentfiles;analyzers;build" />
+    <PackageReference Include="ClaimPartners.Users" Version="1.1.0" PrivateAssets="compile;contentfiles;analyzers;build" />
     <PackageReference Include="ErrorOr" Version="2.0.1" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="Microsoft.Identity.Web" Version="4.16.0" />
+    <!-- Patched transitive dependency of Microsoft.Identity.Web (CVE-2026-84008, CVE-2026-70162); remove once Identity.Web depends on >= 10.0.13. -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
   </ItemGroup>
 
   <ItemGroup>

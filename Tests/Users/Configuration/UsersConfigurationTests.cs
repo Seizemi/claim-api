@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using ModularMonolith.Testing;
 using Modules.Users.Features.Configuration;
@@ -86,6 +88,25 @@ public sealed class UsersConfigurationTests
         Assert.Contains("GraphClientSecret", exception.Message);
     }
 
+    [Fact]
+    public void AddUsersModule_WithGraphClientAssertionAndNoSecret_PassesStartupValidation()
+    {
+        var settings = new Dictionary<string, string?>(BffTestHost.ValidSettings) { ["PartnerUsers:GraphClientSecret"] = null };
+        using var provider = BuildUsersModule(settings, _ => (_, _, _) => Task.FromResult("signed-jwt"));
+
+        provider.GetRequiredService<IStartupValidator>().Validate();
+    }
+
+    [Fact]
+    public void AddUsersModule_WithGraphClientAssertionAndASecret_FailsStartupValidation()
+    {
+        using var provider = BuildUsersModule(BffTestHost.ValidSettings, _ => (_, _, _) => Task.FromResult("signed-jwt"));
+
+        var exception = Assert.Throws<OptionsValidationException>(() => provider.GetRequiredService<IStartupValidator>().Validate());
+
+        Assert.Contains("must be empty when the host supplies client assertions", exception.Message);
+    }
+
     [Theory]
     [InlineData("ann.agent@example.com", "a***@example.com")]
     [InlineData("x@example.com", "x***@example.com")]
@@ -93,5 +114,18 @@ public sealed class UsersConfigurationTests
     public void Mask_HidesTheLocalPart(string email, string expected)
     {
         Assert.Equal(expected, LoggingEmailSender.Mask(email));
+    }
+
+    private static ServiceProvider BuildUsersModule(
+        IReadOnlyDictionary<string, string?> settings,
+        Func<IServiceProvider, GraphClientAssertionCallback> graphClientAssertion)
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(settings).Build();
+
+        return new ServiceCollection()
+            .AddLogging()
+            .AddSingleton<IConfiguration>(configuration)
+            .AddUsersModule(configuration, graphClientAssertion)
+            .BuildServiceProvider();
     }
 }

@@ -1,19 +1,18 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Modules.Claims.Infrastructure.Database;
+using Npgsql;
 
 namespace Modules.Claims.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddClaimsInfrastructure(this IServiceCollection services, IConfiguration configuration, bool enableSensitiveDataLogging)
+    public static IServiceCollection AddClaimsInfrastructure(this IServiceCollection services, bool enableSensitiveDataLogging)
     {
-        var postgresConnectionString = configuration.GetConnectionString("Postgres");
-
-        services.AddDbContext<ClaimsDbContext>(x =>
+        // The data source (connection string, Entra token in Azure) is registered by the host.
+        services.AddDbContext<ClaimsDbContext>((serviceProvider, x) =>
         {
-            x.UseNpgsql(postgresConnectionString, npgsqlOptions =>
+            x.UseNpgsql(serviceProvider.GetRequiredService<NpgsqlDataSource>(), npgsqlOptions =>
                     npgsqlOptions.MigrationsHistoryTable(DbConsts.MigrationHistoryTableName, DbConsts.ClaimsSchemaName))
                 .UseSnakeCaseNamingConvention();
 

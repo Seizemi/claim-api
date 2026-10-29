@@ -18,10 +18,27 @@ namespace Modules.Users.Features;
 /// </summary>
 public static class DependencyInjection
 {
-    public static IServiceCollection AddUsersModule(this IServiceCollection services, IConfiguration configuration)
+    /// <param name="services">The service collection.</param>
+    /// <param name="configuration">The application configuration.</param>
+    /// <param name="graphClientAssertion">
+    /// Signs the Graph app registration's client assertions (Azure: certificate in Key Vault). Null: the
+    /// <c>PartnerUsers:GraphClientSecret</c> is used (local, Docker).
+    /// </param>
+    public static IServiceCollection AddUsersModule(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        Func<IServiceProvider, GraphClientAssertionCallback>? graphClientAssertion = null)
     {
-        services.AddUsersInfrastructure(configuration);
-        services.AddPartnerUserManagement(configuration);
+        services.AddUsersInfrastructure();
+        if (graphClientAssertion is null)
+        {
+            services.AddPartnerUserManagement(configuration);
+        }
+        else
+        {
+            services.AddPartnerUserManagement(configuration, serviceProvider =>
+                new GraphClientAssertionProvider(graphClientAssertion(serviceProvider)));
+        }
         services.TryAddSingleton(TimeProvider.System);
 
         services.AddSingleton<IValidateOptions<UserManagementSettings>, UserManagementSettingsValidator>();

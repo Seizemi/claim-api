@@ -2,7 +2,11 @@ using Microsoft.Extensions.Options;
 
 namespace ModularMonolith.Authentication;
 
-internal sealed class AzureAdSettingsValidator : IValidateOptions<AzureAdSettings>
+/// <param name="usesCertificate">
+/// True when KeyVault:Uri is set (Azure): the code is redeemed with the Key Vault certificate, so no client secret
+/// may be configured. Otherwise the client secret is required.
+/// </param>
+internal sealed class AzureAdSettingsValidator(bool usesCertificate = false) : IValidateOptions<AzureAdSettings>
 {
     public ValidateOptionsResult Validate(string? name, AzureAdSettings options)
     {
@@ -11,7 +15,15 @@ internal sealed class AzureAdSettingsValidator : IValidateOptions<AzureAdSetting
         AddFailureIfMissing(failures, nameof(AzureAdSettings.Authority), options.Authority);
         AddFailureIfMissing(failures, nameof(AzureAdSettings.TenantId), options.TenantId);
         AddFailureIfMissing(failures, nameof(AzureAdSettings.ClientId), options.ClientId);
-        AddFailureIfMissing(failures, nameof(AzureAdSettings.ClientSecret), options.ClientSecret);
+
+        if (!usesCertificate)
+        {
+            AddFailureIfMissing(failures, nameof(AzureAdSettings.ClientSecret), options.ClientSecret);
+        }
+        else if (IsSet(options.ClientSecret))
+        {
+            failures.Add($"{SettingKey(nameof(AzureAdSettings.ClientSecret))} must not be set when KeyVault:Uri is set: sign-in uses the Key Vault certificate.");
+        }
 
         if (IsSet(options.Authority)
             && (!Uri.TryCreate(options.Authority, UriKind.Absolute, out var authority)
