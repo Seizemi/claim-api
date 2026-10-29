@@ -10,7 +10,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddClaimsModule(this IServiceCollection services, IConfiguration configuration, bool enableSensitiveDataLogging)
     {
-        services.AddClaimsInfrastructure(configuration, enableSensitiveDataLogging);
+        services.AddClaimsInfrastructure(enableSensitiveDataLogging);
         services.AddMemoryCache();
         services.AddSingleton(TimeProvider.System);
         services.RegisterHandlersFromAssemblyContaining(typeof(DependencyInjection));

@@ -93,6 +93,26 @@ public sealed class AzureAdSettingsValidatorTests
     }
 
     [Fact]
+    public void Validate_WithCertificateAndNoSecret_Succeeds()
+    {
+        var settings = WithValue(nameof(AzureAdSettings.ClientSecret), null);
+
+        var result = new AzureAdSettingsValidator(usesCertificate: true).Validate(null, settings);
+
+        Assert.True(result.Succeeded);
+    }
+
+    [Fact]
+    public void Validate_WithCertificateAndASecret_FailsWithoutEchoingIt()
+    {
+        var result = new AzureAdSettingsValidator(usesCertificate: true).Validate(null, ValidSettings);
+
+        var failure = Assert.Single(result.Failures!);
+        Assert.Contains("AzureAd:ClientSecret must not be set when KeyVault:Uri is set", failure);
+        Assert.DoesNotContain(ValidSettings.ClientSecret!, failure);
+    }
+
+    [Fact]
     public async Task StartAsync_WithoutAzureAdConfiguration_FailsWithClearMessage()
     {
         var settings = BffTestHost.ValidSettings

@@ -1,8 +1,12 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Authentication;
+using ModularMonolith.Database;
+using ModularMonolith.KeyVault;
+using ModularMonolith.ManagedIdentity;
 using ModularMonolith.Seeding;
 using ModularMonolith.Spa;
+using ModularMonolith.Telemetry;
 using Modules.Claims.Features;
 using Modules.Claims.Infrastructure.Database;
 using Modules.Common.Features;
@@ -11,8 +15,14 @@ using Modules.Users.Infrastructure.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddManagedIdentityCredential();
+builder.Services.AddPostgres();
+builder.Services.AddTelemetry(builder.Configuration);
+builder.Services.AddKeyVaultCertificates(builder.Configuration);
 builder.Services.AddClaimsModule(builder.Configuration, builder.Environment.IsDevelopment());
-builder.Services.AddUsersModule(builder.Configuration);
+builder.Services.AddUsersModule(
+    builder.Configuration,
+    KeyVaultSettings.IsConfigured(builder.Configuration) ? KeyVaultExtensions.GraphClientAssertion : null);
 builder.Services.AddBffAuthentication(builder.Configuration);
 builder.Services.AddSpaHosting(builder.Configuration, builder.Environment);
 builder.Services.AddEndpointsApiExplorer();

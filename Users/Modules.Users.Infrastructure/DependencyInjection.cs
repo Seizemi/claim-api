@@ -1,18 +1,17 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Modules.Users.Infrastructure.Database;
+using Npgsql;
 
 namespace Modules.Users.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddUsersInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddUsersInfrastructure(this IServiceCollection services)
     {
-        var postgresConnectionString = configuration.GetConnectionString("Postgres");
-
-        services.AddDbContext<UsersDbContext>(x => x
-            .UseNpgsql(postgresConnectionString, npgsqlOptions =>
+        // The data source (connection string, Entra token in Azure) is registered by the host.
+        services.AddDbContext<UsersDbContext>((serviceProvider, x) => x
+            .UseNpgsql(serviceProvider.GetRequiredService<NpgsqlDataSource>(), npgsqlOptions =>
                 npgsqlOptions.MigrationsHistoryTable(DbConsts.MigrationHistoryTableName, DbConsts.UsersSchemaName))
             .UseSnakeCaseNamingConvention());
 
