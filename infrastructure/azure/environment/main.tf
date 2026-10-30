@@ -32,6 +32,14 @@ data "terraform_remote_state" "shared" {
 module "environment" {
   source = "../../modules/app-environment"
 
+  providers = {
+    azurerm          = azurerm
+    azuread          = azuread
+    azuread.external = azuread.external
+    random           = random
+    time             = time
+  }
+
   environment = local.environment
   location    = var.location
 

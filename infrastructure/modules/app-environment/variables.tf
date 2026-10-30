@@ -106,6 +106,8 @@ variable "entra" {
     web_client_id            = string # partner-portal-web
     web_service_principal_id = string # partner-portal-web, Enterprise applications > Object ID
     graph_client_id          = string # partner-portal-graph
+    # Used by the root's azuread.external provider only (claim-terraform app registration, GitHub Actions).
+    terraform_client_id = optional(string)
   })
 }
 

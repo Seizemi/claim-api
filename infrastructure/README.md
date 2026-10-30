@@ -16,6 +16,7 @@ Naming: `<type>-claim-<env>-frc` (for example `app-claim-staging-frc`). Globally
 
 - Terraform 1.15 and Azure CLI 2.87 or later.
 - **Owner** on the subscription (or Contributor + User Access Administrator): Terraform creates role assignments.
+- For `azure/environment`: the right to edit `partner-portal-web` and `partner-portal-graph` in the environment's External ID tenant ([External ID tenant](#external-id-tenant)).
 
 ## Terraform state storage (once per subscription)
 
@@ -51,7 +52,7 @@ Each resource module has `main.tf`, `variables.tf` and `outputs.tf`. Its variabl
 | Resource group | `rg-claim-staging-frc` | |
 | VNet + subnets | `vnet-claim-staging-frc`: `snet-app` (App Service VNet integration), `snet-postgres` (delegated) | NSG: PostgreSQL accepts 5432 from `snet-app` only. Only private traffic goes through the VNet. |
 | PostgreSQL Flexible Server | `psql-claim-staging-frc`, database `claimapi` | Private IP only (private DNS zone). **Entra authentication only, no password**: the web app's managed identity and the person running Terraform are the Entra administrators. |
-| Key Vault | `kv-claim-staging-frc` | RBAC. Self-signed certificates `partner-portal-web` and `partner-portal-graph` (12 months, auto-renewed) and the `dataprotection` key. Private keys never leave the vault. |
+| Key Vault | `kv-claim-staging-frc` | RBAC. Self-signed certificates `partner-portal-web` and `partner-portal-graph` (12 months, auto-renewed) and the `dataprotection` key. Private keys never leave the vault. The public parts are uploaded to the app registrations of the External ID tenant ([External ID tenant](#external-id-tenant)). |
 | Storage account | `stclaimstaging<suffix>`, container `dataprotection` | Data Protection key ring. No access keys. |
 | App Service plan + web app | `asp-claim-staging-frc` (B1), `app-claim-staging-frc` | Container from the registry, pulled with the system-assigned managed identity. HTTPS only, health check `/healthz`. |
 | Application Insights | `appi-claim-staging-frc` | In the shared Log Analytics workspace, like the web app and PostgreSQL logs. |
@@ -114,6 +115,39 @@ The plan stops before anything else if the `default` workspace is selected, or i
 
 Before the first deployment, the web app points to `claimapi:latest`, which doesn't exist yet: it stays unhealthy until an image is pushed. Deployments change the image tag; Terraform ignores it.
 
+## External ID tenant
+
+The app signs in to the environment's External ID tenant with the two Key Vault certificates, and Entra only accepts a certificate whose public part is registered on the app registration. `azure/environment` therefore also writes to that tenant (`modules/app-environment/entra.tf`): it uploads the public part of `partner-portal-web` and `partner-portal-graph` to the app registrations of the same name, and `destroy` removes them. Nothing else in the tenant is managed by Terraform (registrations, roles, redirect URIs, users stay manual, ClaimApi README checklist).
+
+It goes through a second `azuread` provider (`azuread.external`, tenant `entra.tenant_id`):
+
+- **Locally**, the Azure CLI must also be signed in to the External ID tenant, with an account that may edit both app registrations (owner, or Cloud Application Administrator). Then select the subscription again, or azurerm would use the wrong tenant:
+
+  ```powershell
+  az login --tenant <external-tenant-id> --allow-no-subscriptions
+  az account set --subscription $env:ARM_SUBSCRIPTION_ID
+  ```
+
+- **From GitHub Actions**, it signs in as the app registration **`claim-terraform`** of that tenant, with OpenID Connect (no secret). Its client ID is `terraform_client_id` in the `ENTRA_<ENV>` secret; leave it out of the local `tfvars/<env>.entra.tfvars`, so local runs use the Azure CLI.
+
+**Setup of `claim-terraform`, once per External ID tenant:**
+
+1. *App registrations* > *New registration*: `claim-terraform`, single tenant, no redirect URI.
+2. *API permissions* > *Microsoft Graph* > *Application permissions* > `Application.ReadWrite.OwnedBy`, then *Grant admin consent*. It can only change the app registrations it owns.
+3. *Certificates & secrets* > *Federated credentials* > *GitHub Actions deploying Azure resources*: organization `Seizemi`, repository `claim-api`, entity *Environment* `infrastructure`.
+4. Make its service principal an **owner** of both app registrations (the portal's *Owners* page only adds users):
+
+   ```powershell
+   az login --tenant <external-tenant-id> --allow-no-subscriptions
+   $sp = az ad sp show --id <claim-terraform client id> --query id -o tsv
+   az ad app owner add --id <partner-portal-web client id> --owner-object-id $sp
+   az ad app owner add --id <partner-portal-graph client id> --owner-object-id $sp
+   ```
+
+5. Add `terraform_client_id = "<claim-terraform client id>"` to the `ENTRA_<ENV>` secret ([From GitHub Actions](#from-github-actions)).
+
+**Certificate renewal is not automated.** Key Vault renews each certificate 30 days before it expires (12-month validity) and the app switches to the new version within 12 hours, but nothing uploads the new public part to Entra until the next `apply`, and Entra would then reject the app's sign-ins and Graph calls. Rebuilding staging (destroy, then apply) well within the 12 months avoids it. A long-lived environment (production) needs a solution first: spec 10.6.
+
 ## From GitHub Actions
 
 Two workflows of this repository, run by hand only (*Actions* > the workflow > *Run workflow*, on `main`):
@@ -137,7 +171,7 @@ It has no Entra (directory) right: the workflows pass its name in `TF_VAR_deploy
 2. *Deployment branches and tags*: **Selected branches**, `main`. Optionally, *Required reviewers*: yourself.
 3. *Environment variables*, from step 1: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `TFSTATE_RESOURCE_GROUP`, `TFSTATE_STORAGE_ACCOUNT`. Variables, not secrets: they're identifiers, useless without the federated sign-in (they would be masked as `***` in every log otherwise).
 4. *Environment secrets*:
-   - `ENTRA_STAGING`: the value of `entra` from `tfvars/staging.entra.tfvars`, the braces included (`{ authority = "...", tenant_id = "...", ... }`, on one or several lines). It reaches Terraform as `TF_VAR_entra`. A secret, not a variable: the repository and its Actions logs are public.
+   - `ENTRA_STAGING`: the value of `entra` from `tfvars/staging.entra.tfvars`, the braces included (`{ authority = "...", tenant_id = "...", ... }`, on one or several lines), **plus** `terraform_client_id` ([External ID tenant](#external-id-tenant)). It reaches Terraform as `TF_VAR_entra`. A secret, not a variable: the repository and its Actions logs are public.
    - `TERRAFORM_GITHUB_TOKEN`: a **fine-grained** token on `Seizemi/claim-api` with *Administration*, *Environments* and *Variables* read and write (the one `github` uses locally). Renew it before it expires.
 
 A `workflow_dispatch` workflow only shows up in *Actions* once its file is on the default branch.

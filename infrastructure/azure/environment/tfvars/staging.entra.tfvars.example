@@ -6,4 +6,6 @@ entra = {
   web_client_id            = "<partner-portal-web client id>"
   web_service_principal_id = "<partner-portal-web service principal object id>"
   graph_client_id          = "<partner-portal-graph client id>"
+  # Only in the GitHub secret ENTRA_STAGING (local runs use the Azure CLI):
+  # terraform_client_id    = "<claim-terraform client id>"
 }

@@ -43,3 +43,14 @@ provider "azurerm" {
 
 # The Azure (workforce) tenant of the subscription, signed in with the Azure CLI. Never the External ID tenant.
 provider "azuread" {}
+
+# The environment's External ID tenant: uploads the Key Vault certificates to its app registrations
+# (modules/app-environment/entra.tf). GitHub Actions: its claim-terraform app registration through OpenID Connect.
+# Locally: the Azure CLI, signed in to that tenant too (README, "External ID tenant").
+provider "azuread" {
+  alias     = "external"
+  tenant_id = var.entra.tenant_id
+  client_id = var.entra.terraform_client_id
+  use_oidc  = var.entra.terraform_client_id != null
+  use_cli   = var.entra.terraform_client_id == null
+}

@@ -66,6 +66,8 @@ variable "entra" {
     web_client_id            = string
     web_service_principal_id = string
     graph_client_id          = string
+    # claim-terraform app registration of the tenant, for GitHub Actions. Null (local runs): the Azure CLI.
+    terraform_client_id = optional(string)
   })
 
   # Hidden in plan/apply output (Actions logs are public, spec step 3.5); still in clear text in the state and the plan
