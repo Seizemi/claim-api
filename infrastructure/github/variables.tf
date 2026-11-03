@@ -30,3 +30,9 @@ variable "deployment_branch" {
   type        = string
   default     = "main"
 }
+
+variable "deployment_tag" {
+  description = "Workflows running on a tag matching this pattern can use the deployment environments too."
+  type        = string
+  default     = "v*"
+}

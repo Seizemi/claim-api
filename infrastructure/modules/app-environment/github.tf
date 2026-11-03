@@ -21,6 +21,13 @@ resource "azurerm_role_assignment" "github_acr_push" {
   principal_id         = module.github_identity.principal_id
 }
 
+# "az acr login" looks the registry up first, which AcrPush doesn't allow. Metadata only: no image, no credential.
+resource "azurerm_role_assignment" "github_acr_reader" {
+  scope                = var.container_registry_id
+  role_definition_name = "Reader"
+  principal_id         = module.github_identity.principal_id
+}
+
 resource "azurerm_role_assignment" "github_web_app" {
   scope                = module.web_app.id
   role_definition_name = "Website Contributor"

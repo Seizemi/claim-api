@@ -1,0 +1,163 @@
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CLIENT_REPOSITORY: Seizemi/claim-client
+  IMAGE_REPOSITORY: claimapi
+  SONAR_ORGANIZATION: Seizemi
+  SONAR_PROJECT_KEY: Seizemi_claim-api
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    env:
+      NUGET_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install analysis tools
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+          dotnet tool install --global dotnet-coverage
+
+      - name: Start the SonarCloud analysis
+        if: github.ref_type == 'branch'
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >-
+          dotnet sonarscanner begin
+          /k:"$SONAR_PROJECT_KEY"
+          /o:"$SONAR_ORGANIZATION"
+          /d:sonar.token="$SONAR_TOKEN"
+          /d:sonar.host.url=https://sonarcloud.io
+          /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+          "/d:sonar.exclusions=**/Migrations/**"
+
+      - name: Build
+        run: dotnet build Tests/Tests.proj -c Release
+
+      - name: Test
+        run: dotnet-coverage collect "dotnet test Tests/Tests.proj -c Release --no-build" -f xml -o coverage.xml
+
+      - name: Send the SonarCloud analysis
+        if: github.ref_type == 'branch'
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
+
+  client-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.CLIENT_REPOSITORY }}
+
+      - name: Tested commit
+        id: commit
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --legacy-peer-deps
+
+      - name: Test
+        run: npm test -- --watchAll=false
+        env:
+          CI: "true"
+
+  build-and-push-image:
+    needs: [api-tests, client-tests]
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+      packages: read
+    outputs:
+      tag: ${{ steps.image.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ClaimApi
+          fetch-depth: 0
+
+      - name: Check the tagged commit is on main
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          if ! git -C ClaimApi merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$GITHUB_REF_NAME isn't on main: merge the commit, then tag it."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.CLIENT_REPOSITORY }}
+          ref: ${{ needs.client-tests.outputs.sha }}
+          path: claim-client
+
+      - name: Image tag
+        id: image
+        env:
+          CLIENT_SHA: ${{ needs.client-tests.outputs.sha }}
+        run: echo "tag=${GITHUB_SHA::12}-${CLIENT_SHA::12}" >> "$GITHUB_OUTPUT"
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Log in to the registry
+        run: az acr login --name "${{ vars.ACR_NAME }}"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ClaimApi/ModularMonolith/Dockerfile
+          push: true
+          tags: ${{ vars.ACR_LOGIN_SERVER }}/${{ env.IMAGE_REPOSITORY }}:${{ steps.image.outputs.tag }}
+          build-args: SOURCE_VERSION=${{ steps.image.outputs.tag }}
+          secrets: nuget_token=${{ secrets.GITHUB_TOKEN }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Summary
+        env:
+          TAG: ${{ steps.image.outputs.tag }}
+        run: echo "Image \`${{ vars.ACR_LOGIN_SERVER }}/$IMAGE_REPOSITORY:$TAG\`" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    needs: build-and-push-image
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/github-action.cd.yml
+    with:
+      image_tag: ${{ needs.build-and-push-image.outputs.tag }}

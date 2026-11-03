@@ -44,4 +44,8 @@ EXPOSE 8080
 FROM base AS final
 COPY --from=backend /app ./
 COPY --from=frontend /src/build ./wwwroot
+# The commits the image is built from (github-action.ci.yml passes them; empty for local builds), returned by /healthz in the
+# X-App-Version header so the pipeline knows when the new container answers. Last, so it never invalidates the cache.
+ARG SOURCE_VERSION
+ENV App__Version=$SOURCE_VERSION
 ENTRYPOINT ["dotnet", "ModularMonolith.dll"]

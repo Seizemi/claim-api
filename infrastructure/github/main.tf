@@ -45,6 +45,14 @@ resource "github_repository_environment_deployment_policy" "this" {
   branch_pattern = var.deployment_branch
 }
 
+# A ci run on a version tag builds and deploys, which the branch policy alone would refuse.
+resource "github_repository_environment_deployment_policy" "tags" {
+  for_each    = github_repository_environment.this
+  repository  = var.repository
+  environment = each.value.environment
+  tag_pattern = var.deployment_tag
+}
+
 locals {
   shared = data.terraform_remote_state.shared.outputs
 
