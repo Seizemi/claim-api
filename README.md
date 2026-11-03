@@ -284,3 +284,37 @@ Don't write the actual values in this README or in any committed file. Dev value
 ### Creating a Supervisor
 
 A Supervisor can't be created from the application. Create the user in the Entra admin center (*Users > New user > Create new external user*, sign-in method Email), then assign the `Supervisor` role in *Enterprise applications > partner-portal-web > Users and groups*. Do this in each tenant.
+
+## CI and deployment to staging (`ci`, `cd`)
+
+Two workflows in `.github/workflows/`:
+
+| Workflow | Runs on | Does |
+|---|---|---|
+| `ci` | a push to any branch, a pushed `v*` tag (`git tag v1.2.0` then `git push origin v1.2.0`), or by hand (*Actions* > *ci* > *Run workflow*) | Tests; on `main` or a tag, builds the image and pushes it to the registry; on a tag, calls `cd`. |
+| `cd` | called by `ci` on a tag (it appears as a job of that `ci` run), or by hand with `image_tag` (*Actions* > *cd* > *Run workflow*, on `main`) | Deploys an image already in the registry to staging. |
+
+Pushing to `main` doesn't deploy: pushing a `v*` tag does. A tag on a commit that isn't on `main` fails the run: nothing is built or deployed.
+
+The React app always comes from the default branch of `claim-client` (`master`), and a push there doesn't start `ci`: push a new tag to deploy a frontend change. Staging only exists between an `infra-apply` and an `infra-destroy` ([infrastructure/README.md](infrastructure/README.md)): when it doesn't, `ci` on `main` or a tag fails at the Azure sign-in of its `build-and-push-image` job, after the tests.
+
+`ci` has four jobs:
+
+1. **api-tests:** `dotnet test Tests/Tests.proj` (every `*.Tests.csproj`, unit and integration with Testcontainers; not the load tests), with coverage, and a SonarCloud analysis of the API on a branch (not on a tag: its commit was already analysed). A failed quality gate doesn't fail the job.
+2. **client-tests:** the React tests, in parallel.
+3. **build-and-push-image:** after both, only on `main` or a tag (on any other branch the run stops after the tests). Builds the tested commits and pushes the image, tagged `<claim-api commit>-<claim-client commit>` (12 characters each): a tag is never reused, `latest` is never deployed. The GitHub token restores `ClaimPartners.Users` as a build secret.
+
+4. **deploy:** after the image, only on a tag: calls `cd` with the image tag.
+
+`cd` has one job, **deploy:** points the web app at `image_tag` (no slots on B1: the app restarts and is briefly unavailable), waits until `/healthz` answers 200 with the new tag in its `X-App-Version` header (up to 15 minutes; the first start also migrates and seeds the database; until then, the previous container may still be the one answering).
+
+SonarCloud setup (once): import `claim-api` on [sonarcloud.io](https://sonarcloud.io), turn off *Administration* > *Analysis Method* > *Automatic Analysis* (it can't run alongside a CI analysis), and add the token as the `SONAR_TOKEN` repository secret. The organization and project keys are at the top of `github-action.ci.yml`.
+
+The `build-and-push-image` and `deploy` jobs run in the GitHub environment `staging`, written by Terraform: `main` and `v*` tags only, and its variables identify the deployment identity `id-claim-staging-frc-github` (`AcrPush` and `Reader` on the registry, `Website Contributor` on the web app), signed in with OpenID Connect. Two `cd` runs never overlap.
+
+**Before the first run:**
+
+- Package `ClaimPartners.Users` on GitHub > *Package settings* > *Manage Actions access* > add the `claim-api` repository with the **Read** role. Otherwise the workflow's token can't restore it (NU1101).
+- The staging redirect URIs on `partner-portal-web`: `https://app-claim-staging-frc.azurewebsites.net/signin-oidc` and `.../signout-callback-oidc` (*Authentication* > *Web*).
+
+**Rollback:** run `cd` by hand with `image_tag` = the previous tag (in the summary of the run that deployed it): no tests, no build. `infra-destroy` deletes the registry with all its images, so there is no retention policy to maintain while staging is rebuilt for each use.

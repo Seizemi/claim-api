@@ -56,7 +56,7 @@ Each resource module has `main.tf`, `variables.tf` and `outputs.tf`. Its variabl
 | Storage account | `stclaimstaging<suffix>`, container `dataprotection` | Data Protection key ring. No access keys. |
 | App Service plan + web app | `asp-claim-staging-frc` (B1), `app-claim-staging-frc` | Container from the registry, pulled with the system-assigned managed identity. HTTPS only, health check `/healthz`. |
 | Application Insights | `appi-claim-staging-frc` | In the shared Log Analytics workspace, like the web app and PostgreSQL logs. |
-| GitHub Actions identity | `id-claim-staging-frc-github` | Federated credential for `repo:Seizemi/claim-api:environment:staging`. `AcrPush` on the registry, `Website Contributor` on the web app. |
+| GitHub Actions identity | `id-claim-staging-frc-github` | Federated credential for `repo:Seizemi/claim-api:environment:staging`. `AcrPush` and `Reader` (for `az acr login`) on the registry, `Website Contributor` on the web app. |
 
 The web app's identity has `AcrPull` on the registry, `Key Vault Secrets User` on the vault, `Key Vault Crypto User` on the `dataprotection` key and `Storage Blob Data Contributor` on the `dataprotection` container.
 
@@ -160,7 +160,7 @@ Two workflows of this repository, run by hand only (*Actions* > the workflow > *
 They never run at the same time (same concurrency group). They sign in to Azure as **`id-claim-terraform-frc`**, a user-assigned managed identity in `rg-claim-tfstate-frc`, created by hand (a pipeline can't sign in with an identity its own Terraform creates or destroys), through OpenID Connect: no Azure secret is stored in GitHub, and only jobs of the GitHub environment `infrastructure` of `Seizemi/claim-api` get a token. Its rights:
 
 - `Contributor` on the subscription;
-- `Role Based Access Control Administrator` on the subscription, **limited by a condition** to assigning and removing the roles this Terraform uses (`AcrPull`, `AcrPush`, `Website Contributor`, `Key Vault Administrator`, `Key Vault Secrets User`, `Key Vault Crypto User`, `Storage Blob Data Contributor`: every `role_definition_name` of this Terraform, keep the condition in sync);
+- `Role Based Access Control Administrator` on the subscription, **limited by a condition** to assigning and removing the roles this Terraform uses (`AcrPull`, `AcrPush`, `Reader`, `Website Contributor`, `Key Vault Administrator`, `Key Vault Secrets User`, `Key Vault Crypto User`, `Storage Blob Data Contributor`: every `role_definition_name` of this Terraform, keep the condition in sync);
 - `Storage Blob Data Contributor` on the state storage account.
 
 It has no Entra (directory) right: the workflows pass its name in `TF_VAR_deployer_principal_name` instead of looking it up. Like a person running Terraform locally, it becomes the Key Vault administrator and a PostgreSQL Entra administrator of the environment.

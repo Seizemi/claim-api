@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.Build.Traversal/4.1.82">
+  <!-- Every test project except the load tests (slow, no pass/fail threshold): dotnet test Tests/Tests.proj.
+       A new test project is picked up as long as its name ends with .Tests.csproj. -->
+  <ItemGroup>
+    <ProjectReference Include="**/*.Tests.csproj" Exclude="**/*.Load.Tests.csproj" />
+  </ItemGroup>
+</Project>

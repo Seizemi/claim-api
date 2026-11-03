@@ -1,0 +1,76 @@
+name: cd
+
+on:
+  workflow_call:
+    inputs:
+      image_tag:
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: Existing image tag to redeploy (rollback)
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_REPOSITORY: claimapi
+  TAG: ${{ inputs.image_tag }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.WEBAPP_NAME }}
+          resource-group-name: ${{ vars.RESOURCE_GROUP }}
+          images: ${{ vars.ACR_LOGIN_SERVER }}/${{ env.IMAGE_REPOSITORY }}:${{ env.TAG }}
+
+      # The previous container keeps answering until the new one is up: wait for /healthz to report the new tag.
+      # The first start of an environment also pulls the image, migrates and seeds the database.
+      - name: Wait for the new version
+        env:
+          URL: ${{ vars.PUBLIC_URL }}/healthz
+        run: |
+          deadline=$((SECONDS + 900))
+          while (( SECONDS < deadline )); do
+            headers=$(curl --silent --max-time 10 --dump-header - --output /dev/null "$URL" || true)
+            status=$(echo "$headers" | head -n 1 | tr -d '\r')
+            version=$(echo "$headers" | grep -i '^x-app-version:' | cut -d' ' -f2 | tr -d '\r')
+            echo "$(date +%T) ${status:-no answer} version=${version:-none}"
+            if [[ "$status" == *" 200"* && "$version" == "$TAG" ]]; then
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::error::$URL didn't report $TAG within 15 minutes. Look at the web app's log stream in the Azure portal."
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Staging"
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Image | \`${{ vars.ACR_LOGIN_SERVER }}/$IMAGE_REPOSITORY:$TAG\` (\`<claim-api commit>-<claim-client commit>\`) |"
+            echo "| URL | ${{ vars.PUBLIC_URL }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
