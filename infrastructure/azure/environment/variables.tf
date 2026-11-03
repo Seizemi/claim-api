@@ -13,7 +13,7 @@ variable "tfstate_storage_account_name" {
 
 variable "location" {
   type    = string
-  default = "francecentral"
+  default = "canadacentral"
 }
 
 # Set by the infra-apply and infra-destroy workflows only (README, "From GitHub Actions").

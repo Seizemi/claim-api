@@ -1,7 +1,7 @@
 variable "location" {
   description = "Azure region of every resource."
   type        = string
-  default     = "francecentral"
+  default     = "canadacentral"
 }
 
 variable "log_retention_days" {

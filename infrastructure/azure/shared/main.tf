@@ -11,7 +11,7 @@ locals {
 module "resource_group" {
   source = "../../modules/resource-group"
 
-  name     = "rg-claim-shared-frc"
+  name     = "rg-claim-shared-cac"
   location = var.location
   tags     = local.tags
 }
@@ -39,7 +39,7 @@ module "container_registry" {
 module "log_analytics_workspace" {
   source = "../../modules/log-analytics-workspace"
 
-  name                = "log-claim-shared-frc"
+  name                = "log-claim-shared-cac"
   resource_group_name = module.resource_group.name
   location            = var.location
   retention_in_days   = var.log_retention_days

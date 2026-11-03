@@ -310,11 +310,11 @@ The React app always comes from the default branch of `claim-client` (`master`),
 
 SonarCloud setup (once): import `claim-api` on [sonarcloud.io](https://sonarcloud.io), turn off *Administration* > *Analysis Method* > *Automatic Analysis* (it can't run alongside a CI analysis), and add the token as the `SONAR_TOKEN` repository secret. The organization and project keys are at the top of `github-action.ci.yml`.
 
-The `build-and-push-image` and `deploy` jobs run in the GitHub environment `staging`, written by Terraform: `main` and `v*` tags only, and its variables identify the deployment identity `id-claim-staging-frc-github` (`AcrPush` and `Reader` on the registry, `Website Contributor` on the web app), signed in with OpenID Connect. Two `cd` runs never overlap.
+The `build-and-push-image` and `deploy` jobs run in the GitHub environment `staging`, written by Terraform: `main` and `v*` tags only, and its variables identify the deployment identity `id-claim-staging-cac-github` (`AcrPush` and `Reader` on the registry, `Website Contributor` on the web app), signed in with OpenID Connect. Two `cd` runs never overlap.
 
 **Before the first run:**
 
 - Package `ClaimPartners.Users` on GitHub > *Package settings* > *Manage Actions access* > add the `claim-api` repository with the **Read** role. Otherwise the workflow's token can't restore it (NU1101).
-- The staging redirect URIs on `partner-portal-web`: `https://app-claim-staging-frc.azurewebsites.net/signin-oidc` and `.../signout-callback-oidc` (*Authentication* > *Web*).
+- The staging redirect URIs on `partner-portal-web`: `https://app-claim-staging-cac.azurewebsites.net/signin-oidc` and `.../signout-callback-oidc` (*Authentication* > *Web*).
 
 **Rollback:** run `cd` by hand with `image_tag` = the previous tag (in the summary of the run that deployed it): no tests, no build. `infra-destroy` deletes the registry with all its images, so there is no retention policy to maintain while staging is rebuilt for each use.

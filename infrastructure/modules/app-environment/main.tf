@@ -19,7 +19,7 @@ locals {
     principal_type = var.deployer_principal_name != null ? "ServicePrincipal" : "User"
   }
 
-  name = "claim-${var.environment}-frc"
+  name = "claim-${var.environment}-cac"
 
   tags = {
     project     = "claim"

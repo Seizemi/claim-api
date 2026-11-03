@@ -1,6 +1,6 @@
 # Infrastructure
 
-Terraform for the Azure resources that host ClaimApi and for the GitHub settings its pipeline uses. Region: `francecentral`. No Azure identifier (subscription, tenant, state storage) is written in this folder: Terraform reads them from [environment variables](#environment-variables).
+Terraform for the Azure resources that host ClaimApi and for the GitHub settings its pipeline uses. Region: `canadacentral` (the Terraform state storage and identity, created by hand, stay in `francecentral`). No Azure identifier (subscription, tenant, state storage) is written in this folder: Terraform reads them from [environment variables](#environment-variables).
 
 | Folder | Content | State |
 |---|---|---|
@@ -10,7 +10,7 @@ Terraform for the Azure resources that host ClaimApi and for the GitHub settings
 | `azure/environment/` | Every application environment, one Terraform workspace each (`staging`, later `prod`), set by `tfvars/<workspace>.tfvars` | `environment.tfstateenv:<workspace>` |
 | `github/` | GitHub environments and variables of the `claim-api` repository, from the Azure outputs | `github.tfstate` |
 
-Naming: `<type>-claim-<env>-frc` (for example `app-claim-staging-frc`). Globally unique names that can't contain hyphens (registry, storage accounts) get a short suffix.
+Naming: `<type>-claim-<env>-cac` (for example `app-claim-staging-cac`). Globally unique names that can't contain hyphens (registry, storage accounts) get a short suffix.
 
 ## Prerequisites
 
@@ -49,14 +49,14 @@ Each resource module has `main.tf`, `variables.tf` and `outputs.tf`. Its variabl
 
 | Resource | Name (staging) | Notes |
 |---|---|---|
-| Resource group | `rg-claim-staging-frc` | |
-| VNet + subnets | `vnet-claim-staging-frc`: `snet-app` (App Service VNet integration), `snet-postgres` (delegated) | NSG: PostgreSQL accepts 5432 from `snet-app` only. Only private traffic goes through the VNet. |
-| PostgreSQL Flexible Server | `psql-claim-staging-frc`, database `claimapi` | Private IP only (private DNS zone). **Entra authentication only, no password**: the web app's managed identity and the person running Terraform are the Entra administrators. |
-| Key Vault | `kv-claim-staging-frc` | RBAC. Self-signed certificates `partner-portal-web` and `partner-portal-graph` (12 months, auto-renewed) and the `dataprotection` key. Private keys never leave the vault. The public parts are uploaded to the app registrations of the External ID tenant ([External ID tenant](#external-id-tenant)). |
+| Resource group | `rg-claim-staging-cac` | |
+| VNet + subnets | `vnet-claim-staging-cac`: `snet-app` (App Service VNet integration), `snet-postgres` (delegated) | NSG: PostgreSQL accepts 5432 from `snet-app` only. Only private traffic goes through the VNet. |
+| PostgreSQL Flexible Server | `psql-claim-staging-cac`, database `claimapi` | Private IP only (private DNS zone). **Entra authentication only, no password**: the web app's managed identity and the person running Terraform are the Entra administrators. |
+| Key Vault | `kv-claim-staging-cac` | RBAC. Self-signed certificates `partner-portal-web` and `partner-portal-graph` (12 months, auto-renewed) and the `dataprotection` key. Private keys never leave the vault. The public parts are uploaded to the app registrations of the External ID tenant ([External ID tenant](#external-id-tenant)). |
 | Storage account | `stclaimstaging<suffix>`, container `dataprotection` | Data Protection key ring. No access keys. |
-| App Service plan + web app | `asp-claim-staging-frc` (B1), `app-claim-staging-frc` | Container from the registry, pulled with the system-assigned managed identity. HTTPS only, health check `/healthz`. |
-| Application Insights | `appi-claim-staging-frc` | In the shared Log Analytics workspace, like the web app and PostgreSQL logs. |
-| GitHub Actions identity | `id-claim-staging-frc-github` | Federated credential for `repo:Seizemi/claim-api:environment:staging`. `AcrPush` and `Reader` (for `az acr login`) on the registry, `Website Contributor` on the web app. |
+| App Service plan + web app | `asp-claim-staging-cac` (B1), `app-claim-staging-cac` | Container from the registry, pulled with the system-assigned managed identity. HTTPS only, health check `/healthz`. |
+| Application Insights | `appi-claim-staging-cac` | In the shared Log Analytics workspace, like the web app and PostgreSQL logs. |
+| GitHub Actions identity | `id-claim-staging-cac-github` | Federated credential for `repo:Seizemi/claim-api:environment:staging`. `AcrPush` and `Reader` (for `az acr login`) on the registry, `Website Contributor` on the web app. |
 
 The web app's identity has `AcrPull` on the registry, `Key Vault Secrets User` on the vault, `Key Vault Crypto User` on the `dataprotection` key and `Storage Blob Data Contributor` on the `dataprotection` container.
 
@@ -93,7 +93,7 @@ terraform plan -out main.tfplan
 terraform apply main.tfplan
 ```
 
-**`azure/environment`**: one root for every environment. The Terraform **workspace** is the environment: it picks the state (blob `environment.tfstateenv:<workspace>`) and names the resources (`app-claim-<workspace>-frc`...). Each environment has two variable files:
+**`azure/environment`**: one root for every environment. The Terraform **workspace** is the environment: it picks the state (blob `environment.tfstateenv:<workspace>`) and names the resources (`app-claim-<workspace>-cac`...). Each environment has two variable files:
 
 | File | Content | Git |
 |---|---|---|
@@ -180,4 +180,4 @@ A `workflow_dispatch` workflow only shows up in *Actions* once its file is on th
 
 The plan file and the state hold the tenant values in clear text: the workflows never upload a plan as an artifact and never print the state. Keep it that way.
 
-The GitHub Actions identity of each environment (`id-claim-<env>-frc-github`, above) is a different one: it only deploys the application (push the image, update the web app).
+The GitHub Actions identity of each environment (`id-claim-<env>-cac-github`, above) is a different one: it only deploys the application (push the image, update the web app).
