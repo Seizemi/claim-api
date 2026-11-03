@@ -48,7 +48,7 @@ public sealed class GetAllClaimsHandlerTests
 
         // Assert
         Assert.False(result.IsError);
-        Assert.Equal(3, result.Value.Items.Count());
+        Assert.Equal(3, result.Value.Items.Count);
         Assert.Equal(
             new[] { newest.Id, middle.Id, oldest.Id },
             result.Value.Items.Select(c => c.Id).ToArray());
@@ -75,7 +75,7 @@ public sealed class GetAllClaimsHandlerTests
 
         // Assert
         Assert.False(result.IsError);
-        Assert.Equal(2, result.Value.Items.Count());
+        Assert.Equal(2, result.Value.Items.Count);
         Assert.Equal(5, result.Value.TotalCount);
         Assert.Equal(3, result.Value.TotalPages);
         Assert.Equal(2, result.Value.PageNumber);

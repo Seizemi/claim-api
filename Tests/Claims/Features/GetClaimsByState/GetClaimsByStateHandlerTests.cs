@@ -103,7 +103,7 @@ public sealed class GetClaimsByStateHandlerTests
 
         // Assert
         Assert.False(result.IsError);
-        Assert.Equal(2, result.Value.Items.Count());
+        Assert.Equal(2, result.Value.Items.Count);
         Assert.Equal(5, result.Value.TotalCount);
         Assert.Equal(3, result.Value.TotalPages);
         Assert.Equal(2, result.Value.PageNumber);

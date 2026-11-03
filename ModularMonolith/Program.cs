@@ -69,6 +69,4 @@ app.MapEndpointModulesFromAssemblyContaining(typeof(Modules.Users.Features.Depen
 app.MapEndpointModulesFromAssemblyContaining(typeof(Program));
 app.MapSpa(app.Environment);
 
-app.Run();
-
-public partial class Program;
+await app.RunAsync();
