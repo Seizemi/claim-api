@@ -12,7 +12,7 @@ permissions:
 env:
   CLIENT_REPOSITORY: Seizemi/claim-client
   IMAGE_REPOSITORY: claimapi
-  SONAR_ORGANIZATION: Seizemi
+  SONAR_ORGANIZATION: seizemi
   SONAR_PROJECT_KEY: Seizemi_claim-api
 
 jobs:
@@ -80,7 +80,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      - run: npm ci --legacy-peer-deps
+      - run: npm ci --legacy-peer-deps --ignore-scripts
 
       - name: Test
         run: npm test -- --watchAll=false

@@ -13,7 +13,8 @@ WORKDIR /src
 COPY claim-client/package.json claim-client/package-lock.json ./
 # react-scripts 5 declares TypeScript <= 4 as an optional peer while the app uses TypeScript 5; the lockfile
 # pins the working versions, so skip that peer check (npm 10, bundled with Node 22, rejects it).
-RUN npm ci --legacy-peer-deps
+# No dependency needs its install scripts to build, so they don't get to run.
+RUN npm ci --legacy-peer-deps --ignore-scripts
 COPY claim-client/ ./
 # Everything in the React build is public. Source maps would publish the source code too.
 ENV GENERATE_SOURCEMAP=false
