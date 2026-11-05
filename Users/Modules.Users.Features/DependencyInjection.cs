@@ -1,5 +1,6 @@
 using ClaimPartners.Users.DependencyInjection;
 using FluentValidation;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -51,8 +52,21 @@ public static class DependencyInjection
             .BindConfiguration(AppSettings.SectionName)
             .ValidateOnStart();
 
-        // Until an email provider is chosen (spec D2).
-        services.AddSingleton<IEmailSender, LoggingEmailSender>();
+        services.AddSingleton<IValidateOptions<EmailSettings>, EmailSettingsValidator>();
+        services.AddOptions<EmailSettings>()
+            .BindConfiguration(EmailSettings.SectionName)
+            .ValidateOnStart();
+
+        if (configuration.GetSection(EmailSettings.SectionName).Get<EmailSettings>() is { IsConfigured: true })
+        {
+            services.AddSingleton<IEmailSender>(serviceProvider => new SmtpEmailSender(
+                serviceProvider.GetRequiredService<IOptions<EmailSettings>>(),
+                () => new SmtpClient()));
+        }
+        else
+        {
+            services.AddSingleton<IEmailSender, LoggingEmailSender>();
+        }
 
         // Roles of new users are assigned in the background (spec 5.8).
         services.AddSingleton<RoleAssignmentSignal>();

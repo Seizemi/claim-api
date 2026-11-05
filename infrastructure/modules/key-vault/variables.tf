@@ -71,6 +71,20 @@ variable "keys" {
   default = {}
 }
 
+# Names apart from values: Terraform can't loop over a sensitive value.
+variable "secret_names" {
+  description = "Names of the secrets to create, each with a value in var.secret_values."
+  type        = set(string)
+  default     = []
+}
+
+variable "secret_values" {
+  description = "Values of the secrets, by name."
+  type        = map(string)
+  default     = {}
+  sensitive   = true
+}
+
 variable "tags" {
   type    = map(string)
   default = {}

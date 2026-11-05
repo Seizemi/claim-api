@@ -27,6 +27,11 @@ output "certificates" {
   }
 }
 
+output "secret_uris" {
+  description = "Versionless data plane URIs of the secrets, by name (what Key Vault references use)."
+  value       = { for name, secret in azurerm_key_vault_secret.this : name => secret.versionless_id }
+}
+
 output "keys" {
   description = "By the keys of var.keys: versionless_id (data plane URI, what apps use) and resource_versionless_id (role assignment scope)."
   value = {

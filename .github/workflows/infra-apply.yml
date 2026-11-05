@@ -48,6 +48,7 @@ jobs:
         working-directory: infrastructure/azure/environment
         env:
           TF_VAR_entra: ${{ secrets.ENTRA_STAGING }}
+          TF_VAR_email: ${{ secrets.EMAIL_STAGING || 'null' }}
           TF_VAR_deployer_principal_name: id-claim-terraform-frc
         run: |
           terraform init

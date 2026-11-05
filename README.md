@@ -285,6 +285,35 @@ Don't write the actual values in this README or in any committed file. Dev value
 
 A Supervisor can't be created from the application. Create the user in the Entra admin center (*Users > New user > Create new external user*, sign-in method Email), then assign the `Supervisor` role in *Enterprise applications > partner-portal-web > Users and groups*. Do this in each tenant.
 
+## Welcome email
+
+Once a new user's role is assigned, the role assignment worker sends them a welcome email, in French, with the application's link and how to set a password (*Mot de passe oublié ?* on the sign-in page). It contains no password. A failed email is logged and not retried: the user is still created. Any SMTP server can send it, so changing provider only changes the settings:
+
+| Setting | Default | |
+|---|---|---|
+| `Email:Host` | | **Empty: nothing is sent**, the email is only written to the log (masked recipient). |
+| `Email:Port` | `587` | Submission port with STARTTLS. Azure blocks port 25, and 465 (implicit TLS) isn't supported. |
+| `Email:Username`, `Email:Password` | | Set together, or both empty if the server takes no sign-in. |
+| `Email:RequireTls` | `true` | `false` only for a local server: refused at startup with a password. |
+| `Email:SenderAddress` | | Required when `Email:Host` is set. |
+| `Email:SenderName` | `Claim` | |
+
+**Locally:** emails go to [Mailpit](https://github.com/axllent/mailpit), which catches them instead of delivering them: read them at http://localhost:8025. `docker compose up` is already set up for it. With `dotnet run`, start only Mailpit (`docker compose up mailpit`) and, from `ModularMonolith`:
+
+```powershell
+dotnet user-secrets set "Email:Host" "localhost"
+dotnet user-secrets set "Email:Port" "1025"
+dotnet user-secrets set "Email:RequireTls" "false"
+dotnet user-secrets set "Email:SenderAddress" "no-reply@claim.local"
+```
+
+**In Azure** (not done yet: staging only logs the email, because this needs a domain):
+
+1. Get a domain and an account with a transactional email provider offering SMTP.
+2. Add the provider's SPF, DKIM and DMARC records to the domain's DNS, so that emails are accepted and don't land in spam.
+3. Set the `EMAIL_STAGING` secret of the GitHub environment `infrastructure` ([infrastructure/README.md](infrastructure/README.md#from-github-actions)).
+4. Run `infra-apply`, create a test user and check the email arrives.
+
 ## CI and deployment to staging (`ci`, `cd`)
 
 Two workflows in `.github/workflows/`:

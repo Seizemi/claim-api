@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 namespace Modules.Users.Features.Email;
 
 /// <summary>
-/// Writes the welcome email to the log instead of sending it, until an email provider is chosen (spec D2).
+/// Writes the welcome email to the log instead of sending it, when no SMTP server is configured (spec D2).
 /// The recipient is masked: full email addresses are never logged.
 /// </summary>
 internal sealed partial class LoggingEmailSender(ILogger<LoggingEmailSender> logger) : IEmailSender

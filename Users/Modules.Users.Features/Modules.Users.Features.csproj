@@ -15,6 +15,7 @@
     <PackageReference Include="ErrorOr" Version="2.0.1" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <PackageReference Include="MailKit" Version="4.18.2" />
     <PackageReference Include="Microsoft.Identity.Web" Version="4.16.0" />
     <!-- Patched transitive dependency of Microsoft.Identity.Web (CVE-2026-84008, CVE-2026-70162); remove once Identity.Web depends on >= 10.0.13. -->
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />

@@ -172,6 +172,7 @@ It has no Entra (directory) right: the workflows pass its name in `TF_VAR_deploy
 3. *Environment variables*, from step 1: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `TFSTATE_RESOURCE_GROUP`, `TFSTATE_STORAGE_ACCOUNT`. Variables, not secrets: they're identifiers, useless without the federated sign-in (they would be masked as `***` in every log otherwise).
 4. *Environment secrets*:
    - `ENTRA_STAGING`: the value of `entra` from `tfvars/staging.entra.tfvars`, the braces included (`{ authority = "...", tenant_id = "...", ... }`, on one or several lines), **plus** `terraform_client_id` ([External ID tenant](#external-id-tenant)). It reaches Terraform as `TF_VAR_entra`. A secret, not a variable: the repository and its Actions logs are public.
+   - `EMAIL_STAGING` (optional): the SMTP server sending the emails, reaching Terraform as `TF_VAR_email`: `{ host = "...", username = "...", password = "...", sender_address = "..." }`, plus `port` (default 587) and `sender_name` (default `Claim`) if needed. Without it the app only writes its emails to the log. The password goes into the vault as the secret `smtp-password` and the web app reads it through a Key Vault reference; like the tenant values, it is in clear text in the state.
    - `TERRAFORM_GITHUB_TOKEN`: a **fine-grained** token on `Seizemi/claim-api` with *Administration*, *Environments* and *Variables* read and write (the one `github` uses locally). Renew it before it expires.
 
 A `workflow_dispatch` workflow only shows up in *Actions* once its file is on the default branch.
