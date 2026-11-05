@@ -14,6 +14,9 @@ public sealed class GetClaimsBySeasonRequestValidatorTests
     [InlineData("not-a-season")]
     [InlineData("ete20255")]
     [InlineData("hiver2025-2028")]
+    [InlineData("ete0000")]
+    [InlineData("hiver0000-0001")]
+    [InlineData("ete٢٠٢٥")]
     [InlineData("")]
     public void Validate_WithInvalidSeasonValue_HasValidationErrorForSeasonValue(string seasonValue)
     {

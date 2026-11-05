@@ -8,6 +8,15 @@ internal sealed class ClaimRequestValidator : AbstractValidator<ClaimRequest>
 {
     public ClaimRequestValidator()
     {
+        RuleFor(x => x.State)
+            .Cascade(CascadeMode.Stop)
+            .NotNull()
+            .WithErrorCode(ClaimErrorCodes.ClaimStateCannotBeNull)
+            .WithMessage(ClaimErrorMessages.ClaimStateCannotBeNull)
+            .IsInEnum()
+            .WithErrorCode(ClaimErrorCodes.ClaimStateIsInvalid)
+            .WithMessage(ClaimErrorMessages.ClaimStateIsInvalid);
+
         RuleFor(x => x.ReasonId)
             .NotEmpty()
             .WithErrorCode(ClaimErrorCodes.ClaimReasonIdCannotBeEmpty)
@@ -26,8 +35,11 @@ internal sealed class ClaimRequestValidator : AbstractValidator<ClaimRequest>
             .SetValidator(new BookingRequestValidator());
 
         RuleFor(x => x.ClaimDate)
-            .SetValidator(new ClaimDateRequestValidator())
-            .When(x => x.ClaimDate is not null);
+            .Cascade(CascadeMode.Stop)
+            .NotNull()
+            .WithErrorCode(ClaimErrorCodes.ClaimDateCannotBeNull)
+            .WithMessage(ClaimErrorMessages.ClaimDateCannotBeNull)
+            .SetValidator(new ClaimDateRequestValidator());
 
         RuleFor(x => x.Compensation)
             .Cascade(CascadeMode.Stop)

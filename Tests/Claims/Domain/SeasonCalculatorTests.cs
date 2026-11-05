@@ -52,6 +52,10 @@ public sealed class SeasonCalculatorTests
     [InlineData("eteabcd")]
     [InlineData("hiver2025-2028")]
     [InlineData("hiver2025_2026")]
+    [InlineData("ete0000")]
+    [InlineData("hiver0000-0001")]
+    [InlineData("ete٢٠٢٥")]
+    [InlineData("hiver٢٠٢٥-٢٠٢٦")]
     [InlineData("")]
     public void TryResolveDateRange_WithInvalidSeasonValue_ReturnsFalse(string seasonValue)
     {

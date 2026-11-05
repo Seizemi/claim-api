@@ -7,7 +7,7 @@ internal static class UpdateClaimMappingExtensions
 {
     internal static void UpdateFrom(this Claim claim, ClaimRequest request)
     {
-        claim.State = request.State;
+        claim.State = request.State!.Value;
         claim.FollowedById = request.FollowedById;
         claim.ReasonId = request.ReasonId;
         claim.ClaimSummary = request.ClaimSummary;

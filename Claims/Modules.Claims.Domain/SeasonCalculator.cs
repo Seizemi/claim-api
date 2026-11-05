@@ -29,6 +29,12 @@ public static partial class SeasonCalculator
         if (summerMatch.Success)
         {
             var year = int.Parse(summerMatch.Groups["year"].Value);
+            // Year 0 passes the regex, but DateOnly starts at year 1.
+            if (year == 0)
+            {
+                return false;
+            }
+
             startDate = new DateOnly(year, 5, 1);
             endDate = new DateOnly(year, 10, 31);
             return true;
@@ -39,7 +45,8 @@ public static partial class SeasonCalculator
         {
             var startYear = int.Parse(winterMatch.Groups["start"].Value);
             var endYear = int.Parse(winterMatch.Groups["end"].Value);
-            if (endYear != startYear + 1)
+            // Year 0 passes the regex, but DateOnly starts at year 1.
+            if (startYear == 0 || endYear != startYear + 1)
             {
                 return false;
             }
@@ -52,9 +59,10 @@ public static partial class SeasonCalculator
         return false;
     }
 
-    [GeneratedRegex(@"^ete(?<year>\d{4})$")]
+    // [0-9] and not \d, which also matches digits of other scripts that int.Parse refuses.
+    [GeneratedRegex(@"^ete(?<year>[0-9]{4})$")]
     private static partial Regex SummerPattern();
 
-    [GeneratedRegex(@"^hiver(?<start>\d{4})-(?<end>\d{4})$")]
+    [GeneratedRegex(@"^hiver(?<start>[0-9]{4})-(?<end>[0-9]{4})$")]
     private static partial Regex WinterPattern();
 }

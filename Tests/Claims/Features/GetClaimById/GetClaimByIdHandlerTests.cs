@@ -96,6 +96,34 @@ public sealed class GetClaimByIdHandlerTests
         Assert.NotNull(result.Value.LockedAt);
     }
 
+    [Theory]
+    [InlineData(-1, true)]
+    [InlineData(1, false)]
+    public async Task HandleAsync_AroundLockExpiry_ReturnsExpectedIsLocked(int secondsFromExpiry, bool expectedIsLocked)
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        await using var context = ClaimsDbContextFactory.Create();
+        var claim = ClaimTestDataFactory.CreateClaim(
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            lockedByUserId: Guid.CreateVersion7(),
+            lockedByUserName: "Alice",
+            lockedAt: timeProvider.GetUtcNow());
+        context.Claims.Add(claim);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        timeProvider.Advance(TimeSpan.FromMinutes(15) + TimeSpan.FromSeconds(secondsFromExpiry));
+
+        var handler = new GetClaimByIdHandler(context, timeProvider);
+
+        // Act
+        var result = await handler.HandleAsync(claim.Id, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.False(result.IsError);
+        Assert.Equal(expectedIsLocked, result.Value.IsLocked);
+    }
+
     [Fact]
     public async Task HandleAsync_ClaimLockExpired_ReturnsIsLockedFalse()
     {

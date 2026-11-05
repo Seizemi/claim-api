@@ -11,6 +11,7 @@ internal static class RouteConsts
     internal const string ClaimsBySeasonFormat = "/api/v1.0/Claim/by-season/{0}";
     internal const string ClaimLockFormat = "/api/v1.0/Claim/claim-details/{0}/lock";
     internal const string ClaimUnlockFormat = "/api/v1.0/Claim/claim-details/{0}/unlock";
+    internal const string Lookups = "/api/v1.0/Lookups";
 
     internal static string ClaimDetails(Guid claimId) => string.Format(ClaimDetailsFormat, claimId);
     internal static string ClaimsByState(ClaimState claimState) => string.Format(ClaimsByStateFormat, claimState);
