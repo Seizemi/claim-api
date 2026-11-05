@@ -74,3 +74,17 @@ variable "entra" {
   # file.
   sensitive = true
 }
+
+variable "email" {
+  description = "SMTP server sending the emails (ClaimApi README, 'Welcome email'). Null: the app only writes them to the log."
+  type = object({
+    host           = string
+    port           = optional(number, 587)
+    username       = string
+    password       = string
+    sender_address = string
+    sender_name    = optional(string, "Claim")
+  })
+  default   = null
+  sensitive = true
+}

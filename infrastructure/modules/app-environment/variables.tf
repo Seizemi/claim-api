@@ -111,6 +111,19 @@ variable "entra" {
   })
 }
 
+variable "email" {
+  description = "SMTP server sending the emails. Null: the app only writes them to the log."
+  type = object({
+    host           = string
+    port           = optional(number, 587)
+    username       = string
+    password       = string
+    sender_address = string
+    sender_name    = optional(string, "Claim")
+  })
+  default = null
+}
+
 # --- GitHub Actions ---
 
 variable "github_repository" {

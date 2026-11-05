@@ -15,6 +15,13 @@ services:
       timeout: 5s
       retries: 5
 
+  # Catches the emails instead of delivering them: read them at http://localhost:8025.
+  mailpit:
+    image: axllent/mailpit:v1.33.0
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
   claimapi:
     # https://localhost:7001: the same URL, and the same registered redirect URI, as dotnet run.
     # HTTPS is required: the __Host- session cookie is only accepted over a secure connection.
@@ -32,6 +39,10 @@ services:
       ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=claimapi;Username=postgres;Password=postgres
       # Keys that encrypt the session cookie, kept in a volume so restarting the container doesn't sign users out.
       DataProtection__KeysDirectory: /keys
+      Email__Host: mailpit
+      Email__Port: "1025"
+      Email__RequireTls: "false"
+      Email__SenderAddress: no-reply@claim.local
     volumes:
       - ~/.aspnet/https:/https:ro
       - dataprotection-keys:/keys

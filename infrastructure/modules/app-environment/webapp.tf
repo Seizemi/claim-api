@@ -17,6 +17,20 @@ locals {
   public_url   = "https://${local.web_app_name}.azurewebsites.net"
 }
 
+# Without an SMTP server the app only writes its emails to the log. Whether one is set isn't a secret, its values are.
+locals {
+  email_enabled = nonsensitive(var.email != null)
+
+  email_app_settings = local.email_enabled ? tomap({
+    Email__Host          = var.email.host
+    Email__Port          = tostring(var.email.port)
+    Email__Username      = var.email.username
+    Email__Password      = "@Microsoft.KeyVault(SecretUri=${module.key_vault.secret_uris["smtp-password"]})"
+    Email__SenderAddress = var.email.sender_address
+    Email__SenderName    = var.email.sender_name
+  }) : tomap({})
+}
+
 module "web_app" {
   source = "../linux-web-app"
 
@@ -30,7 +44,7 @@ module "web_app" {
   docker_image_name = "${var.image_repository}:latest"
   tags              = local.tags
 
-  app_settings = {
+  app_settings = merge({
     WEBSITES_PORT                       = "8080"
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
     ASPNETCORE_ENVIRONMENT              = "Production"
@@ -65,7 +79,7 @@ module "web_app" {
     DataProtection__KeyVaultKey = module.key_vault.keys["dataprotection"].versionless_id
 
     APPLICATIONINSIGHTS_CONNECTION_STRING = module.application_insights.connection_string
-  }
+  }, local.email_app_settings)
 }
 
 # --- What the web app's managed identity may do ---

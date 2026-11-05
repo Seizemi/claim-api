@@ -57,6 +57,7 @@ module "environment" {
   key_vault_soft_delete_days = var.key_vault_soft_delete_days
 
   entra = var.entra
+  email = var.email
 
   github_repository  = var.github_repository
   github_environment = local.environment

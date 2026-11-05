@@ -1,5 +1,5 @@
 # RBAC vault with certificates and keys generated inside it: private keys never leave it and never reach the
-# Terraform state.
+# Terraform state. Secrets are the exception: their values come from outside the vault and are in the state.
 
 terraform {
   required_providers {
@@ -84,6 +84,16 @@ resource "azurerm_key_vault_key" "this" {
   key_type     = each.value.key_type
   key_size     = each.value.key_size
   key_opts     = each.value.key_opts
+  tags         = var.tags
+
+  depends_on = [time_sleep.rbac_propagation]
+}
+
+resource "azurerm_key_vault_secret" "this" {
+  for_each     = var.secret_names
+  name         = each.value
+  value        = var.secret_values[each.value]
+  key_vault_id = azurerm_key_vault.this.id
   tags         = var.tags
 
   depends_on = [time_sleep.rbac_propagation]

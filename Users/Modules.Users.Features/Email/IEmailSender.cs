@@ -1,6 +1,6 @@
 namespace Modules.Users.Features.Email;
 
-/// <summary>Sends the emails of the Users module. The provider is still to be chosen (spec D2).</summary>
+/// <summary>Sends the emails of the Users module (spec D2).</summary>
 internal interface IEmailSender
 {
     Task SendWelcomeAsync(WelcomeEmail email, CancellationToken cancellationToken);

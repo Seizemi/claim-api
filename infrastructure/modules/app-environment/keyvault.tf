@@ -33,4 +33,8 @@ module "key_vault" {
       key_opts = ["wrapKey", "unwrapKey"]
     }
   }
+
+  # The SMTP password, read by the web app through a Key Vault reference (webapp.tf).
+  secret_names  = local.email_enabled ? ["smtp-password"] : []
+  secret_values = local.email_enabled ? tomap({ smtp-password = var.email.password }) : tomap({})
 }
