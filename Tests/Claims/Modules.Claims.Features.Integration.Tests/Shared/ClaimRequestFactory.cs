@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using AutoFixture;
 using Modules.Claims.Domain.Enums;
 using Modules.Claims.Features.Features.Shared.Requests;
@@ -78,6 +80,19 @@ internal static class ClaimRequestFactory
 
     internal static ClaimRequest WithNullSupplier(ClaimRequest request) =>
         request with { Booking = request.Booking with { Supplier = null! } };
+
+    internal static ClaimRequest WithNullClaimDate(ClaimRequest request) =>
+        request with { ClaimDate = null! };
+
+    internal static ClaimRequest WithStateOutsideTheEnum(ClaimRequest request) =>
+        request with { State = (ClaimState)99 };
+
+    internal static JsonObject WithoutState(ClaimRequest request)
+    {
+        var body = JsonSerializer.SerializeToNode(request, TestJsonSerializerOptions.Default)!.AsObject();
+        body.Remove("state");
+        return body;
+    }
 
     internal static ClaimRequest WithDepartureBeforeArrival(ClaimRequest request) =>
         request with

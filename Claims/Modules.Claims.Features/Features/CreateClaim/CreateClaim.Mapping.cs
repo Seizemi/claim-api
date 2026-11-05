@@ -11,7 +11,7 @@ internal static class CreateClaimMappingExtensions
         return new()
         {
             Id = id,
-            State = request.State,
+            State = request.State!.Value,
             FollowedById = request.FollowedById,
             ReasonId = request.ReasonId,
             ClaimSummary = request.ClaimSummary,

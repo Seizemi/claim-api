@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ModularMonolith.Testing;
 using Modules.Claims.Domain.Enums;
 using Modules.Claims.Features.Features.Shared.Responses;
 using Modules.Claims.Features.Integration.Tests.Infrastructure;
@@ -240,6 +241,82 @@ public sealed class UpdateClaimTests(IntegrationTestWebAppFactory factory) : Int
         var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
         Assert.NotNull(problem);
         Assert.True(problem!.Errors.ContainsKey("Claim.CompensationReasonIdDoesNotExist"));
+    }
+
+    [Fact]
+    public async Task UpdateClaim_NullClaimDate_Returns400ValidationProblem()
+    {
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
+        var request = ClaimRequestFactory.WithNullClaimDate(ClaimRequestFactory.CreateValid());
+
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("ClaimDate"));
+    }
+
+    [Fact]
+    public async Task UpdateClaim_MissingState_Returns400AndKeepsTheState()
+    {
+        var original = ClaimRequestFactory.CreateValid(state: ClaimState.Terminate);
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client, original);
+        var body = ClaimRequestFactory.WithoutState(original);
+
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), body, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("State"));
+
+        var dbClaim = await DbContext.Claims.SingleAsync(c => c.Id == claimId, TestContext.Current.CancellationToken);
+        Assert.Equal(ClaimState.Terminate, dbClaim.State);
+    }
+
+    [Fact]
+    public async Task UpdateClaim_StateOutsideTheEnum_Returns400ValidationProblem()
+    {
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
+        var request = ClaimRequestFactory.WithStateOutsideTheEnum(ClaimRequestFactory.CreateValid());
+
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("State"));
+    }
+
+    [Fact]
+    public async Task UpdateClaim_LockedByAnotherUser_Returns409AndKeepsTheClaim()
+    {
+        var original = ClaimRequestFactory.CreateValid();
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client, original);
+        await Client.PostAsync(RouteConsts.ClaimLock(claimId), content: null, TestContext.Current.CancellationToken);
+        var updated = original with { ClaimSummary = "Updated by Bob" };
+
+        var response = await CreateClient(TestUser.Bob).PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), updated, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        var dbClaim = await DbContext.Claims.SingleAsync(c => c.Id == claimId, TestContext.Current.CancellationToken);
+        Assert.Equal(original.ClaimSummary, dbClaim.ClaimSummary);
+    }
+
+    [Fact]
+    public async Task UpdateClaim_LockedByTheSameUser_Returns200AndPersistsChanges()
+    {
+        var original = ClaimRequestFactory.CreateValid();
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client, original);
+        await Client.PostAsync(RouteConsts.ClaimLock(claimId), content: null, TestContext.Current.CancellationToken);
+        var updated = original with { ClaimSummary = "Updated by Alice" };
+
+        var response = await Client.PutAsJsonAsync(RouteConsts.ClaimDetails(claimId), updated, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var dbClaim = await DbContext.Claims.SingleAsync(c => c.Id == claimId, TestContext.Current.CancellationToken);
+        Assert.Equal("Updated by Alice", dbClaim.ClaimSummary);
     }
 
     [Fact]

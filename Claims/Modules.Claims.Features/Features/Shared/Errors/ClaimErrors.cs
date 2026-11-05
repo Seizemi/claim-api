@@ -4,6 +4,9 @@ internal static class ClaimErrorCodes
 {
     internal const string ClaimCannotBeNull = "Claim.CannotBeNull";
     internal const string ClaimIdCannotBeEmpty = "Claim.IdCannotBeEmpty";
+    internal const string ClaimStateCannotBeNull = "Claim.StateCannotBeNull";
+    internal const string ClaimStateIsInvalid = "Claim.StateIsInvalid";
+    internal const string ClaimDateCannotBeNull = "Claim.ClaimDateCannotBeNull";
     internal const string ClaimBookingNumberCannotBeNullOrEmpty = "Claim.BookingNumberCannotBeNullOrEmpty";
     internal const string ClaimCustomerNameCannotBeNullOrEmpty = "Claim.CustomerNameCannotBeNullOrEmpty";
     internal const string ClaimSupplierIdCannotBeEmpty = "Claim.SupplierIdCannotBeEmpty";
@@ -30,6 +33,9 @@ internal static class ClaimErrorMessages
 {
     internal const string ClaimCannotBeNull = "Claim doesn't exist.";
     internal const string ClaimIdCannotBeEmpty = "Claim id cannot be empty.";
+    internal const string ClaimStateCannotBeNull = "Claim state cannot be null.";
+    internal const string ClaimStateIsInvalid = "Claim state is invalid.";
+    internal const string ClaimDateCannotBeNull = "Claim date cannot be null.";
     internal const string ClaimBookingNumberCannotBeNullOrEmpty = "Booking number cannot be null or empty.";
     internal const string ClaimCustomerNameCannotBeNullOrEmpty = "Customer name cannot be null or empty.";
     internal const string ClaimSupplierIdCannotBeEmpty = "Supplier id cannot be empty.";

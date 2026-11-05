@@ -268,6 +268,45 @@ public sealed class CreateClaimTests(IntegrationTestWebAppFactory factory) : Int
     }
 
     [Fact]
+    public async Task CreateClaim_NullClaimDate_Returns400ValidationProblem()
+    {
+        var request = ClaimRequestFactory.WithNullClaimDate(ClaimRequestFactory.CreateValid());
+
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("ClaimDate"));
+    }
+
+    [Fact]
+    public async Task CreateClaim_MissingState_Returns400ValidationProblem()
+    {
+        var body = ClaimRequestFactory.WithoutState(ClaimRequestFactory.CreateValid());
+
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, body, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("State"));
+    }
+
+    [Fact]
+    public async Task CreateClaim_StateOutsideTheEnum_Returns400ValidationProblem()
+    {
+        var request = ClaimRequestFactory.WithStateOutsideTheEnum(ClaimRequestFactory.CreateValid());
+
+        var response = await Client.PostAsJsonAsync(RouteConsts.NewClaim, request, TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.True(problem!.Errors.ContainsKey("State"));
+    }
+
+    [Fact]
     public async Task CreateClaim_MalformedJsonBody_Returns400BadRequest()
     {
         using var content = new StringContent("{ not valid json", Encoding.UTF8, "application/json");

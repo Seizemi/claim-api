@@ -65,10 +65,14 @@ public sealed class GetClaimsBySeasonTests(IntegrationTestWebAppFactory factory)
         Assert.Empty(items!);
     }
 
-    [Fact]
-    public async Task GetClaimsBySeason_InvalidSeasonSegment_Returns400ValidationProblem()
+    [Theory]
+    [InlineData("not-a-season")]
+    [InlineData("ete0000")]
+    [InlineData("hiver0000-0001")]
+    [InlineData("ete٢٠٢٥")]
+    public async Task GetClaimsBySeason_InvalidSeasonSegment_Returns400ValidationProblem(string seasonValue)
     {
-        var response = await Client.GetAsync(RouteConsts.ClaimsBySeason("not-a-season"), TestContext.Current.CancellationToken);
+        var response = await Client.GetAsync(RouteConsts.ClaimsBySeason(seasonValue), TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);

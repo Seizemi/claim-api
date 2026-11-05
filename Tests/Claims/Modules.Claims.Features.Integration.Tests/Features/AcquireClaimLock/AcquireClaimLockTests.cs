@@ -68,6 +68,42 @@ public sealed class AcquireClaimLockTests(IntegrationTestWebAppFactory factory) 
         Assert.Equal(TestUser.Bob.Name, body.Claim.LockedByUserName);
     }
 
+    [Theory]
+    [InlineData(14, false)]
+    [InlineData(16, true)]
+    public async Task AcquireClaimLock_AroundLockExpiry_ReturnsExpectedAcquired(int lockAgeMinutes, bool expectedAcquired)
+    {
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
+        var claim = await DbContext.Claims.SingleAsync(c => c.Id == claimId, TestContext.Current.CancellationToken);
+        claim.LockedByUserId = TestUser.Alice.Id;
+        claim.LockedByUserName = TestUser.Alice.Name;
+        claim.LockedAt = DateTimeOffset.UtcNow.AddMinutes(-lockAgeMinutes);
+        await DbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var response = await CreateClient(TestUser.Bob).PostAsync(RouteConsts.ClaimLock(claimId), content: null, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<AcquireClaimLockResponse>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(body);
+        Assert.Equal(expectedAcquired, body!.Acquired);
+    }
+
+    [Fact]
+    public async Task AcquireClaimLock_AlreadyHeldBySameUser_Returns200NotAcquired()
+    {
+        var claimId = await ClaimApiSeedHelper.SeedClaimAsync(Client);
+        await Client.PostAsync(RouteConsts.ClaimLock(claimId), content: null, TestContext.Current.CancellationToken);
+
+        var response = await Client.PostAsync(RouteConsts.ClaimLock(claimId), content: null, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<AcquireClaimLockResponse>(TestJsonSerializerOptions.Default, TestContext.Current.CancellationToken);
+        Assert.NotNull(body);
+        Assert.False(body!.Acquired);
+        Assert.Equal(TestUser.Alice.Id, body.LockedByUserId);
+        Assert.Null(body.Claim);
+    }
+
     [Fact]
     public async Task AcquireClaimLock_ConcurrentCallers_OnlyOneWins()
     {

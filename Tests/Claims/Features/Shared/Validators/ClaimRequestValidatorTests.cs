@@ -1,4 +1,5 @@
 using FluentValidation.TestHelper;
+using Modules.Claims.Domain.Enums;
 using Modules.Claims.Features.Features.Shared.Errors;
 using Modules.Claims.Features.Features.Shared.Validators;
 using Modules.Claims.Features.Tests.Shared;
@@ -9,6 +10,51 @@ namespace Modules.Claims.Features.Tests.Features.Shared.Validators;
 public sealed class ClaimRequestValidatorTests
 {
     private readonly ClaimRequestValidator _validator = new();
+
+    [Fact]
+    public void Validate_WithNullState_HasValidationErrorForState()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest() with { State = null };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.State)
+            .WithErrorCode(ClaimErrorCodes.ClaimStateCannotBeNull);
+    }
+
+    [Fact]
+    public void Validate_WithStateOutsideTheEnum_HasValidationErrorForState()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest() with { State = (ClaimState)99 };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.State)
+            .WithErrorCode(ClaimErrorCodes.ClaimStateIsInvalid);
+    }
+
+    [Theory]
+    [InlineData(ClaimState.AwaitingSupplier)]
+    [InlineData(ClaimState.AwaitingClient)]
+    [InlineData(ClaimState.Terminate)]
+    [InlineData(ClaimState.ClosedWithoutResponse)]
+    public void Validate_WithEachState_HasNoValidationErrorForState(ClaimState state)
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest() with { State = state };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldNotHaveValidationErrorFor(x => x.State);
+    }
 
     [Fact]
     public void Validate_WithNullBooking_HasValidationErrorForBooking()
@@ -251,7 +297,36 @@ public sealed class ClaimRequestValidatorTests
     }
 
     [Fact]
-    public void Validate_WithNullClaimDate_HasNoValidationErrorForClaimDate()
+    public void Validate_WithDepartureDateEqualToArrivalDate_HasNoValidationErrors()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest();
+        var date = DateOnly.FromDateTime(DateTime.UtcNow);
+        request = request with { ClaimDate = request.ClaimDate with { DateOfDeparture = date, DateOfArrival = date } };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void Validate_WithNullDateOfDeparture_HasNoValidationErrors()
+    {
+        // Arrange
+        var request = ClaimTestDataFactory.CreateClaimRequest();
+        request = request with { ClaimDate = request.ClaimDate with { DateOfDeparture = null } };
+
+        // Act
+        var result = _validator.TestValidate(request);
+
+        // Assert
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void Validate_WithNullClaimDate_HasValidationErrorForClaimDate()
     {
         // Arrange
         var request = ClaimTestDataFactory.CreateClaimRequest() with { ClaimDate = null! };
@@ -260,7 +335,8 @@ public sealed class ClaimRequestValidatorTests
         var result = _validator.TestValidate(request);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.ClaimDate);
+        result.ShouldHaveValidationErrorFor(x => x.ClaimDate)
+            .WithErrorCode(ClaimErrorCodes.ClaimDateCannotBeNull);
     }
 
     [Fact]

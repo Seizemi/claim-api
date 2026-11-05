@@ -28,7 +28,7 @@ public sealed class GetClaimsBySeasonEndpoint : IEndpointModule
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
-
+        
         var response = await handler.HandleAsync(request, cancellationToken);
         if (response.IsError)
         {
